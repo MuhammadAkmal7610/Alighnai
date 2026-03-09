@@ -1,0 +1,436 @@
+AlignAI  /  ByteStream Strategies Inc.
+Website Development
+Complete Specification  —  Single Developer Reference
+Brian Burke, PhD, MBA, PMP
+ByteStream Strategies Inc.
+March 2026  |  Confidential — For Assigned Developer Only
+HOW TO USE THIS DOCUMENT
+This is the single, complete specification document for the ByteStream Strategies / AlignAI website. It contains every requirement in reading order: brand identity including embedded logo files and colour swatches, visual direction, page-by-page specifications, full-page visual mockups for all seven pages, navigation and footer specs, chatbot widget spec, technical requirements, project timeline, payment schedule, and acceptance criteria. No other documents are required.
+Read this document from start to finish before beginning any work. If anything is unclear, contact the client before building.
+Document Contents
+Section 1  Brand Identity — Colour Palette, Logos, Typography
+Section 2  Visual Direction and Tone
+Section 3  Site Structure Overview
+Section 4  Page-by-Page Specifications (Pages 1–7)
+Section 5  Visual Mockups — All 7 Pages (Full-Page Screenshots)
+Section 6  Navigation, Header, Footer, and Global CTA Strip
+Section 7  Chatbot Widget Specification
+Section 8  Technical Requirements
+Section 9  Project Timeline and Milestones
+Section 10  Payment Schedule and Sign-off Gates
+Section 11  Weekly Reporting Requirements
+Section 12  Acceptance Criteria
+Section 1 — Brand Identity
+1.1  Brand Hierarchy
+The website represents ByteStream Strategies Inc. — the consulting entity. AlignAI is the proprietary governance framework delivered through ByteStream. The site uses 'ByteStream Strategies' in the header, footer, and About page. 'AlignAI' is the featured product throughout the site body.
+BRAND HIERARCHY RULE
+Header / Navigation / Footer:  ByteStream Strategies
+Hero sections, Framework and Services pages:  AlignAI featured
+Client contact email:  bburke@bytestream.ca
+1.2  Logo Files
+Two logo versions are embedded below. Both PNG files are also provided as separate attachments. Use the correct version based on background colour — this is mandatory, not optional.
+Version A — Transparent / Dark Background
+Use on Navy #0C1E39 or Deep Blue #274185
+Version B — White Background
+Use on Off-White #F4F6F9 or White #FFFFFF sections
+Logo Usage Rules
+Version A on dark backgrounds (Navy, Deep Blue, near-black footer). Version B on light backgrounds.
+Never stretch, recolour, rotate, apply opacity effects, or add drop shadows to either version
+Clear space: minimum equal to the height of the 'A' letterform on all four sides
+Minimum display size: 140px wide. Never display at smaller scale.
+The four-pointed sparkle element at bottom-right of the logo is part of the brand — do not remove or obscure it
+The wordmark gradient in the logo mark is a logo asset — never replicate gradients in the UI
+1.3  Colour Palette
+All eight colours are extracted directly from the AlignAI logo. Use these exact hex values throughout the site. Do not introduce any additional colours without written client approval.
+Swatch
+Name
+Role and Usage
+#0C1E39
+Navy — Primary
+Hero backgrounds, page headers, navigation bar, footer. The dominant dark anchor of the site.
+#274185
+Deep Blue — Secondary
+Section headers, icon backgrounds, active nav states, CTA strip background, chatbot widget header.
+#407BB7
+Mid Blue — Tertiary
+CTA buttons, text links, interactive elements, hover states, section divider lines.
+#63BCE7
+Cyan — Accent
+Highlights, icon accents, pill labels, badge colours, hover glow on dark sections. Use sparingly.
+#84899A
+Slate — Neutral Dark
+Body text on light sections, captions, secondary labels, sparkle decorative element.
+#C8CDD8
+Light Slate — Neutral Light
+Dividers, borders, card outlines, disabled state text.
+#F4F6F9
+Off-White — Background
+Alternating section backgrounds. Never use pure white for full-width section fills.
+#FFFFFF
+White
+Card backgrounds, modal backgrounds, text on all dark sections.
+CRITICAL — NO GRADIENTS IN THE UI
+The AlignAI logo mark contains a gradient — that is a logo asset only. The website UI must use flat matte colours exclusively throughout. No gradient backgrounds, gradient buttons, gradient text, or gradient overlays anywhere in the site. This is a hard requirement and will be checked at every milestone acceptance review.
+1.4  Typography
+The site uses two Google Fonts: Sora for display headings and Inter for body copy. Both must be preloaded in <head> for performance. Do not substitute alternative fonts.
+Role
+Font
+Specification
+Display headings (H1)
+Sora Bold 700
+White on dark sections, Navy #0C1E39 on light. Letter-spacing -0.03em.
+Section headings (H2–H3)
+Sora SemiBold 600
+Deep Blue #274185 on light, White on dark. Never decorative.
+Body copy
+Inter Regular, 16–17px
+Slate #84899A on light, White on dark. Line-height 1.65. Max-width 680px.
+Nav links
+Inter SemiBold 600, 13px
+All-caps, letter-spacing 0.07em, White on Navy.
+CTA buttons
+Inter SemiBold 600, 14px
+White on Mid Blue #407BB7. 4px border-radius. No pill shape.
+Labels and badges
+Inter Medium 500, 12–13px
+Cyan #63BCE7 on Navy for badge labels. Slate on Off-White for secondary labels.
+Section 2 — Visual Direction and Tone
+This site must position AlignAI as an enterprise-grade governance architecture — not a startup product, not a generic AI tool, and not a consulting brochure. Authoritative, structured, and restrained. Reference points: IBM.com, McKinsey Digital, Palantir.
+✓  DO
+✗  DO NOT
+REFERENCE
+Dark navy hero sections with structured layout
+Gradient backgrounds or colourful hero images
+IBM.com, Palantir.com
+Flat matte colour panels throughout
+Glassmorphism, neumorphism, or card drop shadows
+McKinsey Digital
+12-column grid, clear vertical alignment
+Free-form asymmetric decorative layouts
+Deloitte Insights
+Minimal line icons — consistent stroke weight
+Decorative illustration or startup blob art
+Stripe.com icon style
+White space used intentionally to signal authority
+Dense content packing or visual busyness
+Anthropic.com
+Subtle CSS-based scroll reveals only
+Parallax, animated particles, excessive motion
+Linear.app motion
+Enterprise photography if used: boardrooms, data
+Stock AI imagery: glowing brains, circuit boards
+Avoid photography when in doubt
+Layout Principles
+Full-width dark navy hero on every page. AlignAI logo top left. Navigation top right.
+Content width: max 1200px centered. Generous horizontal padding on all sections.
+Alternating section backgrounds: Navy → Off-White → White → Off-White. No all-white pages.
+Mid Blue horizontal rule between every major section — 1px, full content width.
+CTA buttons: flat Mid Blue #407BB7 fill, white text, 4px border-radius. No pill buttons, no outlined buttons.
+No sidebars. Single-column content flow on all pages.
+Mobile responsive. Breakpoints at 768px (tablet) and 390px (mobile).
+Section 3 — Site Structure Overview
+Seven pages plus a global floating chatbot widget. The table shows every page, its phase assignment, and the milestone at which it must be delivered.
+#
+Page
+Phase / Milestone
+Notes
+1
+Home
+Milestone 1 — Launch
+Full page. See Section 4.1
+2
+The Framework
+Milestone 1 — Launch
+Full page. See Section 4.2
+3
+Services
+Milestone 1 — Launch
+Full page. See Section 4.3
+4
+About
+Milestone 1 — Launch
+Full page. See Section 4.4
+5
+Contact
+Milestone 1 — Launch
+Full page. See Section 4.5
+6
+Insights (Blog)
+Milestone 1 — Launch
+Post listing + single post template. See Section 4.6
+7
+Client Access
+M1 stub / M4 live
+Visual shell at M1, working auth at M4. See Section 4.7
+—
+Chatbot Widget (global)
+M1 stub / M3 live
+Visual stub at M1, Anthropic API live at M3. See Section 7
+Section 4 — Page-by-Page Specifications
+All copy below is directional. Final copy will be confirmed by client before build begins. Do not invent or substitute copy — use [PLACEHOLDER] where final text is pending.
+PAGE 1  Home
+Hero headline:  AI is already influencing decisions in your organization. Most enterprises have no governance over that layer.
+Sub-headline:  ByteStream Strategies helps enterprise leaders build the governance architecture that traditional AI frameworks miss.
+Key message:  Opens with the problem statement. Introduces AlignAI. Four feature blocks on the governance gap. Credential strip in hero. Closes with CTA.
+Primary CTA:  Explore the AlignAI framework →
+Designer notes:  Navy hero with subtle grid texture and 10%-opacity logo mark watermark. Four problem cards on Off-White — flat fill, no shadows. Credential pill strip below hero buttons.
+PAGE 2  The Framework
+Hero headline:  Governance architecture for the layer where AI actually changes enterprise behaviour.
+Sub-headline:  AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions.
+Key message:  Five governance pillars on dark navy using vertical timeline layout. Conceptual model diagram below on Off-White.
+Primary CTA:  See how an assessment works →
+Designer notes:  Pillar timeline: label column right-aligned, connector dots on dividing line. Model diagram: flat boxes in brand colours, vertical flow with connecting arrows. No 3D or decorative effects.
+PAGE 3  Services
+Hero headline:  The AI Decision Visibility Assessment.
+Sub-headline:  A 4–6 week structured engagement covering one business domain.
+Key message:  Two-column layout: left has engagement description, five process steps, and scope tags. Right has five numbered deliverables each with title and description.
+Primary CTA:  Start a conversation →
+Designer notes:  Process steps on left use thin horizontal rules and Mid Blue step numbers. Deliverable items on right use 3px left-border accent in Mid Blue on Off-White background.
+PAGE 4  About
+Hero headline:  Built from doctoral research. Delivered with 30 years of enterprise experience.
+Sub-headline:  Brian Burke, PhD, MBA, PMP — AI Governance Architect and founder of ByteStream Strategies.
+Key message:  Two-column: photo placeholder left (3:4 ratio), bio right with credential badges, three bio paragraphs, LinkedIn and email links.
+Primary CTA:  Connect on LinkedIn →
+Designer notes:  Photo placeholder: Deep Blue #274185 fill with centred [CLIENT PHOTO] label. Credential badges: Navy background, Light Slate border, white text. No testimonials.
+PAGE 5  Contact
+Hero headline:  Start a conversation.
+Sub-headline:  No forms, no demos, no sales calls. A direct conversation about whether there is a fit.
+Key message:  Full-page Navy section only. Email address large and prominent. Short context paragraph above. LinkedIn link below. No form on this page.
+Primary CTA:  bburke@bytestream.ca
+Designer notes:  Intentionally minimal — simplicity signals absence of a sales machine. Email in white, Cyan on hover. Contact page does NOT have a global CTA strip — it is itself the CTA.
+PAGE 6  Insights
+Hero headline:  AI governance thinking. Grounded in research.
+Sub-headline:  Perspectives on the governance gap, regulatory exposure, and what enterprise AI accountability actually requires.
+Key message:  Post listing: 3-column card grid. Cards show title, date, category tag, 2-sentence excerpt, read link. Single post template below for developer reference.
+Primary CTA:  Read → (per post card)
+Designer notes:  Most recent post: Cyan top border. Older posts: Mid Blue top border on hover only. Post listing powered by /data/posts.json. Single post template: max-width 680px, byline row, horizontal rule. No sidebar.
+PAGE 7  Client Access
+Hero headline:  Client & Partner Access
+Sub-headline:  Secure access to your AlignAI workspace, reports, and resources.
+Key message:  Phase 1 (M1): Full-page Navy, centred visual login card — no backend. Phase 4 (M4): Working auth, protected portal with client reports, resource library, and assessment intake.
+Primary CTA:  Sign In → (visual only at M1)
+Designer notes:  Login card: semi-transparent border, 8px radius, Invitation Only badge in Cyan. Standard nav at top. Slim footer with copyright and Return to main site link only. Annotate code clearly for M4 auth integration point.
+Section 5 — Visual Mockups — All 7 Pages
+Full-page visual mockups for all seven pages are shown below, rendered at 1440px desktop width. These mockups are the authoritative visual reference — the built site must match them closely in layout, spacing, colour, and component patterns.
+NOTE ON MOCKUP FIDELITY
+The logo mark in these mockups is approximated using CSS. The actual logo PNG files are embedded in Section 1.2 above. All colours, layout, typography, spacing, and component patterns shown in the mockups are accurate and must be faithfully reproduced in the built site.
+5.1  Page 1 — Home
+5.2  Page 2 — The Framework
+5.3  Page 3 — Services
+5.4  Page 4 — About
+5.5  Page 5 — Contact
+5.6  Page 6 — Insights
+5.7  Page 7 — Client Access
+Section 6 — Navigation, Header, and Footer
+6.1  Navigation Bar
+Fixed top navigation. Navy #0C1E39 background. AlignAI logo left-aligned with clear space.
+Nav links right-aligned: Home | The Framework | Services | About | Insights | Contact
+Active state: 2px Cyan #63BCE7 underline below the active link text.
+Mobile hamburger at 768px. Full-screen overlay, Navy background, links centred and large.
+No dropdown menus. No mega-menu. No sticky animation on scroll.
+6.2  Footer
+Background: #07101E (near-black, slightly lighter than pure black for depth).
+Three-column layout at desktop: Logo + tagline left | Navigation links centre | Contact right.
+Tagline: 'Governance architecture for AI-influenced enterprise decisions.'
+Sparkle element after tagline — Slate colour, 10px. (Matches logo brand element.)
+Copyright line: © 2026 ByteStream Strategies Inc.
+Contact column: bburke@bytestream.ca and LinkedIn link. No other social media icons.
+No cookie banners, third-party chat widgets, or analytics scripts without explicit client approval.
+6.3  Global CTA Strip
+A full-width CTA strip appears immediately above the footer on all pages EXCEPT the Contact page (which is itself the CTA and must not have a duplicate strip below it).
+GLOBAL CTA STRIP SPEC
+Background: Deep Blue #274185  |  Text: White  |  Button: Mid Blue #407BB7 flat fill
+Headline:  "Ready to understand what your AI is actually deciding?"
+Sub-text:  "No platform required. No prior governance work needed. One conversation to establish whether there is a fit."
+Button label:  "Start a conversation →"  |  Button links to Contact page
+Section 7 — Global Floating Chatbot Widget
+7.1  Phase 1 — Visual Stub (Milestone 1)
+Fixed position: bottom-right corner, 28px from bottom and right edges. Present on all 7 pages.
+Trigger: 52px diameter circle, Mid Blue #407BB7, white chat SVG icon. Scale 1.06 on hover (200ms ease).
+Click opens chat panel above the button — ease-in-out slide animation, 200ms.
+Panel: 320px wide, Navy #0C1E39 background, rgba(99,188,231,0.2) border, 8px border-radius.
+Header: Deep Blue #274185, shows AlignAI wordmark + 'Ask about AlignAI' label + 'Beta' badge.
+Opening message: 'Hi — I can answer questions about the AlignAI framework, the AI Decision Visibility Assessment, or enterprise AI governance more broadly. What would you like to know?'
+Input field and send button are visible in Phase 1 but non-functional (no API calls).
+Footer inside panel: 'Powered by AlignAI  ·  Phase 2 — Coming Soon'
+7.2  Phase 2 — Live Widget (Milestone 3)
+API: Anthropic Messages API at /v1/messages. Model: claude-sonnet-4-20250514 or current Sonnet.
+System prompt: AlignAI canonical context document (supplied by client before M3 begins).
+Scope: answers both AlignAI framework questions and broader AI governance questions.
+All API calls routed through Netlify Function or Vercel Edge Function (serverless proxy).
+API key is never in client-side JavaScript or any browser-accessible file — see security note below.
+Conversation history maintained within the current session only. No cross-session persistence.
+Basic rate limiting on the serverless proxy function.
+SECURITY — NON-NEGOTIABLE
+The Anthropic API key must NEVER appear in any client-side code, HTML, JavaScript file, or public repository file. All API calls must route through a serverless proxy that holds the key as an environment variable. Any implementation that exposes the API key in front-end code will fail the M3 acceptance review and must be rebuilt before payment is released.
+Section 8 — Technical Requirements
+8.1  Technology Stack
+Static site — plain HTML/CSS/JS or Astro/Next.js static export. No WordPress, Webflow, or page builders.
+Hosting: Netlify or GitHub Pages. Domain: bytestream.ca.
+Google Fonts: Sora (weights 300–800) and Inter (weights 300–600). Preloaded in <head>.
+Post listing on Page 6 powered by /data/posts.json — no CMS required at launch.
+Chatbot Phase 2: Netlify Function or Vercel Edge Function as API proxy.
+Client area Phase 4: Auth0, Clerk, or Supabase Auth — confirm choice with client before M3 begins.
+8.2  Performance
+Lighthouse Performance score ≥ 90 on all pages, measured at 1440px desktop width.
+All images: WebP format, lazy-loaded, explicit width and height attributes on every element.
+No hero video backgrounds. Critical CSS inlined. Fonts preloaded in <head>.
+8.3  Accessibility
+WCAG 2.1 Level AA minimum compliance. Lighthouse Accessibility score = 100.
+All colour combinations meet 4.5:1 contrast ratio minimum.
+All interactive elements keyboard-navigable. Alt text on all non-decorative images.
+8.4  SEO
+Unique meta title and meta description on every page.
+Open Graph tags on all pages for LinkedIn share previews.
+JSON-LD structured data for Organisation on the Home page.
+robots.txt and sitemap.xml included at launch.
+8.5  Code Handoff
+Source code in private GitHub repository — client invited as collaborator before M2 payment.
+posts.json schema documented in README with step-by-step instructions for adding new posts.
+Netlify / GitHub Pages deployment configuration documented in README.
+All environment variable keys listed in README — values excluded from version control.
+Section 9 — Project Timeline and Milestones
+Project start: Monday March 9, 2026. Target completion: Sunday April 13, 2026. Total duration: 5 weeks and 2 days. Four milestones. Client written sign-off required before each payment is released and before the next milestone begins.
+Milestone
+Dates
+Deliverables
+Payment
+Sign-off Required
+Milestone 1
+First Draft
+Mar 9–22
+(2 weeks)
+• All 7 pages built and navigable
+• Pages 1–6 fully styled per this brief
+• Page 7: visual login stub (no backend)
+• Chatbot widget: visual stub only
+• Responsive at 390px and 1440px
+• Staging URL provided for review
+On sign-off
+Client reviews staging URL. Written approval to bburke@bytestream.ca required before payment and before Milestone 2 begins.
+Milestone 2
+Final + Live
+Mar 23–29
+(1 week)
+• All M1 client revisions applied
+• Lighthouse ≥ 90 on all pages
+• No JavaScript console errors
+• Live at bytestream.ca with SSL
+• Final placeholder text confirmed
+• DNS and SSL fully configured
+On sign-off
+Client reviews live site. Written approval required before payment and before Milestone 3 begins.
+Milestone 3
+Chatbot Live
+Mar 30–Apr 6
+(1 week)
+• Chatbot connected to Anthropic API
+• Serverless proxy deployed and tested
+• AlignAI context loaded as system prompt
+• Rate limiting implemented
+• API key confirmed absent from client-side code
+• Widget tested and functional on all pages
+On sign-off
+Client tests chatbot on live site. Written approval required before payment and before Milestone 4 begins.
+Milestone 4
+Client Area
+Apr 7–13
+(1 week)
+• Working authentication (Auth0/Clerk/Supabase)
+• Protected routes and session management
+• Client portal with resource library
+• Assessment intake form functional
+• Login and logout tested end-to-end
+• Source files and GitHub repo access delivered
+On sign-off
+Client tests protected area. Successful login test + written approval required before final payment.
+PAYMENT GATE — ALL MILESTONES
+Payment for each milestone is released only after the client provides written sign-off to bburke@bytestream.ca confirming deliverables meet this brief. The developer must not begin the next milestone until the previous milestone has been signed off. No exceptions.
+Section 10 — Payment Schedule and Sign-off Gates
+Exact payment amounts are agreed separately on Upwork. The table below defines the payment structure and the conditions that must be met before any payment is released.
+Milestone
+Payment Trigger
+Acceptance Conditions
+Milestone 1
+First Draft
+Written approval to
+bburke@bytestream.ca
+All 7 pages navigable on staging. Pages 1–6 fully styled. Page 7 and chatbot as visual stubs. Responsive at 390px and 1440px. No layout-breaking errors.
+Milestone 2
+Final + Live
+Written approval to
+bburke@bytestream.ca
+All M1 revisions applied. Lighthouse ≥ 90 Performance. No console errors. Live on bytestream.ca with SSL. All colour hex values verified against Section 1.3.
+Milestone 3
+Chatbot Live
+Written approval to
+bburke@bytestream.ca
+Chatbot functional on live site. API key confirmed absent from all client-side code. Rate limiting active. Client has tested widget and it responds correctly.
+Milestone 4
+Client Area
+Written approval to
+bburke@bytestream.ca
+Authentication working. Protected routes enforced. All four content areas accessible post-login. Login/logout tested. GitHub repo access and source files delivered.
+Section 11 — Weekly Progress Reports
+The developer must submit a written progress update every Friday by end of day for the duration of the project. Five reports total. Send to bburke@bytestream.ca.
+11.1  Required Content Per Report
+Work completed since the previous report
+Work planned for the coming week
+Any blockers, questions, or decisions required from the client
+Staging or live URL if a new build is available for review
+Any scope questions or potential changes to the timeline
+11.2  Reporting Schedule
+Report
+Due Date
+Expected Progress at Reporting Time
+Week 1
+Friday Mar 14
+Site structure built, navigation functional. Pages 1–4 in progress. Initial staging URL provided.
+Week 2
+Friday Mar 21
+All 7 pages built and navigable on staging. Full styling complete. Milestone 1 staging URL submitted for client review.
+Week 3
+Friday Mar 28
+M1 revisions complete. Site live at bytestream.ca (Milestone 2). Chatbot serverless function in development.
+Week 4
+Friday Apr 4
+Chatbot connected and tested. Milestone 3 submitted for review. Client area auth approach confirmed with client.
+Week 5
+Friday Apr 11
+Client area built and tested. Milestone 4 submitted for final review. Source file handoff ready.
+Section 12 — Acceptance Criteria
+These are pass/fail requirements applied at every milestone sign-off review. Any failing item must be corrected before payment is released. These are not guidelines.
+12.1  Design Accuracy
+All colour values match hex codes in Section 1.3 exactly — no off-brand approximations or substitutions
+Typography uses Sora (headings) and Inter (body) loaded from Google Fonts — not system font fallbacks
+Logo Version A used on dark sections, Version B on light sections — per Section 1.2
+Spacing, padding, and layout proportions consistent with Section 5 full-page mockups
+No gradients anywhere in the UI — logo gradient is a logo asset, not a UI pattern
+12.2  Technical Quality
+Lighthouse Performance ≥ 90 on all pages at 1440px desktop
+Lighthouse Accessibility = 100
+Zero JavaScript console errors on any page
+All images in WebP format with explicit width and height attributes
+Google Fonts preloaded in <head>. Critical CSS inlined.
+12.3  Responsiveness
+Tested and visually correct at 390px (mobile), 768px (tablet), and 1440px (desktop)
+Navigation collapses to hamburger menu at 768px breakpoint
+No horizontal scroll at any viewport width
+Chatbot widget does not obscure page content on mobile
+12.4  Content
+All placeholder copy marked as [PLACEHOLDER] — zero lorem ipsum text anywhere in the site
+About page photo area marked [CLIENT PHOTO — TO BE SUPPLIED]
+Contact page shows bburke@bytestream.ca as the only contact method — no form
+Footer copyright reads: © 2026 ByteStream Strategies Inc.
+12.5  Security (Milestones 3 and 4)
+Anthropic API key confirmed absent from all client-side JavaScript and all public repository files
+Serverless proxy includes functional rate limiting
+Client area requires successful authentication to access any protected content
+No sensitive credentials of any kind in version control
+12.6  Handoff (Milestone 4)
+Source code delivered via private GitHub repository with client added as collaborator
+posts.json schema and new-post instructions documented in README
+Netlify or GitHub Pages deployment configuration documented in README
+All environment variable key names listed in README — actual values excluded
+Figma design file shared with client if a Figma file was produced during the project
+</w:pBdr><w:spacing w:before="200" w:after="60"/><w:jc w:val="center"/></w:pPr><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:rFonts w:ascii="Arial" w:eastAsia="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:color w:val="84899A"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>AlignAI Website Development Brief  |  ByteStream Strategies Inc.  |  March 2026  |  Confidential — For Assigned Developer Only

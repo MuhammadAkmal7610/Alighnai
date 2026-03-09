@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-body text-navy bg-white text-base leading-body;
+  }
+
+  h1 {
+    @apply font-heading font-bold tracking-heading;
+  }
+
+  h2,
+  h3 {
+    @apply font-heading font-semibold;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-medium;
+  }
+
+  ::selection {
+    background-color: #63bce740;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-cyan;
+  }
+}
+
+@layer components {
+  .section-divider {
+    @apply h-px w-full bg-mid-blue;
+  }
+
+  .container-main {
+    @apply mx-auto w-full max-w-container px-6;
+  }
+
+  .hero-panel {
+    background-color: #0c1e39;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent 56px,
+        rgba(99, 188, 231, 0.045) 56px,
+        rgba(99, 188, 231, 0.045) 57px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 56px,
+        rgba(99, 188, 231, 0.045) 56px,
+        rgba(99, 188, 231, 0.045) 57px
+      );
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-panel::before {
+    content: "";
+    position: absolute;
+    right: 9%;
+    top: 92px;
+    width: 250px;
+    height: 360px;
+    border-left: 125px solid transparent;
+    border-right: 125px solid transparent;
+    border-bottom: 360px solid rgba(99, 188, 231, 0.085);
+    pointer-events: none;
+  }
+
+  .hero-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 1px,
+      rgba(255, 255, 255, 0.015) 1px,
+      rgba(255, 255, 255, 0.015) 2px
+    );
+    mix-blend-mode: screen;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .hero-kicker {
+    @apply inline-block border-l-2 border-cyan pl-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan;
+  }
+
+  .hero-title {
+    @apply font-heading font-extrabold tracking-[-0.028em] text-white;
+  }
+
+  .hero-highlight {
+    @apply font-heading font-extrabold tracking-[-0.028em] text-cyan;
+  }
+}

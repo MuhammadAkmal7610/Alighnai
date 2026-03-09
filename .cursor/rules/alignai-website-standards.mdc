@@ -1,0 +1,82 @@
+---
+description: AlignAI website architecture, design system, and coding standards
+alwaysApply: true
+---
+
+# AlignAI Website Standards
+
+## Canonical Brief Context (Mar 2026)
+
+- Source of truth: `AlignAI_Website_Complete_Brief_Mar2026_1.docx`
+- Build decisions must follow brief mockups and acceptance criteria when conflicts appear.
+- Brand architecture is dual: **ByteStream Strategies Inc.** (company) + **AlignAI** (framework/product).
+
+## Architecture
+
+- Next.js App Router with static export (`output: "export"`)
+- TypeScript strict mode
+- Server Components by default; `"use client"` only for interactive elements
+- Serverless chat function lives in `netlify/functions/`, not in `app/api/`
+- Blog content sourced from `data/posts.json`; no CMS
+- Milestone model: M1 visual stubs, M3 live chatbot, M4 live auth/client area
+
+## Design Tokens
+
+Colors (use Tailwind classes, never raw hex):
+- `navy` #0C1E39, `deep-blue` #274185, `mid-blue` #407BB7
+- `cyan` #63BCE7, `slate` #84899A, `light-slate` #C8CDD8, `off-white` #F4F6F9
+- `white` #FFFFFF only for cards/text on dark sections (not full-width section fills)
+
+Typography:
+- Headings: `font-heading` (Sora) — H1 700 with `-0.03em` tracking, H2/H3 600
+- Body: `font-body` (Inter) 16–17px, `leading-body` 1.65, max-w-prose 680px
+- Nav links: Inter 600, 13px, ALL CAPS, letter-spacing `0.07em`
+- Buttons: Inter 600, 14px
+
+Buttons: `bg-mid-blue text-white rounded-btn` (4px radius), flat fill only, **no outline variant as default CTA**
+
+## Strict Rules
+
+- **NO gradients** — solid backgrounds only
+- Container max-width 1200px (`container-main` class)
+- Section backgrounds alternate: navy → off-white → white → off-white
+- 1px mid-blue divider (`section-divider` class) between major sections
+- CTA strip appears on all pages except `/contact`
+- No drop shadows/glassmorphism/neumorphism/parallax/particle effects
+- No sidebars; single-column narrative flow on content pages
+- Breakpoints must validate at 390px, 768px, 1440px
+- Header/footer brand text should use **ByteStream Strategies** hierarchy, with AlignAI as framework emphasis
+- Contact canonical email: `bburke@bytestream.ca`
+- Footer copyright canonical text: `© 2026 ByteStream Strategies Inc.`
+
+## Accessibility
+
+- WCAG 2.1 AA minimum
+- All interactive elements keyboard accessible
+- Visible focus outlines (cyan)
+- Contrast ratio ≥4.5:1
+- Semantic HTML, ARIA labels on non-obvious controls
+- Skip-to-content link in root layout
+
+## Performance
+
+- Static export — no server runtime
+- Fonts loaded via `next/font` with `display: swap`
+- Images unoptimized (static export) but use WebP when possible
+- No render-blocking client JS; minimize `"use client"` boundaries
+- Target Lighthouse performance >= 90 all pages
+- Explicit width/height on images; lazy-load non-critical images
+
+## SEO
+
+- Every page exports Metadata with title + description + OG tags
+- JSON-LD Organization schema in root layout
+- Static sitemap.xml and robots.txt in `/public`
+
+## Chatbot & Security
+
+- Widget visible globally; visual stub in M1, live API in M3
+- Chat API via serverless proxy only; Anthropic key in environment variables only
+- Session-scoped conversation history only (no cross-session persistence)
+- Basic rate limiting is mandatory
+- Never expose API keys in client bundles, public files, or repository history

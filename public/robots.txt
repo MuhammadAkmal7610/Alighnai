@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://alignai.bytestreamstrategies.com/sitemap.xml
