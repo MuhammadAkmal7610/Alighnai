@@ -27,13 +27,22 @@ export default function ModernDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true)
       const [statsRes, contentRes] = await Promise.all([
         fetch('/api/cms/stats'),
         fetch('/api/cms/posts?take=5')
       ])
       
-      const statsData = await statsRes.json()
-      const contentData = await contentRes.json()
+      let statsData = { totalContents: 0, publishedContents: 0, draftContents: 0, totalPages: 0, publishedPages: 0, totalCategories: 0, totalUsers: 0 }
+      let contentData = { posts: [] }
+
+      try {
+        if (statsRes.ok) statsData = await statsRes.json()
+      } catch (e) { console.error('Stats parse error', e) }
+
+      try {
+        if (contentRes.ok) contentData = await contentRes.json()
+      } catch (e) { console.error('Content parse error', e) }
       
       setStats(statsData)
       setRecentContent(contentData.posts || [])
@@ -53,9 +62,7 @@ export default function ModernDashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-navy">
-      <Sidebar>
-        <div className="flex-1 p-6">
+    <div className="p-6">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -150,8 +157,6 @@ export default function ModernDashboard() {
               </Table>
             </CardContent>
           </Card>
-        </div>
-      </Sidebar>
     </div>
   )
 }

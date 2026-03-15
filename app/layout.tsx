@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Sora, Inter } from "next/font/google";
 import "@/styles/globals.css";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { ChatWidget } from "@/components/ChatWidget";
 import Providers from "@/components/Providers";
 
 const sora = Sora({
@@ -64,10 +61,7 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          <Header />
-          <main id="main-content">{children}</main>
-          <Footer />
-          <ChatWidget />
+          {children}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

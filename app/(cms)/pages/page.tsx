@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { Sidebar } from '@/components/cms/ModernSidebar'
+import { ContentStatus } from '@prisma/client'
+import { CMSEditor } from '@/components/cms/CMSEditor'
 
 export default function PagesManager() {
   const [pages, setPages] = useState<any[]>([])
@@ -22,6 +25,7 @@ export default function PagesManager() {
     content: '',
     template: 'default'
   })
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchPages()
@@ -39,11 +43,35 @@ export default function PagesManager() {
     }
   }
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this page?')) return
+    try {
+      const res = await fetch(`/api/cms/pages/${id}`, { method: 'DELETE' })
+      if (res.ok) await fetchPages()
+    } catch (error) {
+      console.error('Failed to delete page:', error)
+    }
+  }
+
+  const startEdit = (page: any) => {
+    setEditingId(page.id)
+    setFormData({
+      title: page.title,
+      slug: page.slug,
+      content: page.content || '',
+      template: page.template || 'default'
+    })
+    setShowCreateDialog(true)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/cms/pages', {
-        method: 'POST',
+      const url = editingId ? `/api/cms/pages/${editingId}` : '/api/cms/pages'
+      const method = editingId ? 'PATCH' : 'POST'
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
@@ -51,6 +79,7 @@ export default function PagesManager() {
       if (res.ok) {
         await fetchPages()
         setShowCreateDialog(false)
+        setEditingId(null)
         setFormData({
           title: '',
           slug: '',
@@ -72,9 +101,7 @@ export default function PagesManager() {
   }
 
   return (
-    <div className="flex h-screen bg-navy">
-      <Sidebar>
-        <div className="flex-1 p-6">
+    <div className="p-6">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-white">Pages</h1>
@@ -89,7 +116,9 @@ export default function PagesManager() {
               </DialogTrigger>
               <DialogContent className="bg-deep-blue border-mid-blue">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Create New Page</DialogTitle>
+                  <DialogTitle className="text-white">
+                    {editingId ? 'Edit Page' : 'Create New Page'}
+                  </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
@@ -114,20 +143,19 @@ export default function PagesManager() {
                   </div>
                   <div>
                     <Label htmlFor="content" className="text-light-slate">Content</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      className="bg-navy border-mid-blue text-white"
-                      rows={8}
-                      required
+                    <CMSEditor 
+                      content={formData.content} 
+                      onChange={(content) => setFormData({ ...formData, content })} 
                     />
                   </div>
                   <div className="flex gap-4">
                     <Button type="submit" className="bg-cyan text-navy">
-                      Create Page
+                      {editingId ? 'Update Page' : 'Create Page'}
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                    <Button type="button" variant="outline" onClick={() => {
+                      setShowCreateDialog(false)
+                      setEditingId(null)
+                    }}>
                       Cancel
                     </Button>
                   </div>
@@ -168,13 +196,15 @@ export default function PagesManager() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                          <Button size="sm" variant="outline">
+                          <Link href={`/preview/${page.slug}`} target="_blank">
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                          </Link>
+                          <Button size="sm" variant="outline" onClick={() => startEdit(page)}>
                             <Edit className="h-3 w-3" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleDelete(page.id)}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
@@ -185,8 +215,6 @@ export default function PagesManager() {
               </Table>
             </CardContent>
           </Card>
-        </div>
-      </Sidebar>
     </div>
   )
 }

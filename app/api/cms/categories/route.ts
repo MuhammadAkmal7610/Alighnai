@@ -10,7 +10,8 @@ export async function GET() {
     console.error('Categories API error:', error)
     return NextResponse.json({ 
       error: 'Failed to fetch categories',
-      details: error.message || 'Unknown error'
+      details: error.message || 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 })
   }
 }

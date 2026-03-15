@@ -12,56 +12,37 @@ import { Menu, Home, FileText, Grid3x3, Info, Settings, Users, LogOut } from 'lu
 const navigation = [
   {
     title: 'Dashboard',
-    href: '/admin',
+    href: '/',
     icon: Home,
   },
   {
     title: 'Content',
-    href: '/admin/content',
+    href: '/content',
     icon: FileText,
-    children: [
-      { title: 'Blog Posts', href: '/admin/content/blog' },
-      { title: 'Articles', href: '/admin/content/articles' },
-      { title: 'News', href: '/admin/content/news' },
-      { title: 'Case Studies', href: '/admin/content/case-studies' },
-    ]
   },
   {
     title: 'Pages',
-    href: '/admin/pages',
+    href: '/pages',
     icon: Grid3x3,
-    children: [
-      { title: 'Home', href: '/admin/pages/home' },
-      { title: 'About', href: '/admin/pages/about' },
-      { title: 'Framework', href: '/admin/pages/framework' },
-      { title: 'Services', href: '/admin/pages/services' },
-      { title: 'Contact', href: '/admin/pages/contact' },
-    ]
   },
   {
     title: 'Categories',
-    href: '/admin/categories',
+    href: '/categories',
     icon: Menu,
   },
   {
     title: 'Info',
-    href: '/admin/info',
+    href: '/info',
     icon: Info,
-    children: [
-      { title: 'Contact', href: '/admin/info/contact' },
-      { title: 'Social', href: '/admin/info/social' },
-      { title: 'Legal', href: '/admin/info/legal' },
-      { title: 'Settings', href: '/admin/info/settings' },
-    ]
   },
   {
     title: 'Users',
-    href: '/admin/users',
+    href: '/users',
     icon: Users,
   },
   {
     title: 'Settings',
-    href: '/admin/settings',
+    href: '/settings',
     icon: Settings,
   },
 ]
@@ -160,21 +141,28 @@ export function Sidebar({ children }: SidebarProps) {
   )
 
   return (
-    <>
+    <div className="flex h-screen w-screen overflow-hidden bg-navy">
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex">
+      <div className="hidden md:flex flex-shrink-0 border-r border-mid-blue">
         <SidebarContent />
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar Toggle */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetTrigger className="md:hidden fixed top-4 left-4 z-50 bg-navy border border-mid-blue">
-          <Menu className="h-4 w-4 text-light-slate" />
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50 text-white hover:bg-mid-blue">
+            <Menu className="h-6 w-6" />
+          </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0 bg-navy">
+        <SheetContent side="left" className="w-64 p-0 bg-navy border-r border-mid-blue">
           <SidebarContent />
         </SheetContent>
       </Sheet>
-    </>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
+    </div>
   )
 }

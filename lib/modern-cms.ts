@@ -41,15 +41,21 @@ export interface CreateInfoData {
 // Modern CMS Database Service
 export class ModernCMS {
   // Content Management (Blog/Articles)
-  static async getContents(filters?: {
+  static async getContents(options?: {
     type?: ContentType
     status?: ContentStatus
     featured?: boolean
     categoryId?: string
     authorId?: string
+    take?: number
+    skip?: number
   }) {
+    const { take, skip, ...filters } = options || {}
+    
     return await prisma.content.findMany({
       where: filters,
+      take,
+      skip,
       include: {
         author: {
           select: { id: true, name: true, email: true }
@@ -136,9 +142,13 @@ export class ModernCMS {
   }
 
   // Pages Management (Home, About, Framework, etc.)
-  static async getPages(filters?: { status?: ContentStatus; template?: string }) {
+  static async getPages(options?: { status?: ContentStatus; template?: string; take?: number; skip?: number }) {
+    const { take, skip, ...filters } = options || {}
+    
     return await prisma.page.findMany({
       where: filters,
+      take,
+      skip,
       include: {
         author: {
           select: { id: true, name: true, email: true }

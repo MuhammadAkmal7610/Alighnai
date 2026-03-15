@@ -26,7 +26,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       error: 'Failed to fetch content',
       details: error.message || 'Unknown error',
-      code: error.code
+      code: error.code,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 })
   }
 }

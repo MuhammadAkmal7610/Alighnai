@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
+  { href: "/home", label: "Home" },
   { href: "/framework", label: "The Framework" },
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
@@ -42,7 +42,7 @@ export function Header() {
     >
       <div className="container-main flex h-[70px] items-center justify-between">
         <Link
-          href="/"
+          href="/home"
           className="font-heading text-base font-bold text-white"
           aria-label="ByteStream Strategies home"
         >

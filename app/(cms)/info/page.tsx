@@ -23,6 +23,7 @@ export default function InfoManager() {
     content: '',
     metadata: {}
   })
+  const [editingType, setEditingType] = useState<InfoType | null>(null)
 
   useEffect(() => {
     fetchInfo()
@@ -40,11 +41,25 @@ export default function InfoManager() {
     }
   }
 
+  const startEdit = (info: any) => {
+    setEditingType(info.type)
+    setFormData({
+      type: info.type,
+      title: info.title,
+      content: info.content,
+      metadata: info.metadata || {}
+    })
+    setShowCreateDialog(true)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/cms/info', {
-        method: 'POST',
+      const url = editingType ? `/api/cms/info/${editingType}` : '/api/cms/info'
+      const method = editingType ? 'PATCH' : 'POST'
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
@@ -52,6 +67,7 @@ export default function InfoManager() {
       if (res.ok) {
         await fetchInfo()
         setShowCreateDialog(false)
+        setEditingType(null)
         setFormData({
           type: InfoType.CONTACT,
           title: '',
@@ -105,7 +121,9 @@ export default function InfoManager() {
               </DialogTrigger>
               <DialogContent className="bg-deep-blue border-mid-blue">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Add New Info</DialogTitle>
+                  <DialogTitle className="text-white">
+                    {editingType ? 'Edit Info' : 'Add New Info'}
+                  </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
@@ -146,9 +164,12 @@ export default function InfoManager() {
                   </div>
                   <div className="flex gap-4">
                     <Button type="submit" className="bg-cyan text-navy">
-                      Add Info
+                      {editingType ? 'Update Info' : 'Add Info'}
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                    <Button type="button" variant="outline" onClick={() => {
+                      setShowCreateDialog(false)
+                      setEditingType(null)
+                    }}>
                       Cancel
                     </Button>
                   </div>
@@ -176,7 +197,7 @@ export default function InfoManager() {
                       <Button size="sm" variant="outline">
                         <Eye className="h-3 w-3" />
                       </Button>
-                      <Button size="sm" variant="outline">
+                       <Button size="sm" variant="outline" onClick={() => startEdit(info)}>
                         <Edit className="h-3 w-3" />
                       </Button>
                       <Button size="sm" variant="outline">
