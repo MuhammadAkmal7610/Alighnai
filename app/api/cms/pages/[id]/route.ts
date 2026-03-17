@@ -3,11 +3,12 @@ import { ModernCMS } from '@/lib/modern-cms'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
-    const updatedPage = await ModernCMS.updatePage(params.id, body)
+    const updatedPage = await ModernCMS.updatePage(id, body)
     return NextResponse.json(updatedPage)
   } catch (error: any) {
     console.error('Update page error:', error)
@@ -20,10 +21,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ModernCMS.deletePage(params.id)
+    const { id } = await params
+    await ModernCMS.deletePage(id)
     return NextResponse.json({ message: 'Page deleted successfully' })
   } catch (error: any) {
     console.error('Delete page error:', error)

@@ -3,7 +3,7 @@ import { ModernCMS } from '@/lib/modern-cms'
 import { Sidebar } from '@/components/cms/ModernSidebar'
 import { Badge } from '@/components/ui/badge'
 
-export default async function CMSPreviewPage({ params }: { params: { slug: string[] } }) {
+export default async function CMSPreviewPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
   const slugPath = slug.join('/')
   

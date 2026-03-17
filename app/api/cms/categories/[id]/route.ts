@@ -3,11 +3,12 @@ import { ModernCMS } from '@/lib/modern-cms'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
-    const updatedCategory = await ModernCMS.updateCategory(params.id, body)
+    const updatedCategory = await ModernCMS.updateCategory(id, body)
     return NextResponse.json({ category: updatedCategory })
   } catch (error: any) {
     console.error('Update category error:', error)
@@ -20,10 +21,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ModernCMS.deleteCategory(params.id)
+    const { id } = await params
+    await ModernCMS.deleteCategory(id)
     return NextResponse.json({ message: 'Category deleted successfully' })
   } catch (error: any) {
     console.error('Delete category error:', error)

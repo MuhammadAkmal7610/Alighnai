@@ -17,7 +17,12 @@ export default function InfoManager() {
   const [infoItems, setInfoItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    type: InfoType,
+    title: string,
+    content: string,
+    metadata: any
+  }>({
     type: InfoType.CONTACT,
     title: '',
     content: '',
@@ -158,8 +163,25 @@ export default function InfoManager() {
                       value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                       className="bg-navy border-mid-blue text-white"
-                      rows={8}
+                      rows={4}
                       required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="metadata" className="text-light-slate">Metadata (JSON)</Label>
+                    <Textarea
+                      id="metadata"
+                      value={JSON.stringify(formData.metadata, null, 2)}
+                      onChange={(e) => {
+                        try {
+                          const parsed = JSON.parse(e.target.value)
+                          setFormData({ ...formData, metadata: parsed })
+                        } catch (err) {
+                          // Allow typing
+                        }
+                      }}
+                      className="bg-navy border-mid-blue text-white font-mono text-sm"
+                      rows={8}
                     />
                   </div>
                   <div className="flex gap-4">

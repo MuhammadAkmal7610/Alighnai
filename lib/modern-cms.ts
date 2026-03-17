@@ -219,8 +219,10 @@ export class ModernCMS {
       update: data,
       create: {
         type,
+        title: data.title || '',
+        content: data.content || '',
         ...data
-      }
+      } as any
     })
   }
 
@@ -305,12 +307,12 @@ export class ModernCMS {
     const searchQuery = {
       where: {
         OR: [
-          { title: { contains: query, mode: 'insensitive' } },
-          { content: { contains: query, mode: 'insensitive' } },
-          { excerpt: { contains: query, mode: 'insensitive' } }
-        ]
+          { title: { contains: query, mode: 'insensitive' as const } },
+          { content: { contains: query, mode: 'insensitive' as const } },
+          { excerpt: { contains: query, mode: 'insensitive' as const } }
+        ] as any
       }
-    }
+    };
 
     if (type === 'content') {
       return await prisma.content.findMany({

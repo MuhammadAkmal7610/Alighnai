@@ -10,10 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Layout, Settings, FileText } from 'lucide-react'
 import { Sidebar } from '@/components/cms/ModernSidebar'
 import { ContentStatus } from '@prisma/client'
 import { CMSEditor } from '@/components/cms/CMSEditor'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function PagesManager() {
   const [pages, setPages] = useState<any[]>([])
@@ -23,7 +24,8 @@ export default function PagesManager() {
     title: '',
     slug: '',
     content: '',
-    template: 'default'
+    template: 'default',
+    metadata: {}
   })
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -59,7 +61,8 @@ export default function PagesManager() {
       title: page.title,
       slug: page.slug,
       content: page.content || '',
-      template: page.template || 'default'
+      template: page.template || 'default',
+      metadata: page.metadata || {}
     })
     setShowCreateDialog(true)
   }
@@ -84,7 +87,8 @@ export default function PagesManager() {
           title: '',
           slug: '',
           content: '',
-          template: 'default'
+          template: 'default',
+          metadata: {}
         })
       }
     } catch (error) {
@@ -114,41 +118,125 @@ export default function PagesManager() {
                   Create Page
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-deep-blue border-mid-blue">
+              <DialogContent className="bg-deep-blue border-mid-blue max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-white">
                     {editingId ? 'Edit Page' : 'Create New Page'}
                   </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="title" className="text-light-slate">Title</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="bg-navy border-mid-blue text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="slug" className="text-light-slate">URL Slug</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      className="bg-navy border-mid-blue text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="content" className="text-light-slate">Content</Label>
-                    <CMSEditor 
-                      content={formData.content} 
-                      onChange={(content) => setFormData({ ...formData, content })} 
-                    />
-                  </div>
-                  <div className="flex gap-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <Tabs defaultValue="content" className="w-full">
+                    <TabsList className="bg-navy border border-mid-blue w-full justify-start p-1 h-auto gap-2">
+                      <TabsTrigger 
+                        value="content" 
+                        className="data-[state=active]:bg-cyan data-[state=active]:text-navy text-light-slate px-4 py-2"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Content
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="metadata" 
+                        className="data-[state=active]:bg-cyan data-[state=active]:text-navy text-light-slate px-4 py-2"
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Page Attributes
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="content" className="mt-6 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="title" className="text-light-slate">Title</Label>
+                          <Input
+                            id="title"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="bg-navy border-mid-blue text-white"
+                            placeholder="e.g., Home"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="slug" className="text-light-slate">URL Slug</Label>
+                          <Input
+                            id="slug"
+                            value={formData.slug}
+                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                            className="bg-navy border-mid-blue text-white"
+                            placeholder="e.g., home"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="content" className="text-light-slate">Page Content</Label>
+                        <CMSEditor 
+                          content={formData.content} 
+                          onChange={(content) => setFormData({ ...formData, content })} 
+                        />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="metadata" className="mt-6 space-y-4">
+                      <div className="p-4 border border-dashed border-mid-blue/50 rounded-lg space-y-4 bg-navy/30">
+                        <h4 className="text-sm font-semibold text-cyan flex items-center gap-2">
+                          <Layout className="w-4 h-4" />
+                          Hero Section Customization
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs text-slate uppercase">Hero Title Override</Label>
+                            <Input
+                              value={(formData.metadata as any)?.hero?.title || ''}
+                              onChange={(e) => setFormData({ 
+                                ...formData, 
+                                metadata: { 
+                                  ...(formData.metadata || {}), 
+                                  hero: { ...((formData.metadata as any)?.hero || {}), title: e.target.value } 
+                                } 
+                              })}
+                              className="bg-navy border-mid-blue text-white text-sm"
+                              placeholder="Leave empty for default"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs text-slate uppercase">Hero Description Override</Label>
+                            <Textarea
+                              value={(formData.metadata as any)?.hero?.description || ''}
+                              onChange={(e) => setFormData({ 
+                                ...formData, 
+                                metadata: { 
+                                  ...(formData.metadata || {}), 
+                                  hero: { ...((formData.metadata as any)?.hero || {}), description: e.target.value } 
+                                } 
+                              })}
+                              className="bg-navy border-mid-blue text-white text-sm"
+                              rows={3}
+                              placeholder="Leave empty for default"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-light-slate">Raw Metadata (Advanced)</Label>
+                        <Textarea
+                          id="metadata"
+                          value={JSON.stringify(formData.metadata, null, 2)}
+                          onChange={(e) => {
+                            try {
+                              const parsed = JSON.parse(e.target.value)
+                              setFormData({ ...formData, metadata: parsed })
+                            } catch (err) {}
+                          }}
+                          className="bg-navy border-mid-blue text-white font-mono text-xs"
+                          rows={6}
+                        />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+
+                  <div className="flex justify-end gap-3 pt-4 border-t border-mid-blue/30 mt-6">
                     <Button type="submit" className="bg-cyan text-navy">
                       {editingId ? 'Update Page' : 'Create Page'}
                     </Button>
@@ -196,9 +284,9 @@ export default function PagesManager() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Link href={`/preview/${page.slug}`} target="_blank">
-                            <Button size="sm" variant="outline">
-                              <Eye className="h-3 w-3" />
+                          <Link href={page.slug === 'home' ? '/site' : `/site/${page.slug}`} target="_blank">
+                            <Button size="sm" variant="outline" title="View Page">
+                              <Eye className="h-3 w-3 text-cyan" />
                             </Button>
                           </Link>
                           <Button size="sm" variant="outline" onClick={() => startEdit(page)}>

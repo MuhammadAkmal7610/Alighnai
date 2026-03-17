@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { ModernCMS } from '@/lib/modern-cms'
 import { CTASection } from '@/components/CTASection'
 
-export default async function CMSPage({ params }: { params: { slug: string[] } }) {
+export default async function CMSPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
   const slugPath = Array.isArray(slug) ? slug.join('/') : slug
   
@@ -29,7 +29,7 @@ export default async function CMSPage({ params }: { params: { slug: string[] } }
   )
 }
 
-export async function generateMetadata({ params }: { params: { slug: string[] } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
   const slugPath = Array.isArray(slug) ? slug.join('/') : slug
   const page = await ModernCMS.getPageBySlug(slugPath)

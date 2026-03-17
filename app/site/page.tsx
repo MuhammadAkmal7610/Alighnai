@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
+import { ModernCMS } from "@/lib/modern-cms";
+import { InfoType } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Enterprise AI Governance & Strategy",
@@ -8,52 +10,51 @@ export const metadata: Metadata = {
     "AlignAI by ByteStream Strategies helps enterprises deploy AI responsibly with governance frameworks, decision visibility, and strategic advisory.",
 };
 
-const PROBLEMS = [
-  {
-    title: "The Decision Influence Layer",
-    description:
-      "Before your teams make any decision, AI has already shaped what information they see. That layer is entirely ungoverned in most enterprises.",
-  },
-  {
-    title: "Governance Without Architecture",
-    description:
-      "Most organizations have AI policies, not AI governance architecture. Policy tells people what is allowed. Architecture defines ownership and accountability.",
-  },
-  {
-    title: "Regulatory Exposure Is Accelerating",
-    description:
-      "DSFI, BO, Fair Housing algorithmic screening, the EU AI Act, and casemark doctrine are converging on AI decision accountability.",
-  },
-  {
-    title: "The Entry Point Is Visibility",
-    description:
-      "You cannot govern what you cannot see. The first step is mapping where AI is influencing decisions across your enterprise.",
-  },
-];
+export default async function HomePage() {
+  // Fetch from CMS Page first
+  const page = await ModernCMS.getPageBySlug('home');
+  const pageData = (page?.metadata as any) || {};
 
-const CREDENTIALS = [
-  "PhD - Carleton University",
-  "MBA - University of Ottawa",
-  "PMP Certified",
-  "30+ Years Enterprise",
-];
+  // Then fetch from SETTINGS info as fallback/complement
+  const settingsInfo = await ModernCMS.getInfo(InfoType.SETTINGS);
+  const settingsData = (settingsInfo?.metadata as any) || {};
+  
+  // Merge data (CMS Page metadata takes precedence)
+  const data = { ...settingsData, ...pageData };
 
-export default function HomePage() {
+  const hero = data.hero || {
+    kicker: 'Enterprise AI Governance Architecture',
+    title: 'AI is already influencing decisions in your organization.',
+    highlight: 'Most enterprises have no governance over that layer.',
+    description: 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions. Built for enterprise. Grounded in doctoral research.'
+  };
+
+  const problems = data.problems || [];
+  const credentials = data.credentials || [];
+
   return (
     <>
       {/* Hero */}
       <section className="hero-panel pt-28 pb-14 md:pt-32 md:pb-16 relative">
         <div className="container-main relative z-10">
-          <p className="hero-kicker mb-6">Enterprise AI Governance Architecture</p>
+          <p className="hero-kicker mb-6">{hero.kicker}</p>
           <h1 className="hero-title max-w-[900px] text-[32px] leading-[1.08] md:text-[66px]">
-            AI is already influencing<br className="hidden md:block" /> decisions in your organization.
+            {hero.title}
           </h1>
           <p className="hero-highlight mt-2 max-w-[900px] text-[26px] leading-[1.12] md:text-[48px] md:max-w-[800px]">
-            Most enterprises have no governance over that layer.
+            {hero.highlight}
           </p>
           <p className="mt-6 max-w-[540px] text-sm leading-snug text-light-slate md:text-base md:max-w-[530px]">
-            AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions. Built for enterprise. Grounded in doctoral research.
+            {hero.description}
           </p>
+          
+          {/* CMS Content Rendering */}
+          {page?.content && (
+            <div className="mt-8 prose prose-invert max-w-none text-light-slate">
+              <div dangerouslySetInnerHTML={{ __html: page.content }} />
+            </div>
+          )}
+
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/framework"
@@ -74,7 +75,7 @@ export default function HomePage() {
               <li className="text-[10px] font-medium uppercase tracking-[0.16em] text-light-slate">
                 FOUNDER CREDENTIALS
               </li>
-              {CREDENTIALS.map((item) => (
+              {credentials.map((item: string) => (
                 <li
                   key={item}
                   className="rounded-btn border border-deep-blue bg-[#173053] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-light-slate"
@@ -85,7 +86,6 @@ export default function HomePage() {
             </ul>
           </div>
         </div>
-        {/* Optional: subtle background grid lines could be handled via global styles or background-image, not in markup */}
       </section>
 
       <div className="section-divider" />
@@ -105,7 +105,7 @@ export default function HomePage() {
 
           
           <div className="mt-12 grid sm:grid-cols-2">
-            {PROBLEMS.map((problem, index) => (
+            {problems.map((problem: any, index: number) => (
               <div
                 key={problem.title}
                 className="border border-off-white bg-white px-7 py-10"

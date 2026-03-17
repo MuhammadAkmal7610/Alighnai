@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Button } from '@/components/ui/button'
@@ -129,15 +130,23 @@ export const CMSEditor = ({ content, onChange }: CMSEditorProps) => {
       StarterKit,
     ],
     content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none min-h-[300px] p-4 focus:outline-none bg-navy text-white rounded-b-lg border-x border-b border-mid-blue',
+        class: 'prose prose-invert max-w-none min-h-[200px] p-4 focus:outline-none bg-navy text-white rounded-b-lg border-x border-b border-mid-blue',
       },
     },
   })
+  
+  // Update editor content when the prop changes
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   return (
     <div className="w-full">

@@ -15,14 +15,16 @@ export default async function InsightsPage() {
   const posts = await ModernCMS.getContents({ status: ContentStatus.PUBLISHED });
   const featuredPosts = await ModernCMS.getContents({ status: ContentStatus.PUBLISHED, featured: true });
 
-  const formatDate = (value: string) =>
-    new Date(value)
+  const formatDate = (value: Date | string | null) => {
+    if (!value) return "DRAFT";
+    return new Date(value)
       .toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
       })
       .toUpperCase();
+  };
 
   return (
     <>
@@ -88,9 +90,9 @@ export default async function InsightsPage() {
                 <BlogCard
                   key={post.id}
                   title={post.title}
-                  date={post.publishedAt}
-                  tag={post.category}
-                  excerpt={post.excerpt}
+                  date={post.publishedAt?.toISOString() || ''}
+                  tag={post.category?.name || 'Uncategorized'}
+                  excerpt={post.excerpt || ''}
                   slug={post.slug}
                   featured={post.featured}
                 />

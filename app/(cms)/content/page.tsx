@@ -21,7 +21,16 @@ export default function ContentManager() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    type: ContentType;
+    status: ContentStatus;
+    featured: boolean;
+    categoryId: string;
+  }>({
     title: '',
     slug: '',
     excerpt: '',

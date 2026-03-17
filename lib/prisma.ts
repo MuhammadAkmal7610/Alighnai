@@ -7,7 +7,7 @@ const pool = new Pool({
   connectionString,
   ssl: connectionString.includes('neon.tech') ? { rejectUnauthorized: false } : false
 })
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaPg(pool as any)
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined

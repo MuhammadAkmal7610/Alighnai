@@ -1,6 +1,6 @@
 "use client"
 
-import ModernDashboard from './dashboard/page'
+import ModernDashboard from './page'
 
 export default function CMSPage() {
   return <ModernDashboard />

@@ -4,17 +4,18 @@ import { InfoType } from '@prisma/client'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     // For Info, we use the 'type' field as the identifier in upsert
     // But we might be passing the database 'id' here.
     // ModernCMS.updateInfo takes InfoType.
     
     // Let's check if the param is a valid InfoType
-    if (Object.values(InfoType).includes(params.id as InfoType)) {
-        const updatedInfo = await ModernCMS.updateInfo(params.id as InfoType, body)
+    if (Object.values(InfoType).includes(id as InfoType)) {
+        const updatedInfo = await ModernCMS.updateInfo(id as InfoType, body)
         return NextResponse.json(updatedInfo)
     }
     
