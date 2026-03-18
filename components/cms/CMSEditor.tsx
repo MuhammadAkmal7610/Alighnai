@@ -3,10 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Link from '@tiptap/extension-link'
+import CharacterCount from '@tiptap/extension-character-count'
 import { Button } from '@/components/ui/button'
 import { 
   Bold, 
   Italic, 
+  Underline as UnderlineIcon,
   List, 
   ListOrdered, 
   Quote, 
@@ -14,8 +18,11 @@ import {
   Redo, 
   Heading1, 
   Heading2,
-  Code
+  Code,
+  Link as LinkIcon,
+  Eraser
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface CMSEditorProps {
   content: string
@@ -27,99 +34,164 @@ const MenuBar = ({ editor }: { editor: any }) => {
     return null
   }
 
+  const addLink = () => {
+    const url = window.prompt('URL')
+    if (url) {
+      editor.chain().focus().setLink({ href: url }).run()
+    }
+  }
+
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-mid-blue bg-deep-blue rounded-t-lg">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={editor.isActive('bold') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={editor.isActive('italic') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={editor.isActive('heading', { level: 1 }) ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Heading1 className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive('heading', { level: 2 }) ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Heading2 className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive('bulletList') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <List className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={editor.isActive('orderedList') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <ListOrdered className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive('blockquote') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Quote className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={editor.isActive('codeBlock') ? 'bg-mid-blue text-white' : 'text-slate hover:text-white'}
-      >
-        <Code className="h-4 w-4" />
-      </Button>
+    <div className="flex flex-wrap gap-1 p-1.5 border-b border-slate-200 bg-slate-50/80 backdrop-blur-sm rounded-t-lg sticky top-0 z-10">
+      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('bold') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Bold"
+        >
+          <Bold className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('italic') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Italic"
+        >
+          <Italic className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('underline') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Underline"
+        >
+          <UnderlineIcon className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('heading', { level: 1 }) ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Heading 1"
+        >
+          <Heading1 className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('heading', { level: 2 }) ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Heading 2"
+        >
+          <Heading2 className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('bulletList') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Bullet List"
+        >
+          <List className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('orderedList') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Ordered List"
+        >
+          <ListOrdered className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('blockquote') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Quote"
+        >
+          <Quote className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('codeBlock') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Code Block"
+        >
+          <Code className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-0.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={addLink}
+          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('link') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          title="Add Link"
+        >
+          <LinkIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+          className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+          title="Clear Formatting"
+        >
+          <Eraser className="h-4 w-4" />
+        </Button>
+      </div>
+
       <div className="flex-1" />
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().undo().run()}
-        className="text-slate hover:text-white"
-      >
-        <Undo className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().redo().run()}
-        className="text-slate hover:text-white"
-      >
-        <Redo className="h-4 w-4" />
-      </Button>
+      
+      <div className="flex items-center gap-0.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().undo().run()}
+          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-200"
+          title="Undo"
+        >
+          <Undo className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().redo().run()}
+          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-200"
+          title="Redo"
+        >
+          <Redo className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   )
 }
@@ -128,6 +200,14 @@ export const CMSEditor = ({ content, onChange }: CMSEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      Underline,
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-mid-blue underline cursor-pointer',
+        },
+      }),
+      CharacterCount,
     ],
     content,
     immediatelyRender: false,
@@ -136,7 +216,7 @@ export const CMSEditor = ({ content, onChange }: CMSEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none min-h-[200px] p-4 focus:outline-none bg-navy text-white rounded-b-lg border-x border-b border-mid-blue',
+        class: 'prose prose-slate max-w-none min-h-[300px] p-6 focus:outline-none bg-white text-navy rounded-b-lg border-x border-b border-slate-200',
       },
     },
   })
@@ -149,9 +229,16 @@ export const CMSEditor = ({ content, onChange }: CMSEditorProps) => {
   }, [content, editor])
 
   return (
-    <div className="w-full">
+    <div className="w-full shadow-sm rounded-lg border border-slate-200">
       <MenuBar editor={editor} />
       <EditorContent editor={editor} />
+      <div className="bg-slate-50 border-t border-slate-100 px-4 py-2 flex justify-between items-center text-[10px] text-slate-400 font-medium">
+        <div className="flex gap-3">
+          <span>{editor?.storage.characterCount?.characters() || 0} characters</span>
+          <span>{editor?.storage.characterCount?.words() || 0} words</span>
+        </div>
+        <div>Rich Text Mode</div>
+      </div>
     </div>
   )
 }

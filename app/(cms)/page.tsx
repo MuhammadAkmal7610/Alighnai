@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BarChart3, FileText, Users, Eye, TrendingUp, Calendar, Home, Grid3x3, Settings, Menu } from 'lucide-react'
 import { Sidebar } from '@/components/cms/ModernSidebar'
+import { cn } from '@/lib/utils'
 
 export default function ModernDashboard() {
   const [stats, setStats] = useState({
@@ -61,104 +62,128 @@ export default function ModernDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-navy">
-        <div className="text-light-slate">Loading dashboard...</div>
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="text-slate-500 font-medium">Loading dashboard...</div>
       </div>
     )
   }
 
   return (
-    <div className="p-6">
+    <div className="p-8 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-slate">Welcome to your AlignAI CMS</p>
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-navy tracking-tight">Dashboard</h1>
+            <p className="text-slate-500 mt-1 font-medium">Welcome back to your AlignAI CMS</p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-deep-blue border-mid-blue">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-light-slate">Total Content</CardTitle>
-                <FileText className="h-4 w-4 text-cyan" />
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Content</CardTitle>
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <FileText className="h-4 w-4 text-mid-blue" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.totalContents}</div>
-                <p className="text-xs text-slate">All content items</p>
+              <CardContent className="pt-4">
+                <div className="text-3xl font-bold text-navy">{stats.totalContents}</div>
+                <p className="text-xs text-slate-400 mt-1">All content items</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-deep-blue border-mid-blue">
+            <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-light-slate">Published</CardTitle>
-                <Eye className="h-4 w-4 text-green-400" />
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">Published</CardTitle>
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Eye className="h-4 w-4 text-green-600" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.publishedContents}</div>
-                <p className="text-xs text-slate">Live content</p>
+              <CardContent className="pt-4">
+                <div className="text-3xl font-bold text-navy">{stats.publishedContents}</div>
+                <p className="text-xs text-slate-400 mt-1">Live content</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-deep-blue border-mid-blue">
+            <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-light-slate">Drafts</CardTitle>
-                <FileText className="h-4 w-4 text-yellow-400" />
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">Drafts</CardTitle>
+                <div className="p-2 bg-yellow-50 rounded-lg">
+                  <FileText className="h-4 w-4 text-yellow-600" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.draftContents}</div>
-                <p className="text-xs text-slate">Draft content</p>
+              <CardContent className="pt-4">
+                <div className="text-3xl font-bold text-navy">{stats.draftContents}</div>
+                <p className="text-xs text-slate-400 mt-1">Draft content</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-deep-blue border-mid-blue">
+            <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-light-slate">Categories</CardTitle>
-                <Menu className="h-4 w-4 text-cyan" />
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">Categories</CardTitle>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <Menu className="h-4 w-4 text-purple-600" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.totalCategories}</div>
-                <p className="text-xs text-slate">Content categories</p>
+              <CardContent className="pt-4">
+                <div className="text-3xl font-bold text-navy">{stats.totalCategories}</div>
+                <p className="text-xs text-slate-400 mt-1">Content categories</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Recent Content */}
-          <Card className="bg-deep-blue border-mid-blue">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-white">Recent Content</CardTitle>
+          <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-mid-blue" />
+                Recent Content
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-slate">Title</TableHead>
-                    <TableHead className="text-slate">Type</TableHead>
-                    <TableHead className="text-slate">Status</TableHead>
-                    <TableHead className="text-slate">Updated</TableHead>
+                <TableHeader className="bg-slate-50/50">
+                  <TableRow className="border-slate-100">
+                    <TableHead className="text-slate-600 font-bold">Title</TableHead>
+                    <TableHead className="text-slate-600 font-bold">Type</TableHead>
+                    <TableHead className="text-slate-600 font-bold">Status</TableHead>
+                    <TableHead className="text-slate-600 font-bold">Updated</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentContent.map((content) => (
-                    <TableRow key={content.id} className="border-mid-blue">
-                      <TableCell className="text-white">{content.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {content.type?.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={content.status === 'PUBLISHED' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {content.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-slate">
-                        {new Date(content.updatedAt).toLocaleDateString()}
+                  {recentContent.length > 0 ? (
+                    recentContent.map((content) => (
+                      <TableRow key={content.id} className="border-slate-100 hover:bg-slate-50/50 transition-colors">
+                        <TableCell className="text-navy font-medium">{content.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-tight bg-slate-100 text-slate-600 border-slate-200">
+                            {content.type?.replace('_', ' ')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={content.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                            className={cn(
+                              "text-[10px] font-bold uppercase tracking-tight shadow-none",
+                              content.status === 'PUBLISHED' 
+                                ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-100" 
+                                : "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100"
+                            )}
+                          >
+                            {content.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-slate-500 text-sm">
+                          {new Date(content.updatedAt).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-12 text-slate-400 font-medium">
+                        No recent content found
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

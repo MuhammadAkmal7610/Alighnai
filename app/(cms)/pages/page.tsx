@@ -15,6 +15,7 @@ import { Sidebar } from '@/components/cms/ModernSidebar'
 import { ContentStatus } from '@prisma/client'
 import { CMSEditor } from '@/components/cms/CMSEditor'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 export default function PagesManager() {
   const [pages, setPages] = useState<any[]>([])
@@ -48,7 +49,6 @@ export default function PagesManager() {
       setPages(Array.isArray(pagesData) ? pagesData : [])
     } catch (error: any) {
       console.error('CMS: Failed to fetch pages:', error)
-      // You could add a toast notification here if available
     } finally {
       setLoading(false)
     }
@@ -107,94 +107,96 @@ export default function PagesManager() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-navy">
-        <div className="text-light-slate">Loading pages...</div>
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="text-slate-500 font-medium">Loading pages...</div>
       </div>
     )
   }
 
   return (
-    <div className="p-6">
-          <div className="flex justify-between items-center mb-8">
+    <div className="p-8 max-w-7xl mx-auto">
+          <div className="flex justify-between items-end mb-10">
             <div>
-              <h1 className="text-3xl font-bold text-white">Pages</h1>
-              <p className="text-slate">Manage your website pages</p>
+              <h1 className="text-4xl font-bold text-navy tracking-tight">Pages</h1>
+              <p className="text-slate-500 mt-1 font-medium">Manage your website's structural architecture</p>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-cyan text-navy hover:bg-cyan/90">
+                <Button className="bg-navy text-white hover:bg-navy/90 shadow-md">
                   <Plus className="mr-2 h-4 w-4" />
                   Create Page
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-deep-blue border-mid-blue max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="text-white">
+              <DialogContent className="bg-white border-slate-200 max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+                <DialogHeader className="border-b border-slate-100 pb-4 mb-6">
+                  <DialogTitle className="text-2xl font-bold text-navy">
                     {editingId ? 'Edit Page' : 'Create New Page'}
                   </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <Tabs defaultValue="content" className="w-full">
-                    <TabsList className="bg-navy border border-mid-blue w-full justify-start p-1 h-auto gap-2">
+                    <TabsList className="bg-slate-50 border border-slate-200 w-full justify-start p-1 h-auto gap-2 rounded-lg">
                       <TabsTrigger 
                         value="content" 
-                        className="data-[state=active]:bg-cyan data-[state=active]:text-navy text-light-slate px-4 py-2"
+                        className="data-[state=active]:bg-white data-[state=active]:text-navy data-[state=active]:shadow-sm text-slate-500 px-6 py-2.5 font-semibold transition-all"
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         Content
                       </TabsTrigger>
                       <TabsTrigger 
                         value="metadata" 
-                        className="data-[state=active]:bg-cyan data-[state=active]:text-navy text-light-slate px-4 py-2"
+                        className="data-[state=active]:bg-white data-[state=active]:text-navy data-[state=active]:shadow-sm text-slate-500 px-6 py-2.5 font-semibold transition-all"
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         Page Attributes
                       </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="content" className="mt-6 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <TabsContent value="content" className="mt-8 space-y-6">
+                      <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <Label htmlFor="title" className="text-light-slate">Title</Label>
+                          <Label htmlFor="title" className="text-sm font-bold text-navy">Title</Label>
                           <Input
                             id="title"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="bg-navy border-mid-blue text-white"
+                            className="bg-white border-slate-200 text-navy focus:ring-mid-blue focus:border-mid-blue rounded-lg h-11"
                             placeholder="e.g., Home"
                             required
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="slug" className="text-light-slate">URL Slug</Label>
+                          <Label htmlFor="slug" className="text-sm font-bold text-navy">URL Slug</Label>
                           <Input
                             id="slug"
                             value={formData.slug}
                             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                            className="bg-navy border-mid-blue text-white"
+                            className="bg-white border-slate-200 text-navy focus:ring-mid-blue focus:border-mid-blue rounded-lg h-11"
                             placeholder="e.g., home"
                             required
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="content" className="text-light-slate">Page Content</Label>
-                        <CMSEditor 
-                          content={formData.content} 
-                          onChange={(content) => setFormData({ ...formData, content })} 
-                        />
+                        <Label htmlFor="content" className="text-sm font-bold text-navy">Page Content</Label>
+                        <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+                          <CMSEditor 
+                            content={formData.content} 
+                            onChange={(content) => setFormData({ ...formData, content })} 
+                          />
+                        </div>
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="metadata" className="mt-6 space-y-4">
-                      <div className="p-4 border border-dashed border-mid-blue/50 rounded-lg space-y-4 bg-navy/30">
-                        <h4 className="text-sm font-semibold text-cyan flex items-center gap-2">
+                    <TabsContent value="metadata" className="mt-8 space-y-6">
+                      <div className="p-6 border border-slate-200 rounded-xl space-y-5 bg-slate-50/50">
+                        <h4 className="text-sm font-bold text-mid-blue flex items-center gap-2 uppercase tracking-wider">
                           <Layout className="w-4 h-4" />
                           Hero Section Customization
                         </h4>
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 gap-5">
                           <div className="space-y-2">
-                            <Label className="text-xs text-slate uppercase">Hero Title Override</Label>
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Hero Title Override</Label>
                             <Input
                               value={(formData.metadata as any)?.hero?.title || ''}
                               onChange={(e) => setFormData({ 
@@ -204,12 +206,12 @@ export default function PagesManager() {
                                   hero: { ...((formData.metadata as any)?.hero || {}), title: e.target.value } 
                                 } 
                               })}
-                              className="bg-navy border-mid-blue text-white text-sm"
+                              className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
                               placeholder="Leave empty for default"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label className="text-xs text-slate uppercase">Hero Description Override</Label>
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Hero Description Override</Label>
                             <Textarea
                               value={(formData.metadata as any)?.hero?.description || ''}
                               onChange={(e) => setFormData({ 
@@ -219,8 +221,7 @@ export default function PagesManager() {
                                   hero: { ...((formData.metadata as any)?.hero || {}), description: e.target.value } 
                                 } 
                               })}
-                              className="bg-navy border-mid-blue text-white text-sm"
-                              rows={3}
+                              className="bg-white border-slate-200 text-navy text-sm rounded-lg min-h-[100px]"
                               placeholder="Leave empty for default"
                             />
                           </div>
@@ -228,7 +229,7 @@ export default function PagesManager() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-light-slate">Raw Metadata (Advanced)</Label>
+                        <Label className="text-sm font-bold text-navy">Raw Metadata (Advanced)</Label>
                         <Textarea
                           id="metadata"
                           value={JSON.stringify(formData.metadata, null, 2)}
@@ -238,22 +239,23 @@ export default function PagesManager() {
                               setFormData({ ...formData, metadata: parsed })
                             } catch (err) {}
                           }}
-                          className="bg-navy border-mid-blue text-white font-mono text-xs"
-                          rows={6}
+                          className="bg-slate-50 border-slate-200 text-navy font-mono text-xs rounded-lg min-h-[150px]"
                         />
                       </div>
                     </TabsContent>
                   </Tabs>
 
-                  <div className="flex justify-end gap-3 pt-4 border-t border-mid-blue/30 mt-6">
-                    <Button type="submit" className="bg-cyan text-navy">
-                      {editingId ? 'Update Page' : 'Create Page'}
-                    </Button>
+                  <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 mt-8">
                     <Button type="button" variant="outline" onClick={() => {
-                      setShowCreateDialog(false)
-                      setEditingId(null)
-                    }}>
+                        setShowCreateDialog(false)
+                        setEditingId(null)
+                      }}
+                      className="border-slate-200 text-slate-600 hover:bg-slate-50"
+                    >
                       Cancel
+                    </Button>
+                    <Button type="submit" className="bg-navy text-white hover:bg-navy/90 px-8 shadow-md">
+                      {editingId ? 'Update Page' : 'Create Page'}
                     </Button>
                   </div>
                 </form>
@@ -261,48 +263,53 @@ export default function PagesManager() {
             </Dialog>
           </div>
 
-          <Card className="bg-deep-blue border-mid-blue">
+          <Card className="bg-white border-slate-200 shadow-sm overflow-hidden rounded-xl">
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-slate">Title</TableHead>
-                    <TableHead className="text-slate">Slug</TableHead>
-                    <TableHead className="text-slate">Template</TableHead>
-                    <TableHead className="text-slate">Status</TableHead>
-                    <TableHead className="text-slate">Actions</TableHead>
+                <TableHeader className="bg-slate-50/50">
+                  <TableRow className="border-slate-100 h-14">
+                    <TableHead className="text-slate-600 font-bold px-6">Title</TableHead>
+                    <TableHead className="text-slate-600 font-bold px-6">Slug</TableHead>
+                    <TableHead className="text-slate-600 font-bold px-6">Template</TableHead>
+                    <TableHead className="text-slate-600 font-bold px-6">Status</TableHead>
+                    <TableHead className="text-slate-600 font-bold px-6">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pages.map((page) => (
-                    <TableRow key={page.id} className="border-mid-blue">
-                      <TableCell className="text-white">{page.title}</TableCell>
-                      <TableCell className="text-slate">{page.slug}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
+                    <TableRow key={page.id} className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16">
+                      <TableCell className="text-navy font-semibold px-6">{page.title}</TableCell>
+                      <TableCell className="text-slate-500 font-medium px-6">/{page.slug}</TableCell>
+                      <TableCell className="px-6">
+                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-tight bg-slate-100 text-slate-600 border-slate-200 px-2 py-0.5">
                           {page.template}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-6">
                         <Badge 
                           variant={page.status === 'PUBLISHED' ? 'default' : 'secondary'}
-                          className="text-xs"
+                          className={cn(
+                            "text-[10px] font-bold uppercase tracking-tight shadow-none px-2 py-0.5",
+                            page.status === 'PUBLISHED' 
+                              ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-100" 
+                              : "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100"
+                          )}
                         >
                           {page.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-6">
                         <div className="flex gap-2">
                           <Link href={page.slug === 'home' ? '/site' : `/site/${page.slug}`} target="_blank">
-                            <Button size="sm" variant="outline" title="View Page">
-                              <Eye className="h-3 w-3 text-cyan" />
+                            <Button size="sm" variant="outline" title="View Page" className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-mid-blue hover:bg-blue-50">
+                              <Eye className="h-3.5 w-3.5" />
                             </Button>
                           </Link>
-                          <Button size="sm" variant="outline" onClick={() => startEdit(page)}>
-                            <Edit className="h-3 w-3" />
+                          <Button size="sm" variant="outline" onClick={() => startEdit(page)} className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-navy hover:bg-slate-50">
+                            <Edit className="h-3.5 w-3.5" />
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleDelete(page.id)}>
-                            <Trash2 className="h-3 w-3" />
+                          <Button size="sm" variant="outline" onClick={() => handleDelete(page.id)} className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100">
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </TableCell>
