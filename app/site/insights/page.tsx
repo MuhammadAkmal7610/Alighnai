@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
 import { BlogCard } from "@/components/BlogCard";
 import { ModernCMS } from "@/lib/modern-cms";
-import { ContentStatus } from "@prisma/client";
+import { ContentStatus } from "@/lib/cms-enums";
 
 export const metadata: Metadata = {
   title: "Insights",

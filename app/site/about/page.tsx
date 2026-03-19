@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CTASection } from "@/components/CTASection";
 import { ModernCMS } from "@/lib/modern-cms";
-import { InfoType } from "@prisma/client";
+import { InfoType } from "@/lib/cms-enums";
 
 export const metadata: Metadata = {
   title: "About",

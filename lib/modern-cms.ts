@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { ContentType, ContentStatus, UserRole, InfoType } from '@prisma/client'
+import { ContentType, ContentStatus, UserRole, InfoType } from '@/lib/cms-enums'
 
 // Types for the modern CMS
 export interface CreateContentData {

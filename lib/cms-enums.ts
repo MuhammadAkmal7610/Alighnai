@@ -24,3 +24,12 @@ export const InfoType = {
 } as const
 
 export type InfoType = (typeof InfoType)[keyof typeof InfoType]
+
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  EDITOR: 'EDITOR',
+  AUTHOR: 'AUTHOR',
+  VIEWER: 'VIEWER',
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ModernCMS } from "@/lib/modern-cms";
-import { InfoType } from "@prisma/client";
+import { InfoType } from "@/lib/cms-enums";
 
 export const metadata: Metadata = {
   title: "Contact",

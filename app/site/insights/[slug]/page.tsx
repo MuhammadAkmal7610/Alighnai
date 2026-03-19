@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
 import { notFound } from "next/navigation";
 import { ModernCMS } from "@/lib/modern-cms";
-import { ContentStatus } from "@prisma/client";
+import { ContentStatus } from "@/lib/cms-enums";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
