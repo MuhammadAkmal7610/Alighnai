@@ -42,15 +42,20 @@ const MenuBar = ({ editor }: { editor: any }) => {
   }
 
   return (
-    <div className="flex flex-wrap gap-1 p-1.5 border-b border-slate-200 bg-slate-50/80 backdrop-blur-sm rounded-t-lg sticky top-0 z-10">
-      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+    <div className="flex flex-wrap items-center gap-1 p-2 bg-white border-b border-slate-200 rounded-t-lg sticky top-0 z-10 shadow-sm">
+      <div className="flex items-center gap-1 border-r border-slate-200 pr-2 mr-2">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('bold') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
-          title="Bold"
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('bold') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
+          title="Bold (Ctrl+B)"
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -59,8 +64,13 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('italic') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
-          title="Italic"
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('italic') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
+          title="Italic (Ctrl+I)"
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -69,20 +79,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('underline') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
-          title="Underline"
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('underline') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
+          title="Underline (Ctrl+U)"
         >
           <UnderlineIcon className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+      <div className="flex items-center gap-1 border-r border-slate-200 pr-2 mr-2">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('heading', { level: 1 }) ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('heading', { level: 1 }) 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Heading 1"
         >
           <Heading1 className="h-4 w-4" />
@@ -92,20 +112,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('heading', { level: 2 }) ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('heading', { level: 2 }) 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Heading 2"
         >
           <Heading2 className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+      <div className="flex items-center gap-1 border-r border-slate-200 pr-2 mr-2">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('bulletList') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('bulletList') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Bullet List"
         >
           <List className="h-4 w-4" />
@@ -115,20 +145,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('orderedList') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('orderedList') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Ordered List"
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex items-center gap-0.5 border-r border-slate-200 pr-1.5 mr-1.5">
+      <div className="flex items-center gap-1 border-r border-slate-200 pr-2 mr-2">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('blockquote') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('blockquote') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Quote"
         >
           <Quote className="h-4 w-4" />
@@ -138,20 +178,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('codeBlock') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('codeBlock') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Code Block"
         >
           <Code className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-1">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={addLink}
-          className={cn("h-8 w-8 p-0 transition-colors", editor.isActive('link') ? 'bg-navy text-white hover:bg-navy hover:text-white' : 'text-slate-600 hover:bg-slate-200')}
+          className={cn(
+            "h-8 w-8 p-0 transition-all",
+            editor.isActive('link') 
+              ? 'bg-navy text-white hover:bg-navy/90' 
+              : 'text-slate-700 hover:bg-slate-100'
+          )}
           title="Add Link"
         >
           <LinkIcon className="h-4 w-4" />
@@ -161,7 +211,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
           title="Clear Formatting"
         >
           <Eraser className="h-4 w-4" />
@@ -170,13 +220,13 @@ const MenuBar = ({ editor }: { editor: any }) => {
 
       <div className="flex-1" />
       
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-1">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().undo().run()}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-200"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-100"
           title="Undo"
         >
           <Undo className="h-4 w-4" />
@@ -186,7 +236,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().redo().run()}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-200"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-navy hover:bg-slate-100"
           title="Redo"
         >
           <Redo className="h-4 w-4" />

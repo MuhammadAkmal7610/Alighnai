@@ -74,6 +74,10 @@ export default function ModernDashboard() {
           <div className="mb-10">
             <h1 className="text-4xl font-bold text-navy tracking-tight">Dashboard</h1>
             <p className="text-slate-500 mt-1 font-medium">Welcome back to your AlignAI CMS</p>
+            <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
+              <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click item to edit</span>
+            </div>
           </div>
 
           {/* Stats Grid */}
@@ -132,7 +136,7 @@ export default function ModernDashboard() {
           </div>
 
           {/* Chat Board Section */}
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          {/* <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="border-b border-blue-100 bg-gradient-to-r from-blue-100 to-indigo-100">
               <CardTitle className="text-lg font-bold text-blue-900 flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-blue-600" />
@@ -200,7 +204,7 @@ export default function ModernDashboard() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Recent Content */}
           <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
@@ -223,7 +227,14 @@ export default function ModernDashboard() {
                 <TableBody>
                   {recentContent.length > 0 ? (
                     recentContent.map((content) => (
-                      <TableRow key={content.id} className="border-slate-100 hover:bg-slate-50/50 transition-colors">
+                      <TableRow 
+                        key={content.id} 
+                        className="border-slate-100 hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                        onDoubleClick={() => {
+                          const route = content.type === 'PAGE' ? `/pages/${content.id}/edit` : `/content/${content.id}/edit`
+                          window.location.href = route
+                        }}
+                      >
                         <TableCell className="text-navy font-medium">{content.title}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-tight bg-slate-100 text-slate-600 border-slate-200">

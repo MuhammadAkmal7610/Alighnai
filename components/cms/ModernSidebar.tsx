@@ -25,7 +25,7 @@ const navigation = [
     href: '/pages',
     icon: Grid3x3,
   },
-  {
+  /* {
     title: 'Categories',
     href: '/categories',
     icon: Menu,
@@ -44,7 +44,7 @@ const navigation = [
     title: 'Chat',
     href: '/chat',
     icon: MessageSquare,
-  },
+  }, */
   {
     title: 'Settings',
     href: '/settings',

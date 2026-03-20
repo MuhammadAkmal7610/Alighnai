@@ -114,6 +114,10 @@ export default function CategoriesManager() {
             <div>
               <h1 className="text-4xl font-bold text-navy tracking-tight">Categories</h1>
               <p className="text-slate-500 mt-1 font-medium">Organize your content with meaningful classifications</p>
+              <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
+                <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click any row to edit</span>
+              </div>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
@@ -214,7 +218,11 @@ export default function CategoriesManager() {
                 <TableBody>
                   {categories.length > 0 ? (
                     categories.map((category) => (
-                      <TableRow key={category.id} className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16">
+                      <TableRow 
+                        key={category.id} 
+                        className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16 cursor-pointer group"
+                        onDoubleClick={() => startEdit(category)}
+                      >
                         <TableCell className="px-6 text-center">
                           <div 
                             className="h-6 w-6 rounded-full mx-auto shadow-sm border border-slate-100" 

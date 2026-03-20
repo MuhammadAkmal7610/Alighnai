@@ -45,6 +45,10 @@ export default function UsersManager() {
         <div>
           <h1 className="text-4xl font-bold text-navy tracking-tight">Users</h1>
           <p className="text-slate-500 mt-1 font-medium">Manage team access, roles, and platform permissions</p>
+          <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
+            <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click any card to edit</span>
+          </div>
         </div>
         <Button className="bg-navy text-white hover:bg-navy/90 shadow-md">
           <Plus className="mr-2 h-4 w-4" />
@@ -54,7 +58,11 @@ export default function UsersManager() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {users.map((user) => (
-          <Card key={user.id} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden">
+          <Card 
+            key={user.id} 
+            className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden cursor-pointer group"
+            onDoubleClick={() => console.log(`Editing user: ${user.name}`)}
+          >
             <CardHeader className="flex flex-row items-center gap-4 pb-4">
               <div className="h-14 w-14 rounded-full bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center ring-1 ring-slate-100">
                 <User className="h-7 w-7 text-navy" />
@@ -120,7 +128,11 @@ export default function UsersManager() {
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16">
+                <TableRow 
+                  key={user.id} 
+                  className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16 cursor-pointer group"
+                  onDoubleClick={() => console.log(`Editing user: ${user.name}`)}
+                >
                   <TableCell className="px-6">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-navy">

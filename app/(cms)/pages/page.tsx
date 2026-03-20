@@ -17,7 +17,10 @@ import { CMSEditor } from '@/components/cms/CMSEditor'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 
+import { useRouter } from 'next/navigation'
+
 export default function PagesManager() {
+  const router = useRouter()
   const [pages, setPages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -45,7 +48,6 @@ export default function PagesManager() {
       }
 
       const pagesData = await res.json()
-      console.log('Successfully fetched pages:', pagesData)
       setPages(Array.isArray(pagesData) ? pagesData : [])
     } catch (error: any) {
       console.error('CMS: Failed to fetch pages:', error)
@@ -65,15 +67,7 @@ export default function PagesManager() {
   }
 
   const startEdit = (page: any) => {
-    setEditingId(page.id)
-    setFormData({
-      title: page.title,
-      slug: page.slug,
-      content: page.content || '',
-      template: page.template || 'default',
-      metadata: page.metadata || {}
-    })
-    setShowCreateDialog(true)
+    router.push(`/pages/${page.id}/edit`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -119,6 +113,10 @@ export default function PagesManager() {
             <div>
               <h1 className="text-4xl font-bold text-navy tracking-tight">Pages</h1>
               <p className="text-slate-500 mt-1 font-medium">Manage your website's structural architecture</p>
+              <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
+                <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click any row to edit</span>
+              </div>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
@@ -277,7 +275,11 @@ export default function PagesManager() {
                 </TableHeader>
                 <TableBody>
                   {pages.map((page) => (
-                    <TableRow key={page.id} className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16">
+                    <TableRow 
+                      key={page.id} 
+                      className="border-slate-100 hover:bg-slate-50/30 transition-colors h-16 cursor-pointer group"
+                      onDoubleClick={() => startEdit(page)}
+                    >
                       <TableCell className="text-navy font-semibold px-6">{page.title}</TableCell>
                       <TableCell className="text-slate-500 font-medium px-6">/{page.slug}</TableCell>
                       <TableCell className="px-6">

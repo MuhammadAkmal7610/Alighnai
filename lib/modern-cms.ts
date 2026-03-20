@@ -91,15 +91,20 @@ export class ModernCMS {
     })
   }
 
-  static async updateContent(id: string, data: Partial<CreateContentData>) {
+  static async updateContent(id: string, data: any) {
+    // Remove relation objects and non-updatable fields
+    const { id: _id, author, category, createdAt, updatedAt, ...cleanData } = data
+    
     return await prisma.content.update({
       where: { id },
       data: {
-        ...data,
+        ...cleanData,
         publishedAt: data.status === ContentStatus.PUBLISHED && !data.publishedAt ? new Date() : data.publishedAt
       },
       include: {
-        author: true,
+        author: {
+          select: { id: true, name: true, email: true }
+        },
         category: true
       }
     })
@@ -169,6 +174,17 @@ export class ModernCMS {
     })
   }
 
+  static async getPageById(id: string) {
+    return await prisma.page.findUnique({
+      where: { id },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    })
+  }
+
   static async createPage(data: CreatePageData) {
     return await prisma.page.create({
       data,
@@ -178,12 +194,17 @@ export class ModernCMS {
     })
   }
 
-  static async updatePage(id: string, data: Partial<CreatePageData>) {
+  static async updatePage(id: string, data: any) {
+    // Remove relation objects and non-updatable fields that might be in the payload
+    const { id: _id, author, createdAt, updatedAt, ...updateData } = data
+    
     return await prisma.page.update({
       where: { id },
-      data,
+      data: updateData,
       include: {
-        author: true
+        author: {
+          select: { id: true, name: true, email: true }
+        }
       }
     })
   }
