@@ -137,22 +137,35 @@ export function FullPageEditor({ initialPage }: FullPageEditorProps) {
       <div className="flex-1 overflow-y-auto bg-white custom-scrollbar">
         <div className="max-w-[1200px] mx-auto py-10 px-6">
           {/* Page Settings (Floating or Sidebar alternative) */}
-          <div className="mb-10 grid grid-cols-2 gap-6 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+          <div className="mb-10 grid grid-cols-3 gap-6 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-500 uppercase">Page Title</Label>
+              <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Page Title</Label>
               <Input 
                 value={page.title} 
                 onChange={(e) => setPage({ ...page, title: e.target.value })}
-                className="bg-white border-slate-200"
+                className="bg-white border-slate-200 focus:ring-navy focus:border-navy h-10 font-medium"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-500 uppercase">URL Slug</Label>
+              <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">URL Slug</Label>
               <Input 
                 value={page.slug} 
                 onChange={(e) => setPage({ ...page, slug: e.target.value })}
-                className="bg-white border-slate-200"
+                className="bg-white border-slate-200 focus:ring-navy focus:border-navy h-10 font-medium"
               />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Design Template</Label>
+              <select
+                value={page.template || ''}
+                onChange={(e) => setPage({ ...page, template: e.target.value })}
+                className="w-full bg-white border border-slate-200 text-sm focus:ring-navy focus:border-navy h-10 px-3 rounded-md font-medium cursor-pointer"
+              >
+                <option value="blank">Blank (Default Content Only)</option>
+                <option value="home">Home Template (Enterprise)</option>
+                <option value="about">About Template (Founder)</option>
+                <option value="framework">Framework Template (Architecture)</option>
+              </select>
             </div>
           </div>
 

@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, Eye, Phone, Mail, MapPin, FileText, Info as InfoIcon, Globe, Map } from 'lucide-react'
 import { InfoType, type InfoType as InfoTypeValue } from '@/lib/cms-enums'
 import { cn } from '@/lib/utils'
+import { CMSEditor } from '@/components/cms/CMSEditor'
 
 export default function InfoManager() {
   const [infoItems, setInfoItems] = useState<any[]>([])
@@ -174,14 +175,14 @@ export default function InfoManager() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content" className="text-sm font-bold text-navy">Main Content</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="bg-white border-slate-200 text-navy rounded-lg min-h-[120px]"
-                  placeholder="Primary content or text"
-                  required
-                />
+                <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm bg-white">
+                  <CMSEditor 
+                    content={formData.content} 
+                    onChange={(val) => setFormData({ ...formData, content: val })} 
+                    placeholder="Primary content or text"
+                    minHeight="150px"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="metadata" className="text-sm font-bold text-navy">Structured Metadata (JSON)</Label>

@@ -42,6 +42,8 @@ export default function ContentManager() {
     categoryId: ''
   })
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [contentToDelete, setContentToDelete] = useState<any>(null)
 
   useEffect(() => {
     fetchData()
@@ -75,11 +77,20 @@ export default function ContentManager() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this content?')) return
+  const confirmDelete = (content: any) => {
+    setContentToDelete(content)
+    setShowDeleteDialog(true)
+  }
+
+  const handleDelete = async () => {
+    if (!contentToDelete) return
     try {
-      const res = await fetch(`/api/cms/posts/${id}`, { method: 'DELETE' })
-      if (res.ok) await fetchData()
+      const res = await fetch(`/api/cms/posts/${contentToDelete.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        await fetchData()
+        setShowDeleteDialog(false)
+        setContentToDelete(null)
+      }
     } catch (error) {
       console.error('Failed to delete content:', error)
     }
@@ -195,12 +206,12 @@ export default function ContentManager() {
 
                   <div className="space-y-2">
                     <Label htmlFor="excerpt" className="text-sm font-bold text-navy">Excerpt / Summary</Label>
-                    <Textarea
-                      id="excerpt"
-                      value={formData.excerpt}
-                      onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                      className="bg-white border-slate-200 text-navy rounded-lg min-h-[80px]"
+                    <CMSEditor 
+                      variant="ghost"
+                      content={formData.excerpt}
+                      onChange={(val) => setFormData({ ...formData, excerpt: val })}
                       placeholder="Brief summary used in listings"
+                      minHeight="80px"
                     />
                   </div>
 
@@ -290,7 +301,7 @@ export default function ContentManager() {
                             <Button size="sm" variant="outline" onClick={() => startEdit(content)} className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-navy hover:bg-slate-50">
                               <Edit className="h-3.5 w-3.5" />
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDelete(content.id)} className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100">
+                            <Button size="sm" variant="outline" onClick={() => confirmDelete(content)} className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100">
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
@@ -308,6 +319,40 @@ export default function ContentManager() {
               </Table>
             </CardContent>
           </Card>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DialogContent className="bg-white border-slate-200 max-w-md shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                  <Trash2 className="w-5 h-5 text-red-500" />
+                  Delete Content
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <p className="text-slate-600">
+                  Are you sure you want to delete <span className="font-bold text-navy">"{contentToDelete?.title}"</span>? 
+                  This action cannot be undone and this item will be permanently removed.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowDeleteDialog(false)}
+                  className="border-slate-200 text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleDelete}
+                  className="bg-red-600 text-white hover:bg-red-700 px-6 shadow-md"
+                >
+                  Delete Permanently
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
     </div>
   )
 }

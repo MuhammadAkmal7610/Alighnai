@@ -29,13 +29,22 @@ export default function ModernDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      const [statsRes, contentRes] = await Promise.all([
+      const [statsRes, activityRes] = await Promise.all([
         fetch('/api/cms/stats'),
-        fetch('/api/cms/posts?take=5')
+        fetch('/api/cms/activity?take=8')
       ])
       
-      let statsData = { totalContents: 0, publishedContents: 0, draftContents: 0, totalPages: 0, publishedPages: 0, totalCategories: 0, totalUsers: 0 }
-      let contentData = { posts: [] }
+      let statsData = { 
+        totalContents: 0, 
+        publishedContents: 0, 
+        draftContents: 0, 
+        totalPages: 0, 
+        publishedPages: 0, 
+        draftPages: 0,
+        totalCategories: 0, 
+        totalUsers: 0 
+      }
+      let activityData = { activity: [] }
 
       if (statsRes.ok) {
         statsData = await statsRes.json()
@@ -44,15 +53,15 @@ export default function ModernDashboard() {
         console.error('CMS: Failed to fetch stats:', err.details || statsRes.status)
       }
 
-      if (contentRes.ok) {
-        contentData = await contentRes.json()
+      if (activityRes.ok) {
+        activityData = await activityRes.json()
       } else {
-        const err = await contentRes.json().catch(() => ({}))
-        console.error('CMS: Failed to fetch recent posts:', err.details || contentRes.status)
+        const err = await activityRes.json().catch(() => ({}))
+        console.error('CMS: Failed to fetch recent activity:', err.details || activityRes.status)
       }
       
       setStats(statsData)
-      setRecentContent(contentData.posts || [])
+      setRecentContent(activityData.activity || [])
     } catch (error: any) {
       console.error('CMS: Failed to fetch dashboard data:', error)
     } finally {
@@ -90,8 +99,8 @@ export default function ModernDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="text-3xl font-bold text-navy">{stats.totalContents}</div>
-                <p className="text-xs text-slate-400 mt-1">All content items</p>
+                <div className="text-3xl font-bold text-navy">{stats.totalContents + stats.totalPages}</div>
+                <p className="text-xs text-slate-400 mt-1">Total pages & posts</p>
               </CardContent>
             </Card>
 
@@ -103,8 +112,8 @@ export default function ModernDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="text-3xl font-bold text-navy">{stats.publishedContents}</div>
-                <p className="text-xs text-slate-400 mt-1">Live content</p>
+                <div className="text-3xl font-bold text-navy">{stats.publishedContents + stats.publishedPages}</div>
+                <p className="text-xs text-slate-400 mt-1">Live pages & posts</p>
               </CardContent>
             </Card>
 
@@ -116,8 +125,8 @@ export default function ModernDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="text-3xl font-bold text-navy">{stats.draftContents}</div>
-                <p className="text-xs text-slate-400 mt-1">Draft content</p>
+                <div className="text-3xl font-bold text-navy">{stats.draftContents + (stats.totalPages - stats.publishedPages)}</div>
+                <p className="text-xs text-slate-400 mt-1">Draft items</p>
               </CardContent>
             </Card>
 

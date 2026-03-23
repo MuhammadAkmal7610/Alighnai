@@ -10,7 +10,7 @@ interface Message {
 const GREETING =
   "Hi — I can answer questions about the AlignAI framework, the AI Decision Visibility Assessment, or enterprise AI governance more broadly. What would you like to know?";
 
-const PHASE_2_ENABLED = false;
+const PHASE_2_ENABLED = true;
 
 export function ChatPanel({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
@@ -36,8 +36,6 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
     setMessages(updated);
     setInput("");
 
-    if (!PHASE_2_ENABLED) return;
-
     setLoading(true);
     try {
       const res = await fetch("/api/chat", {
@@ -53,14 +51,14 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
       const data = await res.json();
       setMessages([
         ...updated,
-        { role: "assistant", content: data.reply ?? "Sorry, something went wrong." },
+        { role: "assistant", content: data.reply ?? "I'm sorry, I'm having trouble processing that right now." },
       ]);
     } catch {
       setMessages([
         ...updated,
         {
           role: "assistant",
-          content: "Sorry, I couldn't connect. Please try again later.",
+          content: "Sorry, I couldn't connect to the AlignAI network. Please try again later.",
         },
       ]);
     } finally {
@@ -70,17 +68,17 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-x-3 bottom-[96px] z-[70] flex w-auto max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-[8px] border border-[rgba(99,188,231,0.2)] shadow-2xl sm:inset-x-auto sm:right-7 sm:w-80 sm:max-w-80"
+      className="fixed inset-x-3 bottom-[96px] z-[70] flex w-auto max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-xl border border-[rgba(99,188,231,0.2)] shadow-2xl sm:inset-x-auto sm:right-7 sm:w-80 sm:max-w-80"
       role="dialog"
       aria-label="Chat with AlignAI"
     >
       {/* Header */}
-      <div className="flex items-center justify-between bg-deep-blue px-4 py-3">
+      <div className="flex items-center justify-between bg-deep-blue px-4 py-3 border-b border-navy">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-white">AlignAI</span>
-          <span className="text-xs text-light-slate">Ask about AlignAI</span>
-          <span className="rounded-btn bg-cyan px-1.5 py-0.5 text-[10px] font-semibold text-navy">
-            Beta
+          <span className="text-[10px] text-light-slate">Ask about AlignAI</span>
+          <span className="rounded-full bg-mid-blue/20 border border-mid-blue/30 px-2 py-0.5 text-[10px] font-bold text-mid-blue">
+            OFFICIAL
           </span>
         </div>
         <button
@@ -94,7 +92,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             aria-hidden="true"
           >
@@ -107,21 +105,21 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto bg-navy p-4"
-        style={{ maxHeight: "min(52vh, 360px)" }}
+        className="flex-1 overflow-y-auto bg-navy p-4 custom-scrollbar"
+        style={{ height: "360px", maxHeight: "52vh" }}
       >
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`mb-3 ${
-              msg.role === "user" ? "text-right" : "text-left"
+            className={`mb-4 ${
+              msg.role === "user" ? "text-right pl-8" : "text-left pr-8"
             }`}
           >
             <span
-              className={`inline-block max-w-full rounded-btn px-3 py-2 text-sm leading-relaxed ${
+              className={`inline-block max-w-full rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm transition-opacity duration-300 ${
                 msg.role === "user"
-                  ? "bg-mid-blue text-white"
-                  : "bg-deep-blue text-light-slate"
+                  ? "bg-mid-blue text-white rounded-tr-none"
+                  : "bg-deep-blue text-light-slate rounded-tl-none border border-navy shadow-inner"
               }`}
             >
               {msg.content}
@@ -129,9 +127,9 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
           </div>
         ))}
         {loading && (
-          <div className="text-left">
-            <span className="inline-block rounded-btn bg-deep-blue px-3 py-2 text-sm text-slate">
-              Thinking&hellip;
+          <div className="text-left animate-pulse pl-2">
+            <span className="inline-block rounded-full bg-deep-blue px-3 py-1.5 text-xs text-slate-400">
+              AlignAI is thinking...
             </span>
           </div>
         )}
@@ -143,29 +141,31 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
           e.preventDefault();
           handleSend();
         }}
-        className="flex border-t border-deep-blue bg-navy"
+        className="flex border-t border-navy bg-navy/95 backdrop-blur-md p-2"
       >
         <label className="sr-only" htmlFor="chat-input">
           Type a message
         </label>
+        <div className="flex-1 relative flex items-center">
         <input
           id="chat-input"
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask a question..."
-          className="flex-1 bg-transparent px-4 py-3 text-sm text-white placeholder-slate outline-none"
-          disabled={loading || !PHASE_2_ENABLED}
+          autoComplete="off"
+          className="w-full bg-deep-blue rounded-full px-5 py-3 text-sm text-white placeholder-slate-500 outline-none border border-navy focus:border-mid-blue/50 transition-colors shadow-inner"
+          disabled={loading}
         />
         <button
           type="submit"
-          className="px-4 text-mid-blue transition-colors hover:text-cyan disabled:opacity-50"
-          disabled={loading || !input.trim() || !PHASE_2_ENABLED}
+          className="absolute right-2 p-2 text-mid-blue transition-all hover:text-cyan disabled:opacity-50 disabled:scale-95 transform active:scale-90"
+          disabled={loading || !input.trim()}
           aria-label="Send message"
         >
           <svg
-            width="18"
-            height="18"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"
@@ -173,9 +173,10 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
         </button>
+        </div>
       </form>
-      <div className="border-t border-deep-blue bg-navy px-4 py-2 text-center text-[11px] text-slate">
-        Powered by AlignAI · Phase 2 — Coming Soon
+      <div className="bg-navy px-4 py-2 text-center text-[10px] text-slate-500 font-medium">
+        Powered by <span className="text-mid-blue font-bold tracking-tight">AlignAI</span> Governance Assistant
       </div>
     </div>
   );

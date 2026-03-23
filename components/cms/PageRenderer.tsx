@@ -16,17 +16,19 @@ interface PageRendererProps {
 export function PageRenderer({ page, isEditing, onContentChange, onMetadataChange }: PageRendererProps) {
   const data = (page?.metadata as any) || {}
   const slug = page?.slug
+  const template = page?.template || (slug === 'home' ? 'home' : (slug === 'about' ? 'about' : (slug === 'framework' ? 'framework' : 'blank')))
 
   // Page specific elements
-  const isHome = slug === 'home'
-  const isAbout = slug === 'about'
-  const isFramework = slug === 'framework'
+  const isHome = template === 'home'
+  const isAbout = template === 'about'
+  const isFramework = template === 'framework'
+  const isBlank = template === 'blank'
   
   const hero = data.hero || {
-    kicker: isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : 'The Framework'),
-    title: isHome ? 'AI is already influencing decisions in your organization.' : (isAbout ? 'Built from doctoral research.' : 'Governance architecture for the layer most frameworks miss.'),
+    kicker: isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : 'New Page')),
+    title: isHome ? 'AI is already influencing decisions in your organization.' : (isAbout ? 'Built from doctoral research.' : (isFramework ? 'Governance architecture for the layer most frameworks miss.' : 'Start building your new page content...')),
     highlight: isHome ? 'Most enterprises have no governance over that layer.' : '',
-    description: isHome ? 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions.' : (isAbout ? 'Delivered with 30 years of enterprise experience.' : 'AlignAI defines the structural controls for the AI decision environment your organization has already created.')
+    description: isHome ? 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions.' : (isAbout ? 'Delivered with 30 years of enterprise experience.' : (isFramework ? 'AlignAI defines the structural controls for the AI decision environment your organization has already created.' : 'Use the editor below to add your page description and content.'))
   }
 
   const problems = data.problems || []
@@ -39,6 +41,10 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
   }
   const pillars = data.pillars || []
   const modelLayers = data.modelLayers || []
+  const cta = data.cta || {
+    title: 'Ready to understand what your AI is actually deciding?',
+    description: 'No platform required. No prior governance work needed.'
+  }
 
   // Metadata update helpers
   const updateHero = (field: string, value: string) => {
@@ -101,6 +107,18 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
     }
   }
 
+  const updateCTA = (field: string, value: string) => {
+    if (onMetadataChange) {
+      onMetadataChange({
+        ...data,
+        cta: {
+          ...cta,
+          [field]: value
+        }
+      })
+    }
+  }
+
   const [editingField, setEditingField] = useState<string | null>(null)
 
   return (
@@ -123,33 +141,34 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
           <div className="max-w-4xl">
             {/* Kicker */}
             {isEditing && editingField === 'kicker' ? (
-              <input 
-                autoFocus
-                className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-lg text-white text-sm font-medium w-full mb-6 outline-none transition-all"
-                value={hero.kicker}
-                onChange={(e) => updateHero('kicker', e.target.value)}
-                onBlur={() => setEditingField(null)}
-                onKeyDown={(e) => e.key === 'Enter' && setEditingField(null)}
-              />
+              <div className="mb-6">
+                <CMSEditor 
+                  variant="ghost"
+                  content={hero.kicker}
+                  onChange={(val) => updateHero('kicker', val)}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Enter kicker..."
+                />
+              </div>
             ) : (
-              <p 
+              <div 
                 className={cn("hero-kicker mb-6", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                 onDoubleClick={() => isEditing && setEditingField('kicker')}
-              >
-                {hero.kicker}
-              </p>
+                dangerouslySetInnerHTML={{ __html: hero.kicker || (isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : 'The Framework')) }}
+              />
             )}
 
             {/* Title */}
             {isEditing && editingField === 'title' ? (
-              <textarea 
-                autoFocus
-                className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-xl text-white text-4xl md:text-6xl font-bold w-full h-32 mb-6 outline-none transition-all resize-none"
-                value={hero.title}
-                onChange={(e) => updateHero('title', e.target.value)}
-                onBlur={() => setEditingField(null)}
-                onKeyDown={(e) => e.key === 'Escape' && setEditingField(null)}
-              />
+              <div className="mb-6">
+                <CMSEditor 
+                  variant="ghost"
+                  content={hero.title}
+                  onChange={(val) => updateHero('title', val)}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Enter title..."
+                />
+              </div>
             ) : (
               <h1 
                 className={cn(
@@ -157,22 +176,22 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                   isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                 )}
                 onDoubleClick={() => isEditing && setEditingField('title')}
-              >
-                {hero.title}
-              </h1>
+                dangerouslySetInnerHTML={{ __html: hero.title || (isHome ? 'AI is already influencing decisions in your organization.' : (isAbout ? 'Built from doctoral research.' : 'Governance architecture for the layer most frameworks miss.')) }}
+              />
             )}
 
             {/* Highlight (Home Only) */}
             {isHome && (
               isEditing && editingField === 'highlight' ? (
-                <textarea 
-                  autoFocus
-                  className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-xl text-cyan text-4xl md:text-6xl font-bold w-full h-32 mb-8 outline-none transition-all resize-none"
-                  value={hero.highlight}
-                  onChange={(e) => updateHero('highlight', e.target.value)}
-                  onBlur={() => setEditingField(null)}
-                  onKeyDown={(e) => e.key === 'Escape' && setEditingField(null)}
-                />
+                <div className="mb-8">
+                  <CMSEditor 
+                    variant="ghost"
+                    content={hero.highlight}
+                    onChange={(val) => updateHero('highlight', val)}
+                    onDone={() => setEditingField(null)}
+                    placeholder="Enter highlight..."
+                  />
+                </div>
               ) : (
                 <h1 
                   className={cn(
@@ -180,32 +199,31 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                   )}
                   onDoubleClick={() => isEditing && setEditingField('highlight')}
-                >
-                  {hero.highlight}
-                </h1>
+                  dangerouslySetInnerHTML={{ __html: hero.highlight || 'Most enterprises have no governance over that layer.' }}
+                />
               )
             )}
 
             {/* Description */}
             {isEditing && editingField === 'description' ? (
-              <textarea 
-                autoFocus
-                className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-xl text-light-slate text-lg md:text-xl w-full h-40 mb-10 outline-none transition-all resize-none"
-                value={hero.description}
-                onChange={(e) => updateHero('description', e.target.value)}
-                onBlur={() => setEditingField(null)}
-                onKeyDown={(e) => e.key === 'Escape' && setEditingField(null)}
-              />
+              <div className="mb-10">
+                <CMSEditor 
+                  variant="ghost"
+                  content={hero.description}
+                  onChange={(val) => updateHero('description', val)}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Enter description..."
+                />
+              </div>
             ) : (
-              <p 
+              <div 
                 className={cn(
                   "mb-10 max-w-2xl text-lg text-light-slate md:text-xl leading-relaxed",
                   isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                 )}
                 onDoubleClick={() => isEditing && setEditingField('description')}
-              >
-                {hero.description}
-              </p>
+                dangerouslySetInnerHTML={{ __html: hero.description || (isHome ? 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions.' : (isAbout ? 'Delivered with 30 years of enterprise experience.' : 'AlignAI defines the structural controls for the AI decision environment your organization has already created.')) }}
+              />
             )}
           </div>
 
@@ -213,21 +231,10 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
           <div className="mt-12">
             {isEditing && editingField === 'content' ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-cyan/50" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Editing Content</p>
-                  </div>
-                  <button 
-                    onClick={() => setEditingField(null)}
-                    className="text-[10px] font-bold text-cyan hover:text-white transition-colors uppercase tracking-widest"
-                  >
-                    Done
-                  </button>
-                </div>
                 <CMSEditor 
                   content={page?.content || ''} 
                   onChange={(content) => onContentChange?.(content)} 
+                  onDone={() => setEditingField(null)}
                 />
               </div>
             ) : (
@@ -246,9 +253,6 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
               </div>
             )}
           </div>
-          
-          {/* ... (Home credentials and buttons) ... */}
-          {/* (I'll keep them as before) */}
         </div>
       </section>
 
@@ -257,66 +261,67 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         <>
           <div className="section-divider" />
           <section className="bg-off-white py-20">
-            <div className="container-main">
-              <div className="grid gap-12 lg:grid-cols-[260px_1fr] lg:gap-14 text-navy">
+            <div className="container-main text-navy">
+              <div className="grid gap-12 lg:grid-cols-[260px_1fr] lg:gap-14">
                 <div className="flex aspect-[3/4] w-full max-w-[250px] items-center justify-center rounded-btn bg-deep-blue text-white shadow-xl">
                   Headshot Placeholder
                 </div>
                 <div>
                   {isEditing && editingField === 'founder.name' ? (
-                    <input 
-                      autoFocus
-                      className="bg-slate-100 border border-mid-blue/50 focus:border-mid-blue px-4 py-2 rounded-lg text-navy text-4xl font-bold w-full mb-2 outline-none"
-                      value={founder.name}
-                      onChange={(e) => updateFounder('name', e.target.value)}
-                      onBlur={() => setEditingField(null)}
-                      onKeyDown={(e) => e.key === 'Enter' && setEditingField(null)}
-                    />
+                    <div className="mb-4">
+                      <CMSEditor 
+                        variant="ghost"
+                        content={founder.name}
+                        onChange={(val) => updateFounder('name', val)}
+                        onDone={() => setEditingField(null)}
+                        placeholder="Enter name..."
+                      />
+                    </div>
                   ) : (
                     <h2 
                       className={cn("text-4xl font-bold", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
                       onDoubleClick={() => isEditing && setEditingField('founder.name')}
-                    >
-                      {founder.name}
-                    </h2>
+                      dangerouslySetInnerHTML={{ __html: founder.name }}
+                    />
                   )}
 
                   {isEditing && editingField === 'founder.title' ? (
-                    <input 
-                      autoFocus
-                      className="bg-slate-100 border border-mid-blue/50 focus:border-mid-blue px-4 py-2 rounded-lg text-mid-blue font-bold w-full outline-none"
-                      value={founder.title}
-                      onChange={(e) => updateFounder('title', e.target.value)}
-                      onBlur={() => setEditingField(null)}
-                      onKeyDown={(e) => e.key === 'Enter' && setEditingField(null)}
-                    />
+                    <div className="mb-4">
+                      <CMSEditor 
+                        variant="ghost"
+                        content={founder.title}
+                        onChange={(val) => updateFounder('title', val)}
+                        onDone={() => setEditingField(null)}
+                        placeholder="Enter title..."
+                      />
+                    </div>
                   ) : (
                     <p 
                       className={cn("text-mid-blue font-bold mt-1", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
                       onDoubleClick={() => isEditing && setEditingField('founder.title')}
-                    >
-                      {founder.title}
-                    </p>
+                      dangerouslySetInnerHTML={{ __html: founder.title }}
+                    />
                   )}
 
                   <div className="mt-6 space-y-4 text-slate leading-relaxed">
                     {founder.bio.map((p: string, i: number) => (
                       <div key={i}>
                         {isEditing && editingField === `founder.bio.${i}` ? (
-                          <textarea 
-                            autoFocus
-                            className="bg-slate-50 border border-mid-blue/50 focus:border-mid-blue px-4 py-2 rounded-lg text-slate w-full h-32 outline-none resize-none"
-                            value={p}
-                            onChange={(e) => updateFounderBio(i, e.target.value)}
-                            onBlur={() => setEditingField(null)}
-                          />
+                          <div className="mb-4">
+                            <CMSEditor 
+                              variant="ghost"
+                              content={p}
+                              onChange={(val) => updateFounderBio(i, val)}
+                              onDone={() => setEditingField(null)}
+                              placeholder="Enter bio paragraph..."
+                            />
+                          </div>
                         ) : (
-                          <p 
+                          <div 
                             className={cn(isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
                             onDoubleClick={() => isEditing && setEditingField(`founder.bio.${i}`)}
-                          >
-                            {p}
-                          </p>
+                            dangerouslySetInnerHTML={{ __html: p }}
+                          />
                         )}
                       </div>
                     ))}
@@ -337,40 +342,41 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
               <p className="hero-kicker">Five Governance Pillars</p>
               <div className="mt-12 space-y-8">
                 {pillars.map((pillar: any, i: number) => (
-                  <div key={pillar.number} className="border-l-2 border-cyan/50 pl-6 hover:border-cyan transition-colors group">
+                  <div key={pillar.number || i} className="border-l-2 border-cyan/50 pl-6 hover:border-cyan transition-colors group">
                     {isEditing && editingField === `pillars.${i}.title` ? (
-                      <input 
-                        autoFocus
-                        className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-lg text-white text-xl font-bold w-full mb-2 outline-none"
-                        value={pillar.title}
-                        onChange={(e) => updatePillar(i, 'title', e.target.value)}
-                        onBlur={() => setEditingField(null)}
-                        onKeyDown={(e) => e.key === 'Enter' && setEditingField(null)}
-                      />
+                      <div className="mb-2">
+                        <CMSEditor 
+                          variant="ghost"
+                          content={pillar.title}
+                          onChange={(val) => updatePillar(i, 'title', val)}
+                          onDone={() => setEditingField(null)}
+                          placeholder="Enter pillar title..."
+                        />
+                      </div>
                     ) : (
                       <h3 
                         className={cn("text-xl font-bold text-white group-hover:text-cyan transition-colors", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField(`pillars.${i}.title`)}
-                      >
-                        {pillar.title}
-                      </h3>
+                        dangerouslySetInnerHTML={{ __html: pillar.title }}
+                      />
                     )}
 
                     {isEditing && editingField === `pillars.${i}.description` ? (
-                      <textarea 
-                        autoFocus
-                        className="bg-white/10 border border-cyan/50 focus:border-cyan px-4 py-2 rounded-lg text-light-slate w-full h-24 outline-none resize-none mt-2"
-                        value={pillar.description}
-                        onChange={(e) => updatePillar(i, 'description', e.target.value)}
-                        onBlur={() => setEditingField(null)}
-                      />
+                      <div className="mt-2">
+                        <CMSEditor 
+                          variant="ghost"
+                          content={pillar.description}
+                          onChange={(val) => updatePillar(i, 'description', val)}
+                          onDone={() => setEditingField(null)}
+                          placeholder="Enter pillar description..."
+                        />
+                      </div>
                     ) : (
-                      <p 
+                      <div 
                         className={cn("text-light-slate mt-2 leading-relaxed", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField(`pillars.${i}.description`)}
-                      >
-                        {pillar.description}
-                      </p>
+                        dangerouslySetInnerHTML={{ __html: pillar.description }}
+                      />
                     )}
                   </div>
                 ))}
@@ -394,38 +400,39 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                 {problems.map((problem: any, index: number) => (
                   <div key={index} className="bg-white p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow rounded-xl">
                     {isEditing && editingField === `problems.${index}.title` ? (
-                      <input 
-                        autoFocus
-                        className="bg-slate-50 border border-mid-blue/50 focus:border-mid-blue px-4 py-2 rounded-lg text-navy text-lg font-bold w-full mb-2 outline-none"
-                        value={problem.title}
-                        onChange={(e) => updateProblem(index, 'title', e.target.value)}
-                        onBlur={() => setEditingField(null)}
-                        onKeyDown={(e) => e.key === 'Enter' && setEditingField(null)}
-                      />
+                      <div className="mb-2">
+                        <CMSEditor 
+                          variant="ghost"
+                          content={problem.title}
+                          onChange={(val) => updateProblem(index, 'title', val)}
+                          onDone={() => setEditingField(null)}
+                          placeholder="Enter problem title..."
+                        />
+                      </div>
                     ) : (
                       <h3 
                         className={cn("text-lg text-navy font-bold", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField(`problems.${index}.title`)}
-                      >
-                        {problem.title}
-                      </h3>
+                        dangerouslySetInnerHTML={{ __html: problem.title }}
+                      />
                     )}
 
                     {isEditing && editingField === `problems.${index}.description` ? (
-                      <textarea 
-                        autoFocus
-                        className="bg-slate-50 border border-mid-blue/50 focus:border-mid-blue px-4 py-2 rounded-lg text-slate text-sm w-full h-24 outline-none resize-none mt-3"
-                        value={problem.description}
-                        onChange={(e) => updateProblem(index, 'description', e.target.value)}
-                        onBlur={() => setEditingField(null)}
-                      />
+                      <div className="mt-3">
+                        <CMSEditor 
+                          variant="ghost"
+                          content={problem.description}
+                          onChange={(val) => updateProblem(index, 'description', val)}
+                          onDone={() => setEditingField(null)}
+                          placeholder="Enter problem description..."
+                        />
+                      </div>
                     ) : (
-                      <p 
+                      <div 
                         className={cn("mt-3 text-sm text-slate leading-relaxed", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField(`problems.${index}.description`)}
-                      >
-                        {problem.description}
-                      </p>
+                        dangerouslySetInnerHTML={{ __html: problem.description }}
+                      />
                     )}
                   </div>
                 ))}
@@ -435,8 +442,13 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         </>
       )}
 
-      {!isEditing && <div className="section-divider" />}
-      {!isEditing && <CTASection />}
+      <div className="section-divider" />
+      <CTASection 
+        title={cta.title} 
+        description={cta.description} 
+        isEditing={isEditing} 
+        onUpdate={updateCTA}
+      />
     </div>
   )
 }

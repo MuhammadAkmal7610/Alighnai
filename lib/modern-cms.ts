@@ -388,6 +388,39 @@ export class ModernCMS {
     }
   }
 
+  static async getRecentActivity(take: number = 5) {
+    try {
+      const [contents, pages] = await Promise.all([
+        prisma.content.findMany({
+          take,
+          include: {
+            author: { select: { id: true, name: true } }
+          },
+          orderBy: { updatedAt: 'desc' }
+        }),
+        prisma.page.findMany({
+          take,
+          include: {
+            author: { select: { id: true, name: true } }
+          },
+          orderBy: { updatedAt: 'desc' }
+        })
+      ])
+
+      const activity = [
+        ...contents.map(c => ({ ...c, type: 'POST' })),
+        ...pages.map(p => ({ ...p, type: 'PAGE' }))
+      ]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, take)
+
+      return activity
+    } catch (error) {
+      if (isDatabaseConfigError(error)) return []
+      throw error
+    }
+  }
+
   // Search
   static async search(query: string, type?: 'content' | 'page' | 'all') {
     const searchQuery = {
