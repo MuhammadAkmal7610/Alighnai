@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { CMSEditor } from "./cms/CMSEditor";
 import { cn } from "@/lib/utils";

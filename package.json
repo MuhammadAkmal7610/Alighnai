@@ -10,7 +10,13 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "chat-server": "ts-node server/chat-server.ts",
+    "db:seed": "tsx scripts/seed-cms.ts",
+    "db:seed:defaults": "tsx scripts/seed-defaults.ts",
+    "db:seed:all": "npm run db:seed && npm run db:seed:defaults",
     "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx scripts/seed-cms.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
