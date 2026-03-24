@@ -145,6 +145,23 @@ export class ModernCMS {
     })
   }
 
+  static async getPostById(id: string) {
+    try {
+      return await prisma.content.findUnique({
+        where: { id },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true }
+          },
+          category: true
+        }
+      })
+    } catch (error) {
+      if (isDatabaseConfigError(error)) return null
+      throw error
+    }
+  }
+
   // Categories
   static async getCategories() {
     return await prisma.category.findMany({
@@ -173,6 +190,22 @@ export class ModernCMS {
     return await prisma.category.delete({
       where: { id }
     })
+  }
+
+  static async getCategoryById(id: string) {
+    try {
+      return await prisma.category.findUnique({
+        where: { id },
+        include: {
+          _count: {
+            select: { contents: true }
+          }
+        }
+      })
+    } catch (error) {
+      if (isDatabaseConfigError(error)) return null
+      throw error
+    }
   }
 
   // Pages Management (Home, About, Framework, etc.)
@@ -214,14 +247,25 @@ export class ModernCMS {
   }
 
   static async getPageById(id: string) {
-    return await prisma.page.findUnique({
-      where: { id },
-      include: {
-        author: {
-          select: { id: true, name: true, email: true }
+    try {
+      if (!id) throw new Error('getPageById: ID is required');
+      console.log(`CMS Backend: query.page.findUnique(id: ${id})`);
+      const page = await prisma.page.findUnique({
+        where: { id },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true }
+          }
         }
-      }
-    })
+      })
+      if (page) console.log(`CMS Backend: successfully retrieved page "${page.title}" (slug: ${page.slug})`);
+      else console.log(`CMS Backend: page not found (id: ${id})`);
+      return page;
+    } catch (error: any) {
+      console.error(`CMS Backend Error: getPageById(${id}):`, error.message);
+      if (isDatabaseConfigError(error)) return null;
+      throw error;
+    }
   }
 
   static async createPage(data: CreatePageData) {
@@ -234,18 +278,37 @@ export class ModernCMS {
   }
 
   static async updatePage(id: string, data: any) {
-    // Remove relation objects and non-updatable fields that might be in the payload
-    const { id: _id, author, createdAt, updatedAt, ...updateData } = data
-    
-    return await prisma.page.update({
-      where: { id },
-      data: updateData,
-      include: {
-        author: {
-          select: { id: true, name: true, email: true }
+    try {
+      if (!id) throw new Error('updatePage: ID is required');
+      console.log(`CMS Backend: request to updatePage(id: ${id})`);
+      
+      // Ensure metadata is an object if it exists
+      if (data.metadata && typeof data.metadata === 'string') {
+        try {
+          data.metadata = JSON.parse(data.metadata);
+        } catch (e) {
+          console.error('CMS Backend: Failed to parse metadata string', e);
         }
       }
-    })
+
+      // Remove relation objects and non-updatable fields
+      const { id: _id, author, createdAt, updatedAt, ...updateData } = data
+      
+      const updated = await prisma.page.update({
+        where: { id },
+        data: updateData,
+        include: {
+          author: {
+            select: { id: true, name: true, email: true }
+          }
+        }
+      })
+      console.log(`CMS Backend: successfully updated page "${updated.title}"`);
+      return updated;
+    } catch (error: any) {
+      console.error(`CMS Backend Error: updatePage(${id}):`, error.message);
+      throw error;
+    }
   }
 
   static async deletePage(id: string) {

@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, User, Mail, Shield, Trash2, Edit, MoreVertical, Search } from 'lucide-react'
+import { Plus, User, Mail, Shield, Trash2, Edit, MoreVertical, Search, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function UsersManager() {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchUsers()
@@ -18,14 +19,24 @@ export default function UsersManager() {
 
   const fetchUsers = async () => {
     try {
-      // Mock data representing CMS administrators and editors
-      setUsers([
-        { id: '1', name: 'Admin User', email: 'admin@alignai.com', role: 'ADMIN', status: 'ACTIVE', lastLogin: '2 hours ago' },
-        { id: '2', name: 'Editor One', email: 'editor@alignai.com', role: 'EDITOR', status: 'ACTIVE', lastLogin: 'Yesterday' },
-        { id: '3', name: 'James Wilson', email: 'j.wilson@alignai.com', role: 'VIEWER', status: 'INACTIVE', lastLogin: '2 months ago' },
-      ])
-    } catch (error) {
+      setLoading(true)
+      const res = await fetch('/api/cms/users')
+      if (!res.ok) throw new Error('Failed to fetch users')
+      const data = await res.json()
+      
+      // Ensure we have an array, or fallback if empty
+      const userList = (data.users || []).map((u: any) => ({
+        ...u,
+        name: u.name || 'Anonymous User',
+        status: 'ACTIVE', // Default status as it might not be in the schema currently
+        lastLogin: u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : 'Never'
+      }))
+
+      setUsers(userList)
+      setError(null)
+    } catch (error: any) {
       console.error('Failed to fetch users:', error)
+      setError(error.message)
     } finally {
       setLoading(false)
     }

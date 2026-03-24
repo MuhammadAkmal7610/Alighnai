@@ -1,6 +1,33 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
 
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  try {
+    console.log(`GET /api/cms/categories/${id} - Fetching category...`)
+    const category = await ModernCMS.getCategoryById(id)
+    if (!category) {
+      return NextResponse.json({ error: 'Category not found' }, { status: 404 })
+    }
+    console.log(`GET /api/cms/categories/${id} - Successfully fetched category.`)
+    return NextResponse.json({ category })
+  } catch (error: any) {
+    console.error(`Categories API GET error (id: ${id}):`, {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    })
+    return NextResponse.json({ 
+      error: 'Failed to fetch category',
+      details: error.message || 'Unknown error',
+      code: error.code
+    }, { status: 500 })
+  }
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

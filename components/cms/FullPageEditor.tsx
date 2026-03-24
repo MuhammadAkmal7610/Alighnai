@@ -161,10 +161,12 @@ export function FullPageEditor({ initialPage }: FullPageEditorProps) {
                 onChange={(e) => setPage({ ...page, template: e.target.value })}
                 className="w-full bg-white border border-slate-200 text-sm focus:ring-navy focus:border-navy h-10 px-3 rounded-md font-medium cursor-pointer"
               >
-                <option value="blank">Blank (Default Content Only)</option>
                 <option value="home">Home Template (Enterprise)</option>
                 <option value="about">About Template (Founder)</option>
                 <option value="framework">Framework Template (Architecture)</option>
+                <option value="services">Services Template (Engagement)</option>
+                <option value="contact">Contact Template (Direct)</option>
+                <option value="blank">Blank (Default Content Only)</option>
               </select>
             </div>
           </div>

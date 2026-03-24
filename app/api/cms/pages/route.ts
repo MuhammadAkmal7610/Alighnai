@@ -28,7 +28,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    let body;
+    try {
+      const text = await request.text();
+      body = text ? JSON.parse(text) : {};
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
     const newPage = await ModernCMS.createPage(body)
     return NextResponse.json(newPage, { status: 201 })
   } catch (error: any) {
