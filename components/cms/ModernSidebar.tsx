@@ -59,6 +59,12 @@ interface SidebarProps {
 export function Sidebar({ children }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  
+  const isEditMode = pathname?.includes('/edit')
+
+  if (isEditMode) {
+    return <>{children}</>
+  }
 
   const NavItem = ({ item, level = 0 }: { item: any; level?: number }) => {
     const isActive = pathname === item.href

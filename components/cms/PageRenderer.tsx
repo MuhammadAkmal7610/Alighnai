@@ -47,7 +47,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
     kicker: isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : (isContact ? 'ByteStream Strategies' : 'New Page')))),
     title: isHome ? 'AI is already influencing decisions in your organization.' : (isAbout ? 'Built from doctoral research.' : (isFramework ? 'Governance architecture for the layer most frameworks miss.' : (isServices ? 'The AI Decision Visibility <span class="block text-cyan">Assessment.</span>' : (isContact ? 'Start a conversation.' : 'Start building your new page content...')))),
     highlight: isHome ? 'Most enterprises have no governance over that layer.' : '',
-    description: isHome ? 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions.' : (isAbout ? 'Delivered with 30 years of enterprise experience.' : (isFramework ? 'AlignAI defines the structural controls for the AI decision environment your organization has already created.' : (isServices ? 'A 4-6 week structured engagement covering one business domain.' : (isContact ? 'No forms, no demos, no sales calls.' : 'Use the editor below to add your page description and content.'))))
+    description: isHome ? 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions. Built for enterprise. Grounded in doctoral research.' : (isAbout ? 'Delivered with 30 years of enterprise experience.' : (isFramework ? 'AlignAI defines the structural controls for the AI decision environment your organization has already created.' : (isServices ? 'A 4-6 week structured engagement covering one business domain.' : (isContact ? 'No forms, no demos, no sales calls.' : 'Use the editor below to add your page description and content.'))))
   }
 
   const problems = data.problems || []
@@ -227,36 +227,41 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         isEditing ? "bg-navy" : "bg-navy"
     )}>
       {/* Hero Section */}
-      <section className={cn(
-        "pt-32 pb-20 md:pt-44 md:pb-32 relative",
-        (isHome || isAbout || isFramework || isServices) ? "hero-panel" : "bg-navy"
-      )} id="hero">
+      {template !== 'blank' && (
+        <section className={cn(
+          "hero-panel relative",
+          isServices ? "min-h-[72vh] pt-28 pb-16 md:min-h-[85vh] md:pt-36 md:pb-24" : "pt-28 pb-14 md:pt-32 md:pb-16",
+          (isHome || isAbout || isFramework || isServices) ? "" : "bg-navy"
+        )} id="hero">
         <div className="container-main relative z-10">
           {/* Decorative Triangle from target site */}
           {(isHome || isFramework) && !isEditing && (
-            <div className="absolute top-0 right-0 w-[40%] h-full pointer-events-none overflow-hidden opacity-10">
-               <div className="absolute top-1/2 right-0 -translate-y-1/2 w-0 h-0 border-l-[300px] border-l-transparent border-b-[500px] border-b-white transform rotate-12" />
+            <div className="absolute top-0 right-0 w-[50%] h-full pointer-events-none overflow-hidden opacity-30">
+               <div className="absolute bottom-0 right-[-5%] w-0 h-0 border-l-[600px] border-l-transparent border-b-[800px] border-b-deep-blue" />
             </div>
           )}
 
           <div className="max-w-4xl">
             {/* Kicker */}
-            {isEditing && editingField === 'kicker' ? (
-              <div className="mb-6">
-                <CMSEditor 
-                  variant="ghost"
-                  content={hero.kicker}
-                  onChange={(val) => updateHero('kicker', val)}
-                  onDone={() => setEditingField(null)}
-                  placeholder="Enter kicker..."
+            {/* Kicker */}
+            {(!isHome) && (
+              isEditing && editingField === 'kicker' ? (
+                <div className="mb-6">
+                  <CMSEditor 
+                    variant="ghost"
+                    content={hero.kicker}
+                    onChange={(val) => updateHero('kicker', val)}
+                    onDone={() => setEditingField(null)}
+                    placeholder="Enter kicker..."
+                  />
+                </div>
+              ) : (
+                <div 
+                  className={cn("hero-kicker mb-8", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                  onDoubleClick={() => isEditing && setEditingField('kicker')}
+                  dangerouslySetInnerHTML={{ __html: hero.kicker || (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : 'New Page'))) }}
                 />
-              </div>
-            ) : (
-              <div 
-                className={cn("hero-kicker mb-8", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                onDoubleClick={() => isEditing && setEditingField('kicker')}
-                dangerouslySetInnerHTML={{ __html: hero.kicker || (isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : 'New Page')))) }}
-              />
+              )
             )}
 
             {/* Title */}
@@ -273,7 +278,9 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
             ) : (
               <h1 
                 className={cn(
-                  "text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl leading-[1.05] mb-8 font-heading",
+                  isServices 
+                    ? "mt-6 max-w-4xl text-4xl leading-[1.05] text-white sm:text-5xl md:text-[74px]" 
+                    : "hero-title max-w-[900px] text-[32px] leading-[1.08] md:text-[66px]",
                   isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                 )}
                 onDoubleClick={() => isEditing && setEditingField('title')}
@@ -294,9 +301,9 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                   />
                 </div>
               ) : (
-                <h1 
+                <p 
                   className={cn(
-                    "text-5xl font-bold tracking-tight text-cyan md:text-7xl lg:text-8xl leading-[1.05] mb-10 font-heading",
+                    "hero-highlight mt-2 max-w-[900px] text-[26px] leading-[1.12] md:text-[48px] md:max-w-[800px]",
                     isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                   )}
                   onDoubleClick={() => isEditing && setEditingField('highlight')}
@@ -317,9 +324,11 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                 />
               </div>
             ) : (
-              <div 
+              <p 
                 className={cn(
-                  "mb-12 max-w-2xl text-lg text-brand-slate md:text-xl font-medium leading-relaxed opacity-90",
+                  isServices
+                    ? "mt-8 max-w-prose text-[16px] leading-[1.7] text-light-slate"
+                    : "mt-6 max-w-[540px] text-sm leading-snug text-light-slate md:text-base md:max-w-[530px]",
                   isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1"
                 )}
                 onDoubleClick={() => isEditing && setEditingField('description')}
@@ -380,7 +389,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn1Link || "/site/framework"} 
                       className={cn(
-                        "bg-cyan hover:bg-white text-navy font-bold py-4 px-8 rounded-[4px] transition-all flex items-center gap-2 group text-sm uppercase tracking-wider",
+                        "bg-mid-blue hover:bg-cyan hover:text-navy text-white font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 group text-sm uppercase tracking-wider",
                         isEditing && "hover:ring-2 hover:ring-white border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -396,7 +405,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn2Link || "/site/contact"} 
                       className={cn(
-                        "bg-transparent hover:bg-white/10 text-white border border-white/50 font-bold py-4 px-8 rounded-[4px] transition-all flex items-center gap-2 text-sm uppercase tracking-wider",
+                        "bg-transparent hover:bg-white/10 text-white border border-mid-blue font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 text-sm uppercase tracking-wider",
                         isEditing && "hover:ring-2 hover:ring-white/50 border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -413,10 +422,55 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                 )}
               </div>
             )}
+            
+            {/* Founder Credentials (Home Only) */}
+            {isHome && (
+              <div className="mt-16 flex flex-wrap items-center gap-6">
+                <span className="text-[10px] font-bold text-slate uppercase tracking-[0.2em] whitespace-nowrap">FOUNDER CREDENTIALS</span>
+                {isEditing && editingField === 'hero-credentials' ? (
+                  <div className="flex gap-2 p-2 bg-white/5 border border-white/10 rounded-sm">
+                    <Input 
+                      value={(data.credentials || ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"]).join(', ')}
+                      onChange={(e) => updateMetadata('credentials', e.target.value.split(',').map(s => s.trim()))}
+                      className="bg-navy text-white text-[10px] border-white/20 h-8 uppercase tracking-widest min-w-[400px]"
+                      placeholder="Comma-separated credentials..."
+                      autoFocus
+                    />
+                    <Button 
+                      size="sm" 
+                      onClick={() => setEditingField(null)}
+                      className="h-8 bg-cyan text-navy font-bold hover:bg-white text-[10px]"
+                    >
+                      DONE
+                    </Button>
+                  </div>
+                ) : (
+                  <div 
+                    className={cn(
+                        "flex flex-wrap gap-2",
+                        isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit p-1 rounded transition-all"
+                    )}
+                    onDoubleClick={() => isEditing && setEditingField('hero-credentials')}
+                  >
+                    {(data.credentials || ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"]).map((cred: string, i: number) => (
+                      <div key={i} className="px-3 py-1.5 bg-deep-blue border border-mid-blue/30 rounded-btn xl:rounded-sm text-[10px] font-bold text-light-slate uppercase tracking-widest whitespace-nowrap">
+                        {cred}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Main Content Area */}
-          <div className="mt-16">
+          </div>
+        </section>
+      )}
+
+      {/* Main Content Area (For Generic Pages) */}
+      {template === 'blank' && (
+        <section className="bg-navy pt-32 pb-20 min-h-screen border-t border-white/5">
+          <div className="container-main max-w-4xl mx-auto">
             {isEditing && editingField === 'content' ? (
               <div className="space-y-4">
                 <CMSEditor 
@@ -428,8 +482,8 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
             ) : (
               <div 
                 className={cn(
-                  "prose prose-invert max-w-none text-brand-slate opacity-90 leading-relaxed",
-                  isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded p-4 bg-white/5"
+                  "prose prose-invert max-w-none text-white/90 leading-relaxed",
+                  isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded p-4 bg-navy/50"
                 )}
                 onDoubleClick={() => isEditing && setEditingField('content')}
               >
@@ -441,8 +495,8 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
               </div>
             )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* About Specific Section (Founder - Dark Minimalist) */}
       {isAbout && (
@@ -529,7 +583,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     />
                   )}
 
-                  <div className="mt-12 space-y-8 text-brand-slate text-lg leading-relaxed opacity-80">
+                  <div className="mt-12 space-y-8 text-white/80 text-lg leading-relaxed opacity-80">
                     {founder.bio.map((p: string, i: number) => (
                       <div key={i}>
                         {isEditing && editingField === `founder.bio.${i}` ? (
@@ -571,7 +625,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       {isFramework && (
         <>
           <div className="section-divider" />
-          <section className="bg-navy py-32">
+          <section className="bg-off-white py-32">
             <div className="container-main">
               {isEditing && editingField === 'pillars.kicker' ? (
                 <CMSEditor 
@@ -632,7 +686,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                           />
                         ) : (
                           <div 
-                            className={cn("text-brand-slate text-lg leading-relaxed max-w-2xl opacity-80", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                            className={cn("text-white/80 text-lg leading-relaxed max-w-2xl opacity-80", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                             onDoubleClick={() => isEditing && setEditingField(`pillars.${i}.description`)}
                             dangerouslySetInnerHTML={{ __html: pillar.description }}
                           />
@@ -651,7 +705,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       {isHome && (
         <>
           <div className="section-divider" />
-          <section className="bg-white py-32 text-navy">
+          <section className="bg-off-white py-20">
             <div className="container-main">
               {isEditing && editingField === 'home.gap.kicker' ? (
                 <CMSEditor 
@@ -661,14 +715,11 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                    onDone={() => setEditingField(null)}
                 />
               ) : (
-                <div className="flex items-center gap-4 mb-10">
-                   <div className="h-px w-8 bg-mid-blue" />
-                   <p 
-                        className={cn("text-[11px] font-bold uppercase tracking-[0.2em] text-mid-blue", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
-                        onDoubleClick={() => isEditing && setEditingField('home.gap.kicker')}
-                        dangerouslySetInnerHTML={{ __html: data.gapKicker || "The Governance Gap" }}
-                    />
-                </div>
+                <p 
+                    className={cn("hero-kicker text-mid-blue", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                    onDoubleClick={() => isEditing && setEditingField('home.gap.kicker')}
+                    dangerouslySetInnerHTML={{ __html: data.gapKicker || "The Governance Gap" }}
+                />
               )}
 
               {isEditing && editingField === 'home.gap.title' ? (
@@ -682,27 +733,23 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                 </div>
               ) : (
                 <h2 
-                    className={cn("mt-4 max-w-4xl text-5xl leading-[1.1] text-navy md:text-7xl font-bold font-heading", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
+                    className={cn("mt-3 max-w-2xl text-4xl leading-tight text-navy md:text-5xl", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                     onDoubleClick={() => isEditing && setEditingField('home.gap.title')}
                     dangerouslySetInnerHTML={{ __html: data.gapTitle || "Every major AI governance framework is focused on the wrong layer." }}
                 />
               )}
               
-              <p className="mt-10 max-w-2xl text-brand-slate text-lg leading-relaxed opacity-80">
+              <p className="mt-5 max-w-[600px] text-base text-slate">
                  NIST, ISO 42001, and the EU AI Act focus on models, training data, and compliance outputs. They do not govern where AI actually changes enterprise behavior.
               </p>
 
-              <div className="mt-24 grid md:grid-cols-2 border border-slate-100">
+              <div className="mt-12 grid sm:grid-cols-2">
                 {problems.map((problem: any, index: number) => (
-                  <div key={index} className={cn(
-                    "bg-white p-16 transition-all group hover:bg-slate-50/50",
-                    index === 0 ? "border-b border-r border-slate-100" : "",
-                    index === 1 ? "border-b border-slate-100" : "",
-                    index === 2 ? "border-r border-slate-100" : "",
-                    index === 3 ? "" : ""
-                  )}>
+                  <div key={index} className="border border-off-white bg-white px-7 py-10">
                     <div className="flex flex-col h-full">
-                       <span className="text-[10px] font-bold text-brand-slate/30 mb-6 tracking-[0.3em] uppercase">0{index + 1}</span>
+                       <span className="mb-2 block text-xs font-medium tracking-wide text-light-slate">
+                         {(index + 1).toString().padStart(2, "0")}
+                       </span>
                       {isEditing && editingField === `problems.${index}.title` ? (
                         <div className="mb-4">
                           <CMSEditor 
@@ -715,7 +762,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                         </div>
                       ) : (
                         <h3 
-                          className={cn("text-2xl text-navy font-bold mb-6 font-heading", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
+                          className={cn("text-lg text-navy", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                           onDoubleClick={() => isEditing && setEditingField(`problems.${index}.title`)}
                           dangerouslySetInnerHTML={{ __html: problem.title }}
                         />
@@ -733,7 +780,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                         </div>
                       ) : (
                         <div 
-                          className={cn("text-brand-slate text-lg leading-relaxed opacity-70 flex-1", isEditing && "hover:ring-1 hover:ring-mid-blue/30 cursor-edit transition-all rounded px-1")}
+                          className={cn("mt-3 text-sm leading-relaxed text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                           onDoubleClick={() => isEditing && setEditingField(`problems.${index}.description`)}
                           dangerouslySetInnerHTML={{ __html: problem.description }}
                         />
@@ -751,9 +798,9 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       {isServices && (
         <>
           <div className="section-divider" />
-          <section className="bg-[#08162e] py-32 border-b border-white/5">
+          <section className="bg-off-white py-20">
             <div className="container-main">
-              <div className="grid gap-20 lg:grid-cols-[1fr_450px] lg:gap-24">
+              <div className="grid gap-16 lg:grid-cols-2 lg:gap-14">
                 {/* Process Steps */}
                 <div>
                   {isEditing && editingField === 'services.engagement.kicker' ? (
@@ -764,18 +811,15 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                         onDone={() => setEditingField(null)}
                      />
                   ) : (
-                    <div className="flex items-center gap-4 mb-8">
-                       <div className="h-px w-8 bg-cyan" />
-                       <p 
-                          className={cn("text-[11px] font-bold uppercase tracking-[0.2em] text-cyan", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                          onDoubleClick={() => isEditing && setEditingField('services.engagement.kicker')}
-                          dangerouslySetInnerHTML={{ __html: data.engagementKicker || "The Engagement" }}
-                       />
-                    </div>
+                    <p 
+                       className={cn("hero-kicker text-mid-blue", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                       onDoubleClick={() => isEditing && setEditingField('services.engagement.kicker')}
+                       dangerouslySetInnerHTML={{ __html: data.engagementKicker || "The Engagement" }}
+                    />
                   )}
 
                   {isEditing && editingField === 'services.engagement.title' ? (
-                     <div className="mt-6">
+                     <div className="mt-4">
                         <CMSEditor 
                             variant="ghost"
                             content={data.engagementTitle || "A structured engagement. A standing deliverable."}
@@ -785,13 +829,13 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                      </div>
                   ) : (
                     <h2 
-                        className={cn("mt-6 text-4xl leading-tight text-white font-bold font-heading md:text-5xl", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                        className={cn("mt-4 text-2xl leading-tight text-navy", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField('services.engagement.title')}
                         dangerouslySetInnerHTML={{ __html: data.engagementTitle || "A structured engagement. A standing deliverable." }}
                     />
                   )}
 
-                  <div className="mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-brand-slate opacity-80 font-medium">
+                  <div className="mt-6 flex flex-col gap-4">
                     {isEditing && editingField === 'engagement.desc1' ? (
                       <CMSEditor 
                         variant="ghost"
@@ -801,7 +845,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                       />
                     ) : (
                       <p 
-                        className={cn(isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                        className={cn("max-w-prose text-[15px] leading-relaxed text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField('engagement.desc1')}
                         dangerouslySetInnerHTML={{ __html: data.engagementDesc1 || "The Assessment is delivered through ByteStream Strategies. No platform required. No implementation prerequisite. Applicable regardless of what AI systems you currently use." }}
                       />
@@ -816,14 +860,14 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                       />
                     ) : (
                       <p 
-                        className={cn(isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                        className={cn("max-w-prose text-[15px] leading-relaxed text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onDoubleClick={() => isEditing && setEditingField('engagement.desc2')}
                         dangerouslySetInnerHTML={{ __html: data.engagementDesc2 || "It stands alone as a governance diagnostic, or it becomes the foundation for broader architecture work under the AlignAI framework." }}
                       />
                     )}
                   </div>
 
-                  <div className="mt-8 flex flex-wrap gap-3 mb-16">
+                  <div className="mt-6 flex flex-wrap gap-2">
                     {tags.map((tag: string, i: number) => (
                       <div key={i}>
                         {isEditing && editingField === `tags.${i}` ? (
@@ -839,7 +883,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                           />
                         ) : (
                            <span 
-                            className={cn("rounded-sm border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-brand-slate hover:text-cyan transition-colors", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all")}
+                            className={cn("rounded-btn border border-light-slate bg-mid-blue/5 px-3 py-1 text-xs font-medium text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all")}
                             onDoubleClick={() => isEditing && setEditingField(`tags.${i}`)}
                             dangerouslySetInnerHTML={{ __html: tag }}
                            />
@@ -848,52 +892,51 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     ))}
                   </div>
 
-                  <div className="mt-20">
-                    <div className="flex items-center gap-4 mb-8">
-                       <div className="h-px w-8 bg-cyan" />
-                       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan">How It Works</p>
-                    </div>
+                  <div className="mt-8">
+                    <p className="hero-kicker mt-10 text-xl text-mid-blue">How It Works</p>
                     
-                    <ol className="mt-12 divide-y divide-white/5 border-t border-white/5">
+                    <ol className="mt-6 border-light-slate">
                       {processSteps.map((step: any, index: number) => (
-                        <li key={index} className="py-10 grid md:grid-cols-[60px_1fr] group">
-                          <span className="font-heading text-2xl font-bold text-cyan opacity-40 group-hover:opacity-100 transition-opacity">
-                            0{index + 1}
-                          </span>
-                          <div>
-                            {isEditing && editingField === `processSteps.${index}.title` ? (
-                              <div className="mb-4">
-                                <CMSEditor 
-                                  variant="ghost"
-                                  content={step.title}
-                                  onChange={(val) => updateServiceArrayItem('processSteps', index, 'title', val)}
-                                  onDone={() => setEditingField(null)}
-                                />
-                              </div>
-                            ) : (
-                              <h3 
-                                className={cn("text-2xl font-bold text-white font-heading mb-4", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                                onDoubleClick={() => isEditing && setEditingField(`processSteps.${index}.title`)}
-                                dangerouslySetInnerHTML={{ __html: step.title }}
-                              />
-                            )}
+                        <li key={index} className={cn("border-light-slate py-5", index > 0 ? "border-t" : "")}>
+                          <div className="flex gap-4">
+                            <span className="mt-0.5 font-heading text-[18px] font-bold text-mid-blue">
+                              {/* 01 */}
+                            </span>
+                            <div>
+                                {isEditing && editingField === `processSteps.${index}.title` ? (
+                                  <div className="mb-4">
+                                    <CMSEditor 
+                                      variant="ghost"
+                                      content={step.title}
+                                      onChange={(val) => updateServiceArrayItem('processSteps', index, 'title', val)}
+                                      onDone={() => setEditingField(null)}
+                                    />
+                                  </div>
+                                ) : (
+                                  <h3 
+                                    className={cn("text-xl font-semibold text-navy", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                                    onDoubleClick={() => isEditing && setEditingField(`processSteps.${index}.title`)}
+                                    dangerouslySetInnerHTML={{ __html: step.title }}
+                                  />
+                                )}
 
-                            {isEditing && editingField === `processSteps.${index}.description` ? (
-                              <div className="mt-2 text-brand-slate">
-                                <CMSEditor 
-                                  variant="ghost"
-                                  content={step.description}
-                                  onChange={(val) => updateServiceArrayItem('processSteps', index, 'description', val)}
-                                  onDone={() => setEditingField(null)}
-                                />
-                              </div>
-                            ) : (
-                              <p 
-                                className={cn("text-lg leading-relaxed text-brand-slate opacity-70", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                                onDoubleClick={() => isEditing && setEditingField(`processSteps.${index}.description`)}
-                                dangerouslySetInnerHTML={{ __html: step.description }}
-                              />
-                            )}
+                                {isEditing && editingField === `processSteps.${index}.description` ? (
+                                  <div className="mt-1 text-slate">
+                                    <CMSEditor 
+                                      variant="ghost"
+                                      content={step.description}
+                                      onChange={(val) => updateServiceArrayItem('processSteps', index, 'description', val)}
+                                      onDone={() => setEditingField(null)}
+                                    />
+                                  </div>
+                                ) : (
+                                  <p 
+                                    className={cn("mt-1 text-sm leading-relaxed text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                                    onDoubleClick={() => isEditing && setEditingField(`processSteps.${index}.description`)}
+                                    dangerouslySetInnerHTML={{ __html: step.description }}
+                                  />
+                                )}
+                            </div>
                           </div>
                         </li>
                       ))}
@@ -901,26 +944,25 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                   </div>
                 </div>
 
-                {/* Deliverables Column (Minimal Fixed Style) */}
-                <div className="relative">
-                  <div className="md:sticky md:top-36 bg-[#0A1F44] border border-white/10 rounded-sm p-10">
+                {/* Deliverables Column */}
+                <div>
                     {isEditing && editingField === 'services.deliverables.kicker' ? (
                        <CMSEditor 
                           variant="ghost"
-                          content={data.deliverablesKicker || "The Output"}
+                          content={data.deliverablesKicker || "Five Deliverables"}
                           onChange={(val) => updateMetadata('deliverablesKicker', val)}
                           onDone={() => setEditingField(null)}
                        />
                     ) : (
                       <p 
-                          className={cn("text-[10px] font-bold uppercase tracking-[0.2em] text-cyan mb-8", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                          className={cn("hero-kicker text-mid-blue", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                           onDoubleClick={() => setEditingField('services.deliverables.kicker')}
-                          dangerouslySetInnerHTML={{ __html: data.deliverablesKicker || "The Output" }}
+                          dangerouslySetInnerHTML={{ __html: data.deliverablesKicker || "Five Deliverables" }}
                       />
                     )}
 
                     {isEditing && editingField === 'services.deliverables.title' ? (
-                       <div className="mb-10">
+                       <div className="mt-4">
                           <CMSEditor 
                               variant="ghost"
                               content={data.deliverablesTitle || "Deliverables"}
@@ -930,17 +972,19 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                        </div>
                     ) : (
                       <h2 
-                          className={cn("text-5xl text-white font-bold font-heading mb-10", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                          className={cn("mt-4 text-4xl text-navy", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                           onDoubleClick={() => setEditingField('services.deliverables.title')}
                           dangerouslySetInnerHTML={{ __html: data.deliverablesTitle || "Deliverables" }}
                       />
                     )}
 
-                    <ul className="space-y-6">
+                    <ul className="mt-6 space-y-1">
                       {deliverables.map((item: any, index: number) => (
-                        <li key={index} className="flex gap-4 group">
-                          <div className="w-1 h-auto bg-cyan opacity-20 group-hover:opacity-100 transition-opacity" />
-                          <div className="py-1">
+                        <li key={index} className="grid grid-cols-[44px_1fr] gap-1 border-l-[3px] border-mid-blue bg-[#e9edf3] px-4 py-5">
+                          <span className="pt-0.5 text-xs font-semibold text-mid-blue">
+                             {(index + 1).toString().padStart(2, "0")}
+                          </span>
+                          <div>
                             {isEditing && editingField === `deliverables.${index}.title` ? (
                               <CMSEditor 
                                 variant="ghost"
@@ -950,22 +994,24 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                               />
                             ) : (
                               <h3 
-                                  className={cn("text-lg font-bold text-white mb-2", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                                  className={cn("text-xl font-semibold text-navy", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                                   onDoubleClick={() => setEditingField(`deliverables.${index}.title`)}
                                   dangerouslySetInnerHTML={{ __html: item.title }}
                               />
                             )}
 
                             {isEditing && editingField === `deliverables.${index}.description` ? (
-                              <CMSEditor 
-                                variant="ghost"
-                                content={item.description}
-                                onChange={(val) => updateServiceArrayItem('deliverables', index, 'description', val)}
-                                onDone={() => setEditingField(null)}
-                              />
+                               <div className="mt-1">
+                                <CMSEditor 
+                                  variant="ghost"
+                                  content={item.description}
+                                  onChange={(val) => updateServiceArrayItem('deliverables', index, 'description', val)}
+                                  onDone={() => setEditingField(null)}
+                                />
+                               </div>
                             ) : (
                               <p 
-                                  className={cn("text-sm text-brand-slate opacity-70 leading-relaxed", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                                  className={cn("mt-1 text-sm leading-relaxed text-slate", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                                   onDoubleClick={() => setEditingField(`deliverables.${index}.description`)}
                                   dangerouslySetInnerHTML={{ __html: item.description }}
                               />
@@ -974,7 +1020,6 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                         </li>
                       ))}
                     </ul>
-                  </div>
                 </div>
               </div>
             </div>
@@ -986,9 +1031,6 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         <>
           <div className="section-divider" />
           <section className="bg-navy py-44 min-h-[60vh] flex items-center relative overflow-hidden" id="contact">
-            {!isEditing && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-cyan/5 blur-[120px] rounded-full pointer-events-none" />
-            )}
             <div className="container-main text-center relative z-10">
               <div className="max-w-4xl mx-auto space-y-16">
                 <div className="flex flex-col items-center">
@@ -1035,7 +1077,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     />
                   ) : (
                     <p 
-                        className={cn("text-xl text-brand-slate opacity-80 leading-relaxed font-medium", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                        className={cn("text-xl text-white opacity-80 leading-relaxed font-medium", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                         onClick={() => isEditing && setEditingField('contact.subtext')}
                         dangerouslySetInnerHTML={{ __html: data.subtext || 'Whether you are early in AI deployment or already hitting scaling friction, the Assessment provides immediate decision visibility.' }}
                     />
@@ -1136,7 +1178,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                  </div>
                ) : (
                 <div 
-                    className={cn("prose prose-invert max-w-none text-brand-slate/80 text-lg", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit p-4 rounded-lg bg-white/5")}
+                    className={cn("prose prose-invert max-w-none text-white/80 text-lg", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit p-4 rounded-lg bg-white/5")}
                     onClick={() => isEditing && setEditingField(`custom.${idx}.content`)}
                     dangerouslySetInnerHTML={{ __html: section.content }}
                 />
@@ -1150,7 +1192,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-white/10 mx-6 rounded-3xl mt-12 bg-white/[0.02] hover:bg-white/[0.04] transition-all group">
             <PlusCircle className="w-12 h-12 text-cyan mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="text-white font-bold text-xl mb-2">Build your page further</h3>
-            <p className="text-brand-slate/60 text-sm mb-8 max-w-sm text-center">Add new custom sections to expand this page's architecture and content.</p>
+            <p className="text-slate/60 text-sm mb-8 max-w-sm text-center">Add new custom sections to expand this page's architecture and content.</p>
             <Button 
                 onClick={addCustomSection}
                 className="bg-cyan text-navy font-bold hover:bg-white px-8 h-12 rounded-sm uppercase tracking-widest shadow-xl"
@@ -1162,14 +1204,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       )}
 
       <div className="section-divider" />
-      <CTASection 
-        title={cta.title} 
-        description={cta.description} 
-        ctaButtonText={cta.ctaButtonText}
-        ctaButtonLink={cta.ctaButtonLink}
-        isEditing={isEditing} 
-        onUpdate={updateCTA}
-      />
+      <CTASection />
     </div>
   )
 }

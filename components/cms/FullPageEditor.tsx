@@ -17,6 +17,8 @@ import {
   CheckCircle2
 } from 'lucide-react'
 import { PageRenderer } from './PageRenderer'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { cn } from '@/lib/utils'
 import { ContentStatus } from '@prisma/client'
 
@@ -134,10 +136,10 @@ export function FullPageEditor({ initialPage }: FullPageEditorProps) {
       </header>
 
       {/* Editor Content */}
-      <div className="flex-1 overflow-y-auto bg-white custom-scrollbar">
-        <div className="max-w-[1200px] mx-auto py-10 px-6">
+      <div className="flex-1 w-full overflow-y-auto bg-slate-50 custom-scrollbar">
+        <div className="w-full px-6 py-10">
           {/* Page Settings (Floating or Sidebar alternative) */}
-          <div className="mb-10 grid grid-cols-3 gap-6 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
+          <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Page Title</Label>
               <Input 
@@ -172,13 +174,23 @@ export function FullPageEditor({ initialPage }: FullPageEditorProps) {
           </div>
 
           {/* Live Preview / Renderer */}
-          <div className="border border-slate-200 rounded-3xl overflow-hidden shadow-2xl bg-navy ring-8 ring-slate-100">
-            <PageRenderer 
-              page={page} 
-              isEditing={true} 
-              onContentChange={updateContent}
-              onMetadataChange={updateMetadata}
-            />
+          <div className="border border-slate-200 rounded-3xl overflow-hidden shadow-2xl bg-navy ring-8 ring-slate-100 relative">
+            <div className="dark-site-theme min-h-screen">
+              {/* Note: We use absolute header and custom pathname for the preview frame */}
+              <Header 
+                className="absolute top-0 left-0 right-0 bg-navy/80 backdrop-blur-md border-b border-white/5" 
+                pathname={page.slug === 'home' ? '/site' : `/site/${page.slug}`}
+              />
+              <main id="main-content">
+                <PageRenderer 
+                  page={page} 
+                  isEditing={true} 
+                  onContentChange={updateContent}
+                  onMetadataChange={updateMetadata}
+                />
+              </main>
+              <Footer />
+            </div>
           </div>
         </div>
       </div>

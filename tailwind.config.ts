@@ -9,14 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: "#05142B",
-        "deep-blue": "#0A1F44",
-        "mid-blue": "#0D2A5E",
-        cyan: "#00F0FF",
-        "brand-slate": "#94A3B8",
-        "brand-light-slate": "#CBD5E1",
-        "brand-off-white": "#F8FAFC",
-        white: "#FFFFFF",
+        navy: "#0C1E39",
+        "deep-blue": "#274185",
+        "mid-blue": "#407BB7",
+        cyan: "#63BCE7",
+        slate: "#84899A",
+        "light-slate": "#C8CDD8",
+        "off-white": "#F4F6F9",
       },
       fontFamily: {
         heading: ["var(--font-sora)", "sans-serif"],
@@ -37,9 +36,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [],
 };
 
 export default config;

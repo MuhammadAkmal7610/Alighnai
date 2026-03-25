@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
-import { BlogCard } from "@/components/BlogCard";
-import { ModernCMS } from "@/lib/modern-cms";
-import { ContentStatus } from "@/lib/cms-enums";
-
-type CMSPost = Awaited<ReturnType<typeof ModernCMS.getContents>>[number];
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -13,20 +8,53 @@ export const metadata: Metadata = {
     "Articles and analysis on enterprise AI governance, compliance, risk management, and the AlignAI framework.",
 };
 
-export default async function InsightsPage() {
-  const posts = await ModernCMS.getContents({ status: ContentStatus.PUBLISHED });
-  const featuredPosts = await ModernCMS.getContents({ status: ContentStatus.PUBLISHED, featured: true });
+export default function InsightsPage() {
+  const latestPosts = [
+    {
+      slug: "why-ai-governance-matters-now",
+      date: "2026-03-06",
+      badge: "Featured",
+      title: "The Governance Layer Nobody Built",
+      excerpt:
+        "Every major AI governance framework focuses on the model. NIST, ISO 42001, the EU AI Act - all of them. None of them govern where AI actually changes enterprise behaviour.",
+    },
+    {
+      slug: "ai-governance-for-financial-services",
+      date: "2026-03-08",
+      badge: "Real Estate",
+      title: "Your Yardi System Is Making Decisions. Who Owns Them?",
+      excerpt:
+        "If your organization runs Yardi, MRI, or a comparable property management platform, AI is already embedded in your operations. The governance question most organizations cannot yet answer.",
+    },
+    {
+      slug: "decision-visibility-assessment-explained",
+      date: "2026-03-01",
+      badge: "",
+      title: "The Decision Your AI Made This Morning",
+      excerpt:
+        "Before your first meeting today, AI had already made several decisions on your behalf. Not suggestions. Decisions. The question is whether you know which ones.",
+    },
+  ];
 
-  const formatDate = (value: Date | string | null) => {
-    if (!value) return "DRAFT";
-    return new Date(value)
+  const samplePost = {
+    slug: "why-ai-governance-matters-now",
+    title: "The Governance Layer Nobody Built",
+    date: "2026-03-06",
+    tag: "AI Governance",
+    paragraphs: [
+      "Every major AI governance framework in circulation focuses on the model. NIST AI RMF, ISO 42001, the EU AI Act, the proposed Canadian AIDA - all of them are fundamentally concerned with how models are built, trained, documented, and audited.",
+      "That is not the wrong thing to govern. But it is not where AI is actually changing enterprise behaviour.",
+    ],
+  };
+
+  const formatDate = (value: string) =>
+    new Date(value)
       .toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
       })
       .toUpperCase();
-  };
 
   return (
     <>
@@ -51,9 +79,9 @@ export default async function InsightsPage() {
           <p className="hero-kicker text-mid-blue">Latest Posts</p>
 
           <div className="mt-7 grid gap-0 border border-[#d9deea] bg-white md:grid-cols-3">
-            {featuredPosts.map((post: CMSPost, index: number) => (
+            {latestPosts.map((post, index) => (
               <article
-                key={post.id}
+                key={post.slug}
                 className={`p-5 ${
                   index === 0
                     ? "border-t-2 border-t-cyan"
@@ -61,10 +89,10 @@ export default async function InsightsPage() {
                 }`}
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-slate">
-                  {formatDate(post.publishedAt)}
-                  {post.featured && (
+                  {formatDate(post.date)}
+                  {post.badge && (
                     <span className="ml-2 rounded-btn bg-[#d9e7f8] px-1.5 py-0.5 text-[10px] font-semibold text-mid-blue">
-                      Featured
+                      {post.badge}
                     </span>
                   )}
                 </p>
@@ -76,7 +104,7 @@ export default async function InsightsPage() {
                   href={`/insights/${post.slug}`}
                   className="mt-5 inline-block text-sm font-semibold text-mid-blue hover:text-deep-blue"
                 >
-                  Read more →
+                  Read on LinkedIn →
                 </Link>
               </article>
             ))}
@@ -84,22 +112,36 @@ export default async function InsightsPage() {
 
           <div className="mt-14 border-t border-light-slate pt-9">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mid-blue">
-              · All Posts
+              · Single Post Template (Sample Layout)
             </p>
 
-            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post: CMSPost) => (
-                <BlogCard
-                  key={post.id}
-                  title={post.title}
-                  date={post.publishedAt?.toISOString() || ''}
-                  tag={post.category?.name || 'Uncategorized'}
-                  excerpt={post.excerpt || ''}
-                  slug={post.slug}
-                  featured={post.featured}
-                />
-              ))}
-            </div>
+            <article className="mt-6 max-w-[760px]">
+              <h2 className="text-3xl leading-tight text-navy md:text-4xl">{samplePost.title}</h2>
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
+                <span className="text-[#7b8392]">Brian Burke</span>
+                <span className="text-[#7b8392]">•</span>
+                <time dateTime={samplePost.date} className="text-[#7b8392]">
+                  {formatDate(samplePost.date)}
+                </time>
+                <span className="rounded-btn bg-[#d9e7f8] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-mid-blue">
+                  {samplePost.tag}
+                </span>
+              </div>
+              <div className="mt-7 border-t border-[#cfd7e6] pt-7">
+                {samplePost.paragraphs.map((paragraph, index) => (
+                    <p key={`${samplePost.slug}-${index}-${paragraph.slice(0, 24)}`} className="mb-4 text-[15px] leading-[1.72] text-[#6f7785]">
+                      {paragraph}
+                    </p>
+                  ))}
+                <Link
+                  href={`/insights/${samplePost.slug}`}
+                  className="text-[15px] font-semibold text-mid-blue hover:text-deep-blue"
+                >
+                  † Full post content continues here. This demonstrates the single
+                  post template layout.
+                </Link>
+              </div>
+            </article>
           </div>
         </div>
       </section>

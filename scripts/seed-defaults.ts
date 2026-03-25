@@ -11,13 +11,15 @@ async function main() {
         kicker: 'Enterprise AI Governance Architecture',
         title: 'AI is already influencing decisions in your organization.',
         highlight: 'Most enterprises have no governance over that layer.',
-        description: 'AlignAI governs the AI Decision Influence Layer — the environment created by AI systems before humans make decisions. Built for enterprise. Grounded in doctoral research.'
+        description: 'ByteStream Strategies helps enterprise leaders build the governance architecture that traditional AI frameworks miss.'
       },
       problems: [
         { title: 'Decision Invisibility', description: 'AI systems are already making or influencing decisions across your organization with zero oversight.' },
-        { title: 'Governance Gaps', description: 'Traditional frameworks focus on the model, not the decision environment it creates.' }
+        { title: 'Governance Gaps', description: 'Traditional frameworks focus on the model, not the decision environment it creates.' },
+        { title: 'Model-Centric Blindness', description: 'NIST and ISO focus on training data, missing where AI actually changes enterprise behavior.' },
+        { title: 'Regulatory Exposure', description: 'Without a decision influence map, accountability under the EU AI Act is impossible to document.' }
       ],
-      credentials: ["PhD", "MBA", "PMP", "30+ Years Enterprise"]
+      credentials: ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"]
     };
 
     await prisma.page.upsert({
@@ -36,10 +38,16 @@ async function main() {
 
     // Seed About Page Metadata
     const aboutDefaults = {
+      hero: {
+        kicker: 'The Founder',
+        title: 'Built from doctoral research.',
+        highlight: 'Delivered with 30 years of enterprise experience.',
+        description: 'Brian Burke, PhD, MBA, PMP — AI Governance Architect and founder of ByteStream Strategies.'
+      },
       founder: {
         name: 'Brian Burke',
         title: 'AI Governance Architect · Founder, ByteStream Strategies Inc.',
-        credentials: ["PhD", "MBA", "PMP", "30+ Years Enterprise"],
+        credentials: ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"],
         bio: [
           "Brian Burke holds a PhD in Organizational and Systems Perspective from Carleton University, an MBA in Enterprise Governance and Strategy from the University of Ottawa, and is a certified Project Management Professional. He has more than 30 years of enterprise consulting experience.",
           "His doctoral research examined the governance gap in how enterprises deploy large language models, specifically, the absence of structural controls over the AI Decision Influence Layer. AlignAI is the proprietary governance architecture framework developed from that research.",
@@ -66,6 +74,12 @@ async function main() {
 
     // Seed Services Page Metadata
     const servicesDefaults = {
+      hero: {
+        kicker: 'The Entry Point',
+        title: 'The AI Decision Visibility Assessment.',
+        highlight: '',
+        description: 'A 4-6 week structured engagement covering one business domain.'
+      },
       heroDescription: "A 4-6 week structured engagement covering one business domain. Stands alone as a governance diagnostic, or becomes the foundation for broader architecture work.",
       tags: ["4-6 weeks", "One business domain", "Fixed scope", "Five deliverables", "Platform-agnostic"],
       processSteps: [

@@ -83,8 +83,8 @@ export default async function InsightPostPage({ params }: PageProps) {
       <section className="bg-navy pt-32 pb-16">
         <div className="container-main">
           <Link
-            href="/insights"
-            className="text-sm text-light-slate transition-colors hover:text-white"
+            href="/site/insights"
+            className="inline-flex items-center text-sm font-semibold text-mid-blue hover:text-cyan transition-colors"
           >
             &larr; All Insights
           </Link>
