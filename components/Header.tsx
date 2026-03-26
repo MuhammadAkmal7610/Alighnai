@@ -59,7 +59,7 @@ export function Header({
         <Link
           href="/site"
           className="flex items-center gap-4 transition-opacity hover:opacity-80"
-          aria-label="AlignAI home"
+          aria-label="ByteStream Strategies home"
           onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
         >
           <Image

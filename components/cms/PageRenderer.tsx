@@ -14,7 +14,8 @@ import {
   Layout, 
   ExternalLink,
   Settings,
-  X
+  X,
+  User
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -416,7 +417,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn1Link || "/site/framework"} 
                       className={cn(
-                        "bg-mid-blue hover:bg-[#4a8cc8] text-white font-bold py-4 px-8 rounded-btn border border-[#34649e] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all flex items-center gap-2 group text-[15px] leading-tight tracking-normal",
+                        "bg-mid-blue hover:bg-cyan hover:text-navy text-white font-semibold py-3 px-6 rounded-btn border border-[#34649e] transition-all flex items-center gap-2 group text-[15px] leading-tight tracking-normal",
                         isEditing && "hover:ring-2 hover:ring-white border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -432,7 +433,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn2Link || "/site/contact"} 
                       className={cn(
-                        "bg-transparent hover:bg-white/5 text-white border border-white/35 font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 text-[15px] leading-tight tracking-normal",
+                        "bg-transparent hover:bg-white/5 text-white border border-white/35 font-semibold py-3 px-6 rounded-btn transition-all flex items-center gap-2 text-[15px] leading-tight tracking-normal",
                         isEditing && "hover:ring-2 hover:ring-white/50 border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -537,12 +538,11 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       {isAbout && (
         <>
           <div className="section-divider" />
-          <section className="bg-navy py-32 border-b border-white/5">
+          <section className="bg-off-white py-32 border-b border-light-slate/30">
             <div className="container-main">
-              <div className="grid gap-20 lg:grid-cols-[380px_1fr] lg:gap-24">
+              <div className="grid gap-20 lg:grid-cols-[400px_1fr] lg:gap-24">
                 <div className="relative group">
-                  <div className="absolute inset-0 bg-cyan/10 translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2" />
-                  <div className="relative aspect-[3/4] w-full rounded-sm bg-[#0A1F44] border border-white/10 flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[3/4] w-full rounded-sm bg-navy flex items-center justify-center overflow-hidden">
                     {founder.image ? (
                         <img 
                             src={founder.image} 
@@ -550,9 +550,9 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                             className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                         />
                     ) : (
-                        <div className="flex flex-col items-center gap-3 opacity-40">
-                            <ImageIcon className="w-8 h-8 text-cyan" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">No Headshot</span>
+                        <div className="flex flex-col items-center gap-4">
+                            <User className="w-12 h-12 text-white/20" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-white/40">Headshot to be supplied</span>
                         </div>
                     )}
                     
@@ -578,10 +578,14 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     )}
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-4 mb-8">
-                     <div className="h-px w-8 bg-cyan" />
-                     <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan">The Founder</p>
+                <div className="flex flex-col justify-center">
+                  {/* Credentials / Badges at the top */}
+                  <div className="flex flex-wrap gap-2 mb-8">
+                    {(data.credentials || ["PhD", "MBA", "PMP", "30+ Years Enterprise"]).map((cred: string, i: number) => (
+                      <div key={i} className="bg-navy px-3 py-1.5 rounded-sm">
+                        <span className="text-white font-bold text-[11px] uppercase tracking-wider">{cred}</span>
+                      </div>
+                    ))}
                   </div>
 
                   {isEditing && editingField === 'founder.name' ? (
@@ -595,7 +599,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     </div>
                   ) : (
                     <h2 
-                      className={cn("text-5xl font-bold text-white font-heading", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                      className={cn("text-6xl font-bold text-navy font-heading leading-tight", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                       onDoubleClick={() => isEditing && setEditingField('founder.name')}
                       dangerouslySetInnerHTML={{ __html: founder.name }}
                     />
@@ -612,13 +616,13 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     </div>
                   ) : (
                     <p 
-                      className={cn("text-cyan font-bold tracking-wide mt-2 text-sm uppercase", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                      className={cn("text-cyan font-bold tracking-wide mt-3 text-lg", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
                       onDoubleClick={() => isEditing && setEditingField('founder.title')}
                       dangerouslySetInnerHTML={{ __html: founder.title }}
                     />
                   )}
 
-                  <div className="mt-12 space-y-8 text-white/80 text-lg leading-relaxed opacity-80">
+                  <div className="mt-10 space-y-6 text-slate text-[17px] leading-relaxed max-w-3xl">
                     {founder.bio.map((p: string, i: number) => (
                       <div key={i}>
                         {isEditing && editingField === `founder.bio.${i}` ? (
@@ -641,13 +645,19 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     ))}
                   </div>
 
-                  <div className="mt-16 flex flex-wrap gap-12">
-                     {founder.credentials.map((cred: string, i: number) => (
-                       <div key={i} className="flex flex-col">
-                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">Status</span>
-                          <span className="text-white font-bold text-sm tracking-wide">{cred}</span>
-                       </div>
-                     ))}
+                  <div className="mt-12 flex flex-wrap gap-4">
+                    <Link 
+                      href={data.linkedin || "https://www.linkedin.com/"}
+                      className="bg-mid-blue hover:bg-navy text-white font-bold py-3.5 px-8 rounded-btn transition-all text-[15px] flex items-center gap-2"
+                    >
+                      Connect on LinkedIn <span>→</span>
+                    </Link>
+                    <a 
+                      href={`mailto:${data.email || "bburke@bytestream.ca"}`}
+                      className="bg-white border border-light-slate/50 hover:border-navy text-slate hover:text-navy font-medium py-3.5 px-8 rounded-btn transition-all text-[15px]"
+                    >
+                      {data.email || "bburke@bytestream.ca"}
+                    </a>
                   </div>
                 </div>
               </div>

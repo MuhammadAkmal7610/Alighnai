@@ -71,6 +71,15 @@ export function Footer({ suppressNavigation }: FooterProps = {}) {
               </li>
               <li>
                 <Link
+                  href="/site/about"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/site/insights"
                   className="hover:text-white text-zinc-500 transition-colors"
                   onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
