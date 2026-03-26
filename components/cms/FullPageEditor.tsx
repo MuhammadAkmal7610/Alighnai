@@ -398,6 +398,183 @@ export function FullPageEditor({ initialPage }: FullPageEditorProps) {
                 </div>
               </div>
             </div>
+
+            <div className="border-t border-slate-100 pt-5">
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-mid-blue">
+                Site navigation
+              </p>
+              <p className="mb-4 text-[11px] leading-relaxed text-slate-500">
+                Published pages only on the live site. Preview below reflects your
+                toggles immediately.
+              </p>
+              <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/90 p-3">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-mid-blue focus:ring-mid-blue"
+                  checked={
+                    (page.metadata as Record<string, unknown> | null)
+                      ?.showInNav === true
+                  }
+                  onChange={(e) =>
+                    setPage({
+                      ...page,
+                      metadata: {
+                        ...(typeof page.metadata === "object" && page.metadata
+                          ? page.metadata
+                          : {}),
+                        showInNav: e.target.checked,
+                      },
+                    })
+                  }
+                />
+                <span className="text-xs font-semibold text-navy">
+                  Show in main navigation
+                </span>
+              </label>
+              <div className="mb-4 grid grid-cols-1 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-slate-500">
+                    Nav label (optional)
+                  </Label>
+                  <Input
+                    value={String(
+                      (page.metadata as Record<string, unknown> | null)
+                        ?.navLabel ?? ""
+                    )}
+                    onChange={(e) =>
+                      setPage({
+                        ...page,
+                        metadata: {
+                          ...(typeof page.metadata === "object" &&
+                          page.metadata
+                            ? page.metadata
+                            : {}),
+                          navLabel: e.target.value || undefined,
+                        },
+                      })
+                    }
+                    className="h-9 border-slate-200 bg-white text-sm"
+                    placeholder="Page title"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-slate-500">
+                    Nav sort order
+                  </Label>
+                  <Input
+                    type="number"
+                    value={
+                      (page.metadata as Record<string, unknown> | null)
+                        ?.navOrder != null
+                        ? String(
+                            (page.metadata as Record<string, unknown>)
+                              .navOrder
+                          )
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value.trim();
+                      setPage({
+                        ...page,
+                        metadata: {
+                          ...(typeof page.metadata === "object" &&
+                          page.metadata
+                            ? page.metadata
+                            : {}),
+                          navOrder:
+                            raw === "" ? undefined : Number(raw),
+                        },
+                      });
+                    }}
+                    className="h-9 border-slate-200 bg-white text-sm"
+                    placeholder="100"
+                  />
+                </div>
+              </div>
+              <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/90 p-3">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-mid-blue focus:ring-mid-blue"
+                  checked={
+                    (page.metadata as Record<string, unknown> | null)
+                      ?.showInFooter === true
+                  }
+                  onChange={(e) =>
+                    setPage({
+                      ...page,
+                      metadata: {
+                        ...(typeof page.metadata === "object" && page.metadata
+                          ? page.metadata
+                          : {}),
+                        showInFooter: e.target.checked,
+                      },
+                    })
+                  }
+                />
+                <span className="text-xs font-semibold text-navy">
+                  Show in footer (Navigation column)
+                </span>
+              </label>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-slate-500">
+                    Footer label (optional)
+                  </Label>
+                  <Input
+                    value={String(
+                      (page.metadata as Record<string, unknown> | null)
+                        ?.footerLabel ?? ""
+                    )}
+                    onChange={(e) =>
+                      setPage({
+                        ...page,
+                        metadata: {
+                          ...(typeof page.metadata === "object" &&
+                          page.metadata
+                            ? page.metadata
+                            : {}),
+                          footerLabel: e.target.value || undefined,
+                        },
+                      })
+                    }
+                    className="h-9 border-slate-200 bg-white text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-slate-500">
+                    Footer sort order
+                  </Label>
+                  <Input
+                    type="number"
+                    value={
+                      (page.metadata as Record<string, unknown> | null)
+                        ?.footerOrder != null
+                        ? String(
+                            (page.metadata as Record<string, unknown>)
+                              .footerOrder
+                          )
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value.trim();
+                      setPage({
+                        ...page,
+                        metadata: {
+                          ...(typeof page.metadata === "object" &&
+                          page.metadata
+                            ? page.metadata
+                            : {}),
+                          footerOrder:
+                            raw === "" ? undefined : Number(raw),
+                        },
+                      });
+                    }}
+                    className="h-9 border-slate-200 bg-white text-sm"
+                    placeholder="100"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </aside>
       </div>

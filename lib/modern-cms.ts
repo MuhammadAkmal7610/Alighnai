@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
 import { ContentType, ContentStatus, UserRole, InfoType } from '@/lib/cms-enums'
 
@@ -487,10 +488,63 @@ export class ModernCMS {
     })
   }
 
-  static async updateUser(id: string, data: Partial<{ name: string; avatar: string; bio: string; role: UserRole }>) {
+  static async updateUser(
+    id: string,
+    data: Partial<{ name: string; avatar: string; bio: string | null; role: UserRole }>
+  ) {
     return await prisma.user.update({
       where: { id },
-      data
+      data,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        avatar: true,
+        bio: true,
+        lastLoginAt: true,
+        createdAt: true,
+        _count: {
+          select: { contents: true, pages: true },
+        },
+      },
+    })
+  }
+
+  static async createUser(data: {
+    email: string
+    name: string
+    password: string
+    role: UserRole
+  }) {
+    const passwordHash = await bcrypt.hash(data.password, 12)
+    return await prisma.user.create({
+      data: {
+        email: data.email.trim().toLowerCase(),
+        name: data.name.trim(),
+        passwordHash,
+        role: data.role,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        avatar: true,
+        bio: true,
+        lastLoginAt: true,
+        createdAt: true,
+        _count: {
+          select: { contents: true, pages: true },
+        },
+      },
+    })
+  }
+
+  static async deleteUser(id: string) {
+    return await prisma.user.delete({
+      where: { id },
+      select: { id: true },
     })
   }
 

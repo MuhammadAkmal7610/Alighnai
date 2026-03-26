@@ -29,7 +29,7 @@
   }
 
   ::selection {
-    background-color: #63bce740;
+    background-color: color-mix(in srgb, var(--color-cyan, #63bce7) 25%, transparent);
   }
 
   :focus-visible {
@@ -47,21 +47,21 @@
   }
 
   .hero-panel {
-    background-color: #0c1e39;
+    background-color: var(--hero-panel-bg, #0c1e39);
     background-image:
       repeating-linear-gradient(
         to right,
         transparent 0,
         transparent 56px,
-        rgba(99, 188, 231, 0.045) 56px,
-        rgba(99, 188, 231, 0.045) 57px
+        var(--hero-grid-line, rgba(99, 188, 231, 0.045)) 56px,
+        var(--hero-grid-line, rgba(99, 188, 231, 0.045)) 57px
       ),
       repeating-linear-gradient(
         to bottom,
         transparent 0,
         transparent 56px,
-        rgba(99, 188, 231, 0.045) 56px,
-        rgba(99, 188, 231, 0.045) 57px
+        var(--hero-grid-line, rgba(99, 188, 231, 0.045)) 56px,
+        var(--hero-grid-line, rgba(99, 188, 231, 0.045)) 57px
       );
     position: relative;
     overflow: hidden;
@@ -70,20 +70,20 @@
   .hero-panel::before {
     content: "";
     position: absolute;
-    right: -50px;
-    bottom: 130px;
+    right: var(--hero-triangle-right, -50px);
+    bottom: var(--hero-triangle-bottom, 130px);
     width: 200px;
     height: 400px;
     background: none;
-    border-left: 250px solid transparent;
-    border-right: 250px solid transparent;
-    border-bottom: 500px solid rgba(99, 188, 231, 0.18); /* Increased from 0.07 for "thik" look */
+    border-left: var(--hero-triangle-border-left, 250px) solid transparent;
+    border-right: var(--hero-triangle-border-right, 250px) solid transparent;
+    border-bottom: var(--hero-triangle-border-bottom-width, 500px) solid
+      var(--hero-triangle-color, rgba(99, 188, 231, 0.18));
     pointer-events: none;
   }
   .hero-panel.dark-shape-override::before {
-    border-bottom-color: rgba(8, 21, 44, 0.85); /* Prominent dark blue */
+    border-bottom-color: var(--hero-triangle-color-dark, rgba(8, 21, 44, 0.85));
   }
-
 
   .hero-panel::after {
     content: "";
@@ -97,7 +97,7 @@
       rgba(255, 255, 255, 0.015) 2px
     );
     mix-blend-mode: screen;
-    opacity: 0.35;
+    opacity: var(--hero-scan-opacity, 0.35);
     pointer-events: none;
   }
 
@@ -111,7 +111,7 @@
     width: 20px;
     height: 1px;
     margin-right: 12px;
-    background-color: #63BCE7; /* Tailwind's cyan */
+    background-color: var(--color-cyan, #63bce7);
     border-radius: 1px;
     flex-shrink: 0;
   }

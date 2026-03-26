@@ -7,6 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BarChart3, FileText, Users, Eye, TrendingUp, Calendar, Home, Grid3x3, Settings, Menu, MessageSquare, Phone, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  CMS_H1,
+  CMS_PAGE_HEADER,
+  CMS_PAGE_SHELL,
+  CMS_TABLE_SCROLL,
+} from '@/lib/cms-page-shell'
 
 export default function ModernDashboard() {
   const [stats, setStats] = useState({
@@ -77,14 +83,18 @@ export default function ModernDashboard() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className={CMS_PAGE_SHELL}>
           {/* Header */}
-          <div className="mb-10">
-            <h1 className="text-4xl font-bold text-navy tracking-tight">Dashboard</h1>
-            <p className="text-slate-500 mt-1 font-medium">Welcome back to your AlignAI CMS</p>
-            <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
-              <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click item to edit</span>
+          <div className={CMS_PAGE_HEADER}>
+            <div className="min-w-0">
+              <h1 className={CMS_H1}>Dashboard</h1>
+              <p className="mt-1 font-medium text-slate-500">Welcome back to your AlignAI CMS</p>
+              <div className="mt-4 flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 sm:w-max">
+                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-mid-blue animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  Double-click item to edit
+                </span>
+              </div>
             </div>
           </div>
 
@@ -223,7 +233,8 @@ export default function ModernDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
+              <div className={CMS_TABLE_SCROLL}>
+              <Table className="min-w-[640px]">
                 <TableHeader className="bg-slate-50/50">
                   <TableRow className="border-slate-100">
                     <TableHead className="text-slate-600 font-bold">Title</TableHead>
@@ -279,6 +290,7 @@ export default function ModernDashboard() {
                   )}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
     </div>

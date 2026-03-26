@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut, MessageSquare, FolderTree } from 'lucide-react'
+import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut } from 'lucide-react'
 
 const navOverview = [
   { title: 'Dashboard', href: '/admin', icon: Home },
@@ -17,10 +17,10 @@ const navOverview = [
 ]
 
 const navManage = [
-  { title: 'Categories', href: '/admin/categories', icon: FolderTree },
+  // { title: 'Categories', href: '/admin/categories', icon: FolderTree },
   // { title: 'Info', href: '/admin/info', icon: Info },
   { title: 'Users', href: '/admin/users', icon: Users },
-  { title: 'Chat', href: '/admin/chat', icon: MessageSquare },
+  // { title: 'Chat', href: '/admin/chat', icon: MessageSquare },
   { title: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
@@ -52,7 +52,15 @@ export function Sidebar({ children }: SidebarProps) {
   const initial =
     (user?.name?.[0] || user?.email?.[0] || '?').toUpperCase()
 
-  const NavItem = ({ item, level = 0 }: { item: any; level?: number }) => {
+  const NavItem = ({
+    item,
+    level = 0,
+    onNavigate,
+  }: {
+    item: any
+    level?: number
+    onNavigate?: () => void
+  }) => {
     const isActive = navItemActive(pathname, item.href)
     const hasChildren = item.children && item.children.length > 0
 
@@ -60,22 +68,23 @@ export function Sidebar({ children }: SidebarProps) {
       <div>
         <Link
           href={item.href}
+          onClick={() => onNavigate?.()}
           className={cn(
             'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-            level === 0 && 'h-11',
+            level === 0 && 'min-h-[44px]',
             isActive
               ? 'bg-slate-100 text-navy shadow-sm border border-slate-200'
               : 'text-slate-600 hover:bg-slate-50 hover:text-navy',
-            level === 1 && 'ml-6 h-9'
+            level === 1 && 'ml-6 min-h-9'
           )}
         >
-          {item.icon && <item.icon className={cn("h-4 w-4", isActive ? "text-mid-blue" : "text-slate-400")} />}
-          {item.title}
+          {item.icon && <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-mid-blue" : "text-slate-400")} />}
+          <span className="truncate">{item.title}</span>
         </Link>
         {hasChildren && (
           <div className="ml-6 mt-1 space-y-1 border-l border-slate-100 pl-2">
             {item.children.map((child: any, index: number) => (
-              <NavItem key={index} item={child} level={1} />
+              <NavItem key={index} item={child} level={1} onNavigate={onNavigate} />
             ))}
           </div>
         )}
@@ -83,18 +92,12 @@ export function Sidebar({ children }: SidebarProps) {
     )
   }
 
-  const SidebarContent = () => (
+  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <div className="flex h-full w-64 flex-col bg-white border-r border-slate-200">
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded bg-navy flex items-center justify-center shadow-sm">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
-          <div>
-            <h1 className="text-sm font-semibold text-navy">AlignAI</h1>
-            <p className="text-xs text-slate-500 font-medium">CMS</p>
-          </div>
+            <img src="/brand/logo-bg-white.png" alt="AlignAI" className="h-14 w-auto" />
         </div>
       </div>
 
@@ -107,7 +110,7 @@ export function Sidebar({ children }: SidebarProps) {
             </p>
             <div className="space-y-1">
               {navOverview.map((item, index) => (
-                <NavItem key={index} item={item} />
+                <NavItem key={index} item={item} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
@@ -117,7 +120,7 @@ export function Sidebar({ children }: SidebarProps) {
             </p>
             <div className="space-y-1">
               {navManage.map((item, index) => (
-                <NavItem key={index} item={item} />
+                <NavItem key={index} item={item} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
@@ -164,17 +167,22 @@ export function Sidebar({ children }: SidebarProps) {
       {/* Mobile Sidebar Toggle */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden fixed top-4 left-4 z-50 bg-white border-slate-200 shadow-sm">
+          <Button
+            variant="outline"
+            size="icon"
+            className="fixed left-4 top-[max(1rem,env(safe-area-inset-top))] z-50 border-slate-200 bg-white shadow-sm md:hidden"
+            aria-label="Open menu"
+          >
             <Menu className="h-6 w-6 text-navy" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-64 p-0 bg-white border-r border-slate-100">
-          <SidebarContent />
+          <SidebarContent onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-auto bg-slate-50">
+      {/* Main Content Area — top padding clears fixed mobile menu button */}
+      <main className="min-w-0 flex-1 overflow-auto bg-slate-50 pt-[calc(3.5rem+env(safe-area-inset-top))] md:pt-0">
         {children}
       </main>
     </div>

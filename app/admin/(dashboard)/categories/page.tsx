@@ -11,6 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, Tag, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  CMS_H1,
+  CMS_PAGE_HEADER,
+  CMS_PAGE_SHELL,
+  CMS_TABLE_SCROLL,
+} from '@/lib/cms-page-shell'
 
 export default function CategoriesManager() {
   const [categories, setCategories] = useState<any[]>([])
@@ -109,19 +115,19 @@ export default function CategoriesManager() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-10">
-            <div>
-              <h1 className="text-4xl font-bold text-navy tracking-tight">Categories</h1>
-              <p className="text-slate-500 mt-1 font-medium">Organize your content with meaningful classifications</p>
-              <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
-                <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click any row to edit</span>
+    <div className={CMS_PAGE_SHELL}>
+          <div className={CMS_PAGE_HEADER}>
+            <div className="min-w-0">
+              <h1 className={CMS_H1}>Categories</h1>
+              <p className="mt-1 font-medium text-slate-500">Organize your content with meaningful classifications</p>
+              <div className="mt-4 flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 sm:w-max">
+                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-mid-blue animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Double-click any row to edit</span>
               </div>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-navy text-white hover:bg-navy/90 shadow-md">
+                <Button className="w-full bg-navy text-white shadow-md hover:bg-navy/90 sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
                   Create Category
                 </Button>
@@ -133,7 +139,7 @@ export default function CategoriesManager() {
                   </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-sm font-bold text-navy">Display Name</Label>
                       <Input
@@ -205,7 +211,8 @@ export default function CategoriesManager() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
+              <div className={CMS_TABLE_SCROLL}>
+              <Table className="min-w-[640px]">
                 <TableHeader className="bg-slate-50/50">
                   <TableRow className="border-slate-100 h-14">
                     <TableHead className="text-slate-600 font-bold px-6 w-16 text-center">Color</TableHead>
@@ -253,6 +260,7 @@ export default function CategoriesManager() {
                   )}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
     </div>

@@ -2,28 +2,29 @@
 
 import { ChatBoard } from '@/components/chat/ChatBoard'
 import { MessageSquare, Users, Phone, Mail, Settings, Bell } from 'lucide-react'
+import { CMS_H1, CMS_PAGE_HEADER, CMS_PAGE_SHELL } from '@/lib/cms-page-shell'
 
 export default function ChatPage() {
   return (
-    <div className="max-w-7xl mx-auto space-y-6 p-6">
+    <div className={`${CMS_PAGE_SHELL} space-y-6`}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <MessageSquare className="h-8 w-8 text-blue-600" />
+      <div className={CMS_PAGE_HEADER}>
+        <div className="min-w-0">
+          <h1 className={`${CMS_H1} flex flex-wrap items-center gap-2`}>
+            <MessageSquare className="h-7 w-7 shrink-0 text-blue-600 sm:h-8 sm:w-8" />
             CRM Chat Board
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             Real-time communication and collaboration platform for your team.
           </p>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 bg-white">
-            <Users className="h-4 w-4" />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50 sm:text-base">
+            <Users className="h-4 w-4 shrink-0" />
             Team Members (4)
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            <Phone className="h-4 w-4" />
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 sm:text-base">
+            <Phone className="h-4 w-4 shrink-0" />
             Start Call
           </button>
         </div>

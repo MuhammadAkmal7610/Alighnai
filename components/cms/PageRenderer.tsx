@@ -7,6 +7,7 @@ import { CMSEditor } from "./CMSEditor"
 import { cn } from "@/lib/utils"
 import { 
   Plus, 
+  Minus,
   Trash2, 
   Image as ImageIcon, 
   Upload, 
@@ -21,15 +22,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { InsightsPageView } from "@/components/site/InsightsPageView"
+import { LoginCard } from "@/components/LoginCard"
+import type { ClientAccessFormCopy } from "@/lib/client-access-form"
 
 interface PageRendererProps {
   page: any
   isEditing?: boolean
   onContentChange?: (content: string) => void
   onMetadataChange?: (metadata: any) => void
+  /** Header/footer branding; pass from server for Client Access login block */
+  logoUrl?: string
 }
 
-export function PageRenderer({ page, isEditing, onContentChange, onMetadataChange }: PageRendererProps) {
+export function PageRenderer({
+  page,
+  isEditing,
+  onContentChange,
+  onMetadataChange,
+  logoUrl,
+}: PageRendererProps) {
   const data = (page?.metadata as any) || {}
   const slug = page?.slug
   const dbTemplate = page?.template
@@ -45,6 +56,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
   const isContact = template === 'contact'
   const isInsights = template === 'insights'
   const isBlank = template === 'blank'
+  const isClientAccess = slug === "client-access"
   
   const hero = data.hero || {
     kicker: isHome ? 'Enterprise AI Governance Architecture' : (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : (isContact ? 'ByteStream Strategies' : 'New Page')))),
@@ -164,6 +176,131 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
     }
   }
 
+  // List editing helpers (Add / Remove)
+  const addFounderBio = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const newBio = [...founder.bio]
+    newBio.splice(afterIndex + 1, 0, "New bio...")
+    onMetadataChange({
+      ...data,
+      founder: { ...founder, bio: newBio },
+    })
+  }
+
+  const removeFounderBio = (index: number) => {
+    if (!onMetadataChange) return
+    const newBio = founder.bio.filter((_: string, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      founder: { ...founder, bio: newBio.length ? newBio : [""] },
+    })
+  }
+
+  const addProblem = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const newProblems = [...problems]
+    newProblems.splice(afterIndex + 1, 0, { title: "New problem", description: "New description..." })
+    onMetadataChange({
+      ...data,
+      problems: newProblems,
+    })
+  }
+
+  const removeProblem = (index: number) => {
+    if (!onMetadataChange) return
+    const newProblems = problems.filter((_: any, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      problems: newProblems.length ? newProblems : [{ title: "", description: "" }],
+    })
+  }
+
+  const addProcessStep = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const newSteps = [...processSteps]
+    newSteps.splice(afterIndex + 1, 0, {
+      title: "New step",
+      description: "Step description...",
+    })
+    onMetadataChange({
+      ...data,
+      processSteps: newSteps,
+    })
+  }
+
+  const removeProcessStep = (index: number) => {
+    if (!onMetadataChange) return
+    const newSteps = processSteps.filter((_: any, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      processSteps: newSteps.length ? newSteps : [{ title: "", description: "" }],
+    })
+  }
+
+  const addDeliverable = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const newItems = [...deliverables]
+    newItems.splice(afterIndex + 1, 0, {
+      title: "New deliverable",
+      description: "Deliverable description...",
+    })
+    onMetadataChange({
+      ...data,
+      deliverables: newItems,
+    })
+  }
+
+  const removeDeliverable = (index: number) => {
+    if (!onMetadataChange) return
+    const newItems = deliverables.filter((_: any, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      deliverables: newItems.length ? newItems : [{ title: "", description: "" }],
+    })
+  }
+
+  const addTag = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const newTags = [...tags]
+    newTags.splice(afterIndex + 1, 0, "New tag")
+    onMetadataChange({
+      ...data,
+      tags: newTags,
+    })
+  }
+
+  const removeTag = (index: number) => {
+    if (!onMetadataChange) return
+    const newTags = tags.filter((_: string, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      tags: newTags.length ? newTags : [""],
+    })
+  }
+
+  const getParagraphBlocks = (html: string) => {
+    const str = html || ""
+    const matches = str.match(/<p[^>]*>[\s\S]*?<\/p>/gi)
+    if (matches && matches.length) return matches
+    const t = str.trim()
+    if (!t) return []
+    return [t.startsWith("<") ? t : `<p>${t}</p>`]
+  }
+
+  const addParagraphBlockToPage = () => {
+    if (!onContentChange) return
+    const blocks = getParagraphBlocks(page?.content || "")
+    blocks.push("<p>New paragraph...</p>")
+    onContentChange(blocks.join("\n"))
+  }
+
+  const removeLastParagraphBlockFromPage = () => {
+    if (!onContentChange) return
+    const blocks = getParagraphBlocks(page?.content || "")
+    blocks.pop()
+    onContentChange(blocks.length ? blocks.join("\n") : "")
+  }
+
   const updateCTA = (field: string, value: string) => {
     if (onMetadataChange) {
       onMetadataChange({
@@ -184,6 +321,53 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       })
     }
   }
+
+  const DEFAULT_MODEL_LAYERS = [
+    { label: "Foundation", title: "Enterprise Operations" },
+    { label: "Layer 2", title: "AI Systems (Yardi, Copilot, LLMs, etc.)" },
+    { label: "The Gap", title: "AI Decision Influence Layer" },
+    { label: "AlignAI", title: "Governance Architecture" },
+    { label: "Outcome", title: "Responsible AI Adoption" },
+  ]
+
+  const modelLayersList =
+    Array.isArray(data.modelLayers) && data.modelLayers.length > 0
+      ? data.modelLayers
+      : DEFAULT_MODEL_LAYERS
+
+  const updateModelLayer = (index: number, field: "label" | "title", value: string) => {
+    if (!onMetadataChange) return
+    const next = [...modelLayersList]
+    next[index] = { ...next[index], [field]: value }
+    onMetadataChange({ ...data, modelLayers: next })
+  }
+
+  const addModelLayer = (afterIndex: number) => {
+    if (!onMetadataChange) return
+    const next = [...modelLayersList]
+    next.splice(afterIndex + 1, 0, { label: "New layer", title: "Description" })
+    onMetadataChange({ ...data, modelLayers: next })
+  }
+
+  const removeModelLayer = (index: number) => {
+    if (!onMetadataChange) return
+    const next = modelLayersList.filter((_: unknown, i: number) => i !== index)
+    onMetadataChange({
+      ...data,
+      modelLayers: next.length ? next : DEFAULT_MODEL_LAYERS,
+    })
+  }
+
+  const patchClientAccessForm = (patch: Partial<ClientAccessFormCopy>) => {
+    if (!onMetadataChange) return
+    onMetadataChange({
+      ...data,
+      clientAccessForm: { ...(data.clientAccessForm || {}), ...patch },
+    })
+  }
+
+  const GAP_BODY_DEFAULT =
+    "NIST, ISO 42001, and the EU AI Act focus on models, training data, and compliance outputs. They do not govern where AI actually changes enterprise behavior."
 
   const addCustomSection = () => {
     if (onMetadataChange) {
@@ -261,7 +445,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       {template !== 'blank' && !isContact && !isInsights && (
         <section className={cn(
           "hero-panel relative",
-          isServices ? "min-h-[72vh] pt-28 pb-16 md:min-h-[85vh] md:pt-36 md:pb-24 dark-shape-override" : "pt-28 pb-14 md:pt-32 md:pb-16",
+          isServices ? "min-h-[72vh] pt-28 pb-16 md:min-h-[85vh] md:pt-36 md:pb-24" : "pt-28 pb-14 md:pt-32 md:pb-16",
           (isHome || isAbout || isFramework || isServices) ? "" : "bg-navy",
           isFramework && "framework-hero md:h-screen md:pt-32 pb-20"
         )} id="hero">
@@ -477,7 +661,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     onDoubleClick={() => isEditing && setEditingField('hero-credentials')}
                   >
                     {(data.credentials || ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"]).map((cred: string, i: number) => (
-                      <div key={i} className="rounded-full border border-cyan/45 bg-white/[0.04] px-3 py-2 text-[10px] font-bold text-white uppercase tracking-widest whitespace-nowrap backdrop-blur-[2px]">
+                      <div key={i} className="rounded-md border border-cyan/45 bg-white/[0.04] px-3 py-2 text-[10px] font-bold text-white uppercase tracking-widest whitespace-nowrap backdrop-blur-[2px]">
                         {cred}
                       </div>
                     ))}
@@ -500,11 +684,53 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
       )}
 
       {/* Main Content Area (For Generic Pages) */}
-      {template === 'blank' && (
+      {template === "blank" && isClientAccess && (
+        <section className="hero-panel flex min-h-screen flex-col items-center justify-center pt-16">
+          <div className="container-main w-full py-14">
+            <LoginCard
+              logoUrl={logoUrl}
+              formCopy={data.clientAccessForm}
+              editable={!!isEditing}
+              onFormCopyChange={(patch: Partial<ClientAccessFormCopy>) =>
+                patchClientAccessForm(patch)
+              }
+            />
+          </div>
+        </section>
+      )}
+
+      {template === "blank" && !isClientAccess && (
         <section className="bg-navy pt-32 pb-20 min-h-screen border-t border-white/5">
           <div className="container-main max-w-4xl mx-auto">
             {isEditing && editingField === 'content' ? (
               <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan/90">
+                    Content Blocks
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      onClick={addParagraphBlockToPage}
+                      className="h-9 w-9 border-white/20 bg-white/5 text-white hover:bg-white/10"
+                      title="Add paragraph"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      onClick={removeLastParagraphBlockFromPage}
+                      className="h-9 w-9 border-white/20 bg-white/5 text-white hover:bg-white/10"
+                      title="Remove last paragraph"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
                 <CMSEditor 
                   content={page?.content || ''} 
                   onChange={(content) => onContentChange?.(content)} 
@@ -620,7 +846,37 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
 
                   <div className="mt-10 space-y-6 text-slate text-[17px] leading-relaxed max-w-3xl">
                     {founder.bio.map((p: string, i: number) => (
-                      <div key={i}>
+                      <div key={i} className="relative group">
+                        {isEditing && (
+                          <div className="pointer-events-auto absolute -right-3 top-2 z-30 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={() => {
+                                removeFounderBio(i)
+                                setEditingField(null)
+                              }}
+                              className="h-8 w-8 rounded-full bg-white/5 hover:bg-red-500/10 text-red-300 hover:text-red-400"
+                              title="Remove bio paragraph"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              onClick={() => {
+                                addFounderBio(i)
+                                setEditingField(`founder.bio.${i + 1}`)
+                              }}
+                              className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-cyan hover:text-cyan"
+                              title="Add bio paragraph"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
                         {isEditing && editingField === `founder.bio.${i}` ? (
                           <div className="mb-6">
                             <CMSEditor 
@@ -739,40 +995,162 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
           {/* Model Layers Diagram Section */}
           <div className="section-divider" />
           <section className="bg-off-white py-32 border-b border-light-slate/30">
-            <div className="container-main text-center">
-              <div className="inline-flex items-center gap-3 mb-12">
-                <div className="h-px w-8 bg-mid-blue" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-mid-blue">Conceptual Model</p>
-                <div className="h-px w-8 bg-mid-blue" />
-              </div>
-              
-              <h2 className="text-4xl font-bold text-navy mb-20 max-w-3xl mx-auto">
-                Governance architecture for the AI influence layer.
-              </h2>
+            <div className="container-main">
+              {isEditing && editingField === "conceptual.kicker" ? (
+                <CMSEditor
+                  variant="ghost"
+                  content={data.conceptualModelKicker || "THE CONCEPTUAL MODEL"}
+                  onChange={(val) => updateMetadata("conceptualModelKicker", val)}
+                  onDone={() => setEditingField(null)}
+                />
+              ) : (
+                <p
+                  className={cn(
+                    "hero-kicker mb-4 text-mid-blue",
+                    isEditing && "cursor-edit rounded px-1 hover:ring-1 hover:ring-cyan/30"
+                  )}
+                  onDoubleClick={() => isEditing && setEditingField("conceptual.kicker")}
+                  dangerouslySetInnerHTML={{
+                    __html: data.conceptualModelKicker || "THE CONCEPTUAL MODEL",
+                  }}
+                />
+              )}
+              {isEditing && editingField === "conceptual.title" ? (
+                <div className="max-w-3xl">
+                  <CMSEditor
+                    variant="ghost"
+                    content={
+                      data.conceptualModelTitle ||
+                      "Where AlignAI sits in the enterprise AI stack."
+                    }
+                    onChange={(val) => updateMetadata("conceptualModelTitle", val)}
+                    onDone={() => setEditingField(null)}
+                  />
+                </div>
+              ) : (
+                <h2
+                  className={cn(
+                    "max-w-3xl text-3xl font-bold leading-tight text-navy md:text-4xl md:leading-tight",
+                    isEditing && "cursor-edit rounded px-1 hover:ring-1 hover:ring-cyan/30"
+                  )}
+                  onDoubleClick={() => isEditing && setEditingField("conceptual.title")}
+                >
+                  {data.conceptualModelTitle ||
+                    "Where AlignAI sits in the enterprise AI stack."}
+                </h2>
+              )}
+              {isEditing && editingField === "conceptual.description" ? (
+                <div className="mt-4 max-w-2xl">
+                  <CMSEditor
+                    variant="ghost"
+                    content={
+                      data.conceptualModelDescription ||
+                      "A practical view of how governance architecture integrates with AI systems, decision environments, and executive oversight."
+                    }
+                    onChange={(val) => updateMetadata("conceptualModelDescription", val)}
+                    onDone={() => setEditingField(null)}
+                  />
+                </div>
+              ) : (
+                <p
+                  className={cn(
+                    "mt-4 max-w-2xl text-base leading-relaxed text-slate",
+                    isEditing && "cursor-edit rounded px-1 hover:ring-1 hover:ring-cyan/30"
+                  )}
+                  onDoubleClick={() => isEditing && setEditingField("conceptual.description")}
+                >
+                  {data.conceptualModelDescription ||
+                    "A practical view of how governance architecture integrates with AI systems, decision environments, and executive oversight."}
+                </p>
+              )}
 
-               <div className="relative mt-10 max-w-4xl">
+              <div className="relative mt-14 max-w-2xl">
+                {/* Vertical connector: visible in gaps between cards; cards cover the line where they overlap */}
                 <div
                   className="absolute left-8 top-12 bottom-10 hidden w-[3px] bg-[#1e4f89] md:block"
                   aria-hidden="true"
                 />
-                <div className="space-y-7 max-w-2xl">
-                  {(data.modelLayers || [
-                    { label: "Foundation", title: "Enterprise Operations" },
-                    { label: "Layer 2", title: "AI Systems (Yardi, Copilot, LLMs, etc.)" },
-                    { label: "The Gap", title: "AI Decision Influence Layer" },
-                    { label: "AlignAI", title: "Governance Architecture" },
-                    { label: "Outcome", title: "Responsible AI Adoption" }
-                  ]).map((layer: any, idx: number) => (
+                <div className="relative z-10 space-y-7">
+                  {modelLayersList.map((layer: any, idx: number) => (
                     <div
-                      key={layer.label || idx}
-                      className="relative border-l-[3px] border-mid-blue bg-[#dde8f3] px-8 py-6 md:ml-2"
+                      key={`${layer.label}-${idx}`}
+                      className="group relative border-l-[4px] border-mid-blue bg-[#dde8f3] px-6 py-6 pl-7 shadow-sm"
                     >
-                      <p className="text-xs font-bold uppercase tracking-[0.07em] text-cyan">
-                        {layer.label}
-                      </p>
-                      <p className="mt-2 text-base font-semibold text-mid-blue md:text-lg">
-                        {layer.title}
-                      </p>
+                      {isEditing && (
+                        <div className="pointer-events-auto absolute -right-2 top-3 z-30 flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            onClick={() => {
+                              removeModelLayer(idx)
+                              if (editingField?.startsWith(`modelLayers.${idx}`))
+                                setEditingField(null)
+                            }}
+                            className="h-8 w-8 rounded-full bg-white/90 text-red-600 shadow-sm hover:bg-red-50"
+                            title="Remove layer"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            onClick={() => {
+                              addModelLayer(idx)
+                              setEditingField(`modelLayers.${idx + 1}.label`)
+                            }}
+                            className="h-8 w-8 rounded-full bg-white/90 text-cyan shadow-sm hover:bg-cyan/10"
+                            title="Add layer"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                      {isEditing && editingField === `modelLayers.${idx}.label` ? (
+                        <CMSEditor
+                          variant="ghost"
+                          content={layer.label}
+                          onChange={(val) => updateModelLayer(idx, "label", val)}
+                          onDone={() => setEditingField(null)}
+                        />
+                      ) : (
+                        <p
+                          className={cn(
+                            "text-[11px] font-bold uppercase tracking-[0.12em] text-cyan",
+                            isEditing &&
+                              "cursor-edit rounded px-0.5 hover:ring-1 hover:ring-cyan/40"
+                          )}
+                          onDoubleClick={() =>
+                            isEditing && setEditingField(`modelLayers.${idx}.label`)
+                          }
+                        >
+                          {layer.label}
+                        </p>
+                      )}
+                      {isEditing && editingField === `modelLayers.${idx}.title` ? (
+                        <div className="mt-2">
+                          <CMSEditor
+                            variant="ghost"
+                            content={layer.title}
+                            onChange={(val) => updateModelLayer(idx, "title", val)}
+                            onDone={() => setEditingField(null)}
+                          />
+                        </div>
+                      ) : (
+                        <p
+                          className={cn(
+                            "mt-2 text-base font-semibold text-mid-blue md:text-lg",
+                            isEditing &&
+                              "cursor-edit rounded px-0.5 hover:ring-1 hover:ring-cyan/40"
+                          )}
+                          onDoubleClick={() =>
+                            isEditing && setEditingField(`modelLayers.${idx}.title`)
+                          }
+                        >
+                          {layer.title}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -820,13 +1198,65 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                 />
               )}
               
-              <p className="mt-5 max-w-[600px] text-base text-slate">
-                 NIST, ISO 42001, and the EU AI Act focus on models, training data, and compliance outputs. They do not govern where AI actually changes enterprise behavior.
-              </p>
+              {isEditing && editingField === "home.gap.body" ? (
+                <div className="mt-5 max-w-[640px]">
+                  <CMSEditor
+                    variant="ghost"
+                    content={data.gapDescription || GAP_BODY_DEFAULT}
+                    onChange={(val) => updateMetadata("gapDescription", val)}
+                    onDone={() => setEditingField(null)}
+                  />
+                </div>
+              ) : (
+                <div
+                  className={cn(
+                    "mt-5 max-w-[600px] text-base text-slate",
+                    isEditing &&
+                      "cursor-edit rounded px-1 hover:ring-1 hover:ring-cyan/30"
+                  )}
+                  onDoubleClick={() => isEditing && setEditingField("home.gap.body")}
+                  dangerouslySetInnerHTML={{
+                    __html: data.gapDescription || GAP_BODY_DEFAULT,
+                  }}
+                />
+              )}
 
               <div className="mt-12 grid sm:grid-cols-2">
                 {problems.map((problem: any, index: number) => (
-                  <div key={index} className="border border-navy/[0.08] bg-white px-7 py-10 shadow-sm">
+                  <div
+                    key={index}
+                    className="relative border border-navy/[0.08] bg-white px-7 py-10 shadow-sm group"
+                  >
+                    {isEditing && (
+                      <div className="pointer-events-auto absolute -right-3 top-4 z-30 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          onClick={() => {
+                            removeProblem(index)
+                            if (editingField?.startsWith(`problems.${index}.`)) setEditingField(null)
+                          }}
+                          className="h-8 w-8 rounded-full bg-white/5 hover:bg-red-500/10 text-red-500"
+                          title="Remove problem"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          onClick={() => {
+                            addProblem(index)
+                            setEditingField(`problems.${index + 1}.title`)
+                          }}
+                          className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-cyan"
+                          title="Add problem"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                     <div className="flex flex-col h-full">
                        <span className="mb-2 block text-xs font-medium tracking-wide text-light-slate">
                          {(index + 1).toString().padStart(2, "0")}
@@ -978,7 +1408,43 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     
                     <ol className="mt-6 border-light-slate">
                       {processSteps.map((step: any, index: number) => (
-                        <li key={index} className={cn("border-light-slate py-5", index > 0 ? "border-t" : "")}>
+                        <li
+                          key={index}
+                          className={cn(
+                            "relative border-light-slate py-5",
+                            index > 0 ? "border-t" : ""
+                          )}
+                        >
+                          {isEditing && (
+                            <div className="pointer-events-auto absolute -right-3 top-5 z-30 flex flex-col gap-2 opacity-100">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                onClick={() => {
+                                  removeProcessStep(index)
+                                  if (editingField?.startsWith(`processSteps.${index}.`)) setEditingField(null)
+                                }}
+                                className="h-8 w-8 rounded-full bg-white/5 hover:bg-red-500/10 text-red-500"
+                                title="Remove step"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                onClick={() => {
+                                  addProcessStep(index)
+                                  setEditingField(`processSteps.${index + 1}.title`)
+                                }}
+                                className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-cyan"
+                                title="Add step"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                           <div className="flex gap-4">
                             <span className="mt-0.5 font-heading text-[18px] font-bold text-mid-blue">
                               {/* 01 */}
@@ -1061,7 +1527,40 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
 
                     <ul className="mt-6 space-y-1">
                       {deliverables.map((item: any, index: number) => (
-                        <li key={index} className="grid grid-cols-[44px_1fr] gap-1 border-l-[3px] border-mid-blue bg-[#e9edf3] px-4 py-5">
+                        <li
+                          key={index}
+                          className="relative grid grid-cols-[44px_1fr] gap-1 border-l-[3px] border-mid-blue bg-[#e9edf3] px-4 py-5 group"
+                        >
+                          {isEditing && (
+                            <div className="pointer-events-auto absolute -right-3 top-4 z-30 flex flex-col gap-2 opacity-100">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                onClick={() => {
+                                  removeDeliverable(index)
+                                  if (editingField?.startsWith(`deliverables.${index}.`)) setEditingField(null)
+                                }}
+                                className="h-8 w-8 rounded-full bg-white/5 hover:bg-red-500/10 text-red-500"
+                                title="Remove deliverable"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                onClick={() => {
+                                  addDeliverable(index)
+                                  setEditingField(`deliverables.${index + 1}.title`)
+                                }}
+                                className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-cyan"
+                                title="Add deliverable"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                           <span className="pt-0.5 text-xs font-semibold text-mid-blue">
                              {(index + 1).toString().padStart(2, "0")}
                           </span>
@@ -1364,7 +1863,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         </div>
       )}
 
-      {!isContact && (
+      {!isContact && !isClientAccess && (
         <>
           {!isInsights && <div className="section-divider" />}
           <CTASection />

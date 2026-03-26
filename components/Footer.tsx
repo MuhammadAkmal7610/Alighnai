@@ -2,15 +2,40 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { DEFAULT_LOGO_URL } from "@/lib/site-theme";
+
+export type FooterNavLink = { href: string; label: string };
+
+const BASE_FOOTER_NAV: FooterNavLink[] = [
+  { href: "/site", label: "Home" },
+  { href: "/site/framework", label: "The Framework" },
+  { href: "/site/services", label: "Services" },
+  { href: "/site/about", label: "About" },
+  { href: "/site/insights", label: "Insights" },
+  { href: "/site/contact", label: "Contact" },
+];
 
 interface FooterProps {
   /** When true (e.g. CMS iframe preview), internal links do not navigate */
   suppressNavigation?: boolean;
+  /** Appended after core links — from CMS (showInFooter) */
+  extraNavLinks?: FooterNavLink[];
+  logoUrl?: string;
 }
 
-export function Footer({ suppressNavigation }: FooterProps = {}) {
+export function Footer({
+  suppressNavigation,
+  extraNavLinks = [],
+  logoUrl = DEFAULT_LOGO_URL,
+}: FooterProps = {}) {
+  const baseHrefs = new Set(BASE_FOOTER_NAV.map((l) => l.href));
+  const extrasFiltered = extraNavLinks.filter((l) => !baseHrefs.has(l.href));
+  const footerNavLinks: FooterNavLink[] = [
+    ...BASE_FOOTER_NAV,
+    ...extrasFiltered,
+  ];
   return (
-    <footer className="bg-[#08162e] text-light-slate">
+    <footer className="bg-footer-bg text-light-slate">
       <div className="container-main py-14">
         <div className="grid gap-10 md:grid-cols-3">
           <div className="max-w-[300px]">
@@ -21,11 +46,11 @@ export function Footer({ suppressNavigation }: FooterProps = {}) {
               onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
             >
               <Image
-                src="/brand/logo-bg-black.png"
+                src={logoUrl}
                 alt="AlignAI"
                 width={160}
                 height={40}
-                className="h-8 w-auto"
+                className="h-14 w-auto"
               />
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-slate">
@@ -42,60 +67,17 @@ export function Footer({ suppressNavigation }: FooterProps = {}) {
               Navigation
             </p>
             <ul className="mt-3 space-y-5 text-sm">
-              <li>
-                <Link
-                  href="/site"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/site/framework"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  The Framework
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/site/services"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/site/about"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/site/insights"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  Insights
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/site/contact"
-                  className="hover:text-white text-zinc-500 transition-colors"
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  Contact
-                </Link>
-              </li>
+              {footerNavLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-zinc-500 transition-colors hover:text-white"
+                    onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 

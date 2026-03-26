@@ -18,6 +18,19 @@ export async function cmsAuth(): Promise<CmsAuthResult> {
   return { ok: true, session };
 }
 
+/** CMS routes that manage users must call this after `cmsAuth`. */
+export async function cmsAuthAdmin(): Promise<CmsAuthResult> {
+  const r = await cmsAuth();
+  if (!r.ok) return r;
+  if (r.session.user?.role !== "ADMIN") {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "Admin only" }, { status: 403 }),
+    };
+  }
+  return r;
+}
+
 /**
  * JWT may carry a stale user id (e.g. after DB reseed). Resolve a valid `users.id` for FK fields, or undefined.
  */

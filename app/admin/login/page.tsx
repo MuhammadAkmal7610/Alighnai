@@ -49,8 +49,8 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy shadow-sm">
-            <span className="text-lg font-bold text-white">A</span>
+          <div className="mx-auto mb-4 flex items-center justify-center ">
+          <img src="/brand/logo-bg-white.png" alt="AlignAI" className="h-14 w-auto mx-auto" />
           </div>
           <h1 className="text-2xl font-bold text-navy">AlignAI CMS</h1>
           <p className="mt-1 text-sm text-slate-500">Sign in to manage content</p>

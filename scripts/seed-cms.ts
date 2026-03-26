@@ -103,6 +103,10 @@ async function main() {
           { number: "04", title: "Oversight Structures", description: "Define the monitoring, review cadence, override paths, and evidence requirements for each AI-influenced decision domain." },
           { number: "05", title: "Executive Accountability", description: "Assign named ownership for every AI-influenced decision domain. Leadership must be able to answer: who is responsible when AI-influenced decision causes harm?" }
         ],
+        conceptualModelKicker: "THE CONCEPTUAL MODEL",
+        conceptualModelTitle: "Where AlignAI sits in the enterprise AI stack.",
+        conceptualModelDescription:
+          "A practical view of how governance architecture integrates with AI systems, decision environments, and executive oversight.",
         modelLayers: [
           { label: "Foundation", title: "Enterprise Operations" },
           { label: "Layer 2", title: "AI Systems (Yardi, Copilot, LLMs, etc.)" },
@@ -139,6 +143,10 @@ async function main() {
           { title: "Regulatory Exposure Is Accelerating", description: "DSFI, BO, Fair Housing algorithmic screening, the EU AI Act, and casemark doctrine are converging on AI decision accountability." },
           { title: "The Entry Point Is Visibility", description: "You cannot govern what you cannot see. The first step is mapping where AI is influencing decisions across your enterprise." }
         ],
+        gapKicker: "THE GOVERNANCE GAP",
+        gapTitle: "Every major AI governance framework is focused on the wrong layer.",
+        gapDescription:
+          "<p>NIST, ISO 42001, and the EU AI Act focus on models, training data, and compliance outputs. They do not govern where AI actually changes enterprise behavior.</p>",
         credentials: ["PhD - Carleton University", "MBA - University of Ottawa", "PMP Certified", "30+ Years Enterprise"]
       }
     }
@@ -299,6 +307,60 @@ async function main() {
             'Every major AI governance framework in circulation focuses on the model. NIST AI RMF, ISO 42001, the EU AI Act, the proposed Canadian AIDA - all of them are fundamentally concerned with how models are built, trained, documented, and audited.',
             'That is not the wrong thing to govern. But it is not where AI is actually changing enterprise behaviour.',
           ],
+        },
+      },
+    },
+  })
+
+  // 9b. Client Access — published so /site/client-access uses CMS PageRenderer
+  await prisma.page.upsert({
+    where: { slug: 'client-access' },
+    update: {
+      title: 'Client Access',
+      template: 'blank',
+      status: ContentStatus.PUBLISHED,
+      content: '',
+      metadata: {
+        seoTitle: 'Client Access',
+        seoDescription:
+          'Secure client portal for AlignAI by ByteStream Strategies project access.',
+        clientAccessForm: {
+          badge: '• Invitation Only',
+          title: 'Client & Partner Access',
+          subtitle:
+            'Secure access to your AlignAI workspace, reports, and resources.',
+          emailLabel: 'Email Address',
+          emailPlaceholder: 'you@organization.com',
+          passwordLabel: 'Password',
+          passwordPlaceholder: '**********',
+          submitButton: 'Sign In →',
+          footerLine1: 'Access is by invitation only',
+          footerLine2: 'To request access, contact bburke@bytestream.ca',
+        },
+      },
+    },
+    create: {
+      title: 'Client Access',
+      slug: 'client-access',
+      status: ContentStatus.PUBLISHED,
+      template: 'blank',
+      content: '',
+      metadata: {
+        seoTitle: 'Client Access',
+        seoDescription:
+          'Secure client portal for AlignAI by ByteStream Strategies project access.',
+        clientAccessForm: {
+          badge: '• Invitation Only',
+          title: 'Client & Partner Access',
+          subtitle:
+            'Secure access to your AlignAI workspace, reports, and resources.',
+          emailLabel: 'Email Address',
+          emailPlaceholder: 'you@organization.com',
+          passwordLabel: 'Password',
+          passwordPlaceholder: '**********',
+          submitButton: 'Sign In →',
+          footerLine1: 'Access is by invitation only',
+          footerLine2: 'To request access, contact bburke@bytestream.ca',
         },
       },
     },

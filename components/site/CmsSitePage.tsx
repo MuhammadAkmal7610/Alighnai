@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { auth } from "@/auth"
 import { ModernCMS } from "@/lib/modern-cms"
 import { PageRenderer } from "@/components/cms/PageRenderer"
+import { getSiteSettingsRow, brandingFromMetadata } from "@/lib/site-theme-server"
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>
 
@@ -25,9 +26,14 @@ export async function CmsSitePage({
     if (!session?.user?.id) notFound()
   }
 
-  const page = await ModernCMS.getPageBySlug(slug, { publishedOnly: !preview })
+  const [page, settings] = await Promise.all([
+    ModernCMS.getPageBySlug(slug, { publishedOnly: !preview }),
+    getSiteSettingsRow().catch(() => null),
+  ])
   if (!page) notFound()
   if (!preview && page.status !== "PUBLISHED") notFound()
 
-  return <PageRenderer page={page} />
+  const logoUrl = brandingFromMetadata(settings?.metadata).logoUrl
+
+  return <PageRenderer page={page} logoUrl={logoUrl} />
 }

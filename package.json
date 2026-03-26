@@ -13,6 +13,7 @@
     "db:seed": "tsx scripts/seed-cms.ts",
     "db:seed:defaults": "tsx scripts/seed-defaults.ts",
     "db:seed:all": "npm run db:seed && npm run db:seed:defaults",
+    "db:publish-client-access": "tsx scripts/publish-client-access.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
@@ -46,6 +47,7 @@
     "@tiptap/pm": "^3.20.1",
     "@tiptap/react": "^3.20.1",
     "@tiptap/starter-kit": "^3.20.1",
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

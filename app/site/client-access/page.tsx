@@ -5,6 +5,7 @@ import { ModernCMS } from "@/lib/modern-cms";
 import { PageRenderer } from "@/components/cms/PageRenderer";
 import { LoginCard } from "@/components/LoginCard";
 import { getCmsPageMetadata } from "@/lib/site-page-meta";
+import { getSiteSettingsRow, brandingFromMetadata } from "@/lib/site-theme-server";
 
 const FALLBACK = {
   title: "Client Access",
@@ -45,18 +46,22 @@ export default async function ClientAccessPage({
     if (!session?.user?.id) notFound();
   }
 
-  const page = await ModernCMS.getPageBySlug("client-access", {
-    publishedOnly: !preview,
-  });
+  const [page, settings] = await Promise.all([
+    ModernCMS.getPageBySlug("client-access", {
+      publishedOnly: !preview,
+    }),
+    getSiteSettingsRow().catch(() => null),
+  ]);
+  const logoUrl = brandingFromMetadata(settings?.metadata).logoUrl;
 
   if (page && (preview || page.status === "PUBLISHED")) {
-    return <PageRenderer page={page} />;
+    return <PageRenderer page={page} logoUrl={logoUrl} />;
   }
 
   return (
     <section className="hero-panel flex min-h-screen items-center justify-center pt-16">
       <div className="container-main py-14">
-        <LoginCard />
+        <LoginCard logoUrl={logoUrl} />
       </div>
     </section>
   );

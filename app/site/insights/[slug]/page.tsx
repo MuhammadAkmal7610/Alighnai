@@ -54,6 +54,13 @@ export default async function InsightPostPage({ params, searchParams }: PageProp
       })
       .toUpperCase();
 
+  /** CMS body is often TipTap HTML (<p>, <h2>, …); plain text still uses the formatter below. */
+  function isLikelyHtml(content: string) {
+    const t = content.trim();
+    if (!t.startsWith("<")) return false;
+    return /<\/?[a-z][a-z0-9]*\b/i.test(t);
+  }
+
   const formatContent = (content: string) => {
     return content.split('\n\n').map((paragraph, index) => {
       if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
@@ -129,7 +136,14 @@ export default async function InsightPostPage({ params, searchParams }: PageProp
       <section className="bg-white py-16">
         <article className="container-main">
           <div className="mx-auto max-w-prose">
-            {formatContent(post.content)}
+            {isLikelyHtml(post.content) ? (
+              <div
+                className="insight-article-body [&_p]:mt-4 [&_p:first-child]:mt-0 [&_p]:leading-relaxed [&_p]:text-slate [&_h1]:mt-8 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-navy [&_h2]:mt-8 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:text-navy [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-navy [&_a]:font-semibold [&_a]:text-mid-blue [&_a]:underline [&_a:hover]:text-deep-blue [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:text-slate [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:text-slate [&_li]:mt-1 [&_blockquote]:border-l-4 [&_blockquote]:border-mid-blue/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate [&_strong]:font-semibold [&_strong]:text-navy"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            ) : (
+              formatContent(post.content)
+            )}
           </div>
         </article>
       </section>

@@ -11,10 +11,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, Eye, Layout, Settings, FileText } from 'lucide-react'
-import { Sidebar } from '@/components/cms/ModernSidebar'
 import { CMSEditor } from '@/components/cms/CMSEditor'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import {
+  CMS_H1,
+  CMS_PAGE_HEADER,
+  CMS_PAGE_SHELL,
+  CMS_TABLE_SCROLL,
+} from '@/lib/cms-page-shell'
 
 import { useRouter } from 'next/navigation'
 
@@ -118,19 +123,21 @@ export default function PagesManager() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-10">
-            <div>
-              <h1 className="text-4xl font-bold text-navy tracking-tight">Pages</h1>
-              <p className="text-slate-500 mt-1 font-medium">Manage your website's structural architecture</p>
-              <div className="mt-4 flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1 w-max">
-                <div className="h-1.5 w-1.5 rounded-full bg-mid-blue animate-pulse" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Double-click any row to edit</span>
+    <div className={CMS_PAGE_SHELL}>
+          <div className={CMS_PAGE_HEADER}>
+            <div className="min-w-0">
+              <h1 className={CMS_H1}>Pages</h1>
+              <p className="mt-1 font-medium text-slate-500">Manage your website&apos;s structural architecture</p>
+              <div className="mt-4 flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 sm:w-max">
+                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-mid-blue animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  Double-click any row to edit
+                </span>
               </div>
             </div>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-navy text-white hover:bg-navy/90 shadow-md">
+                <Button className="w-full bg-navy text-white shadow-md hover:bg-navy/90 sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
                   Create Page
                 </Button>
@@ -143,7 +150,7 @@ export default function PagesManager() {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <Tabs defaultValue="content" className="w-full">
-                    <TabsList className="bg-slate-50 border border-slate-200 w-full justify-start p-1 h-auto gap-2 rounded-lg">
+                    <TabsList className="h-auto w-full min-w-0 flex-nowrap justify-start gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap">
                       <TabsTrigger 
                         value="content" 
                         className="data-[state=active]:bg-white data-[state=active]:text-navy data-[state=active]:shadow-sm text-slate-500 px-6 py-2.5 font-semibold transition-all"
@@ -161,7 +168,7 @@ export default function PagesManager() {
                     </TabsList>
 
                     <TabsContent value="content" className="mt-8 space-y-6">
-                      <div className="grid grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="title" className="text-sm font-bold text-navy">Title</Label>
                           <Input
@@ -305,6 +312,136 @@ export default function PagesManager() {
                         </div>
                       </div>
 
+                      <div className="p-6 border border-slate-200 rounded-xl space-y-5 bg-white">
+                        <h4 className="text-sm font-bold text-mid-blue flex items-center gap-2 uppercase tracking-wider">
+                          <Layout className="w-4 h-4" />
+                          Site navigation
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Only <span className="font-semibold text-navy">published</span> pages appear on the live site. Labels default to the page title if left empty.
+                        </p>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/80 p-3">
+                          <input
+                            type="checkbox"
+                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-mid-blue focus:ring-mid-blue"
+                            checked={(formData.metadata as Record<string, unknown>)?.showInNav === true}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                metadata: {
+                                  ...(formData.metadata || {}),
+                                  showInNav: e.target.checked,
+                                },
+                              })
+                            }
+                          />
+                          <span>
+                            <span className="text-sm font-semibold text-navy">Show in main navigation</span>
+                            <span className="mt-0.5 block text-xs text-slate-500">Appended after Home, Framework, Services, …</span>
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Nav label (optional)</Label>
+                            <Input
+                              value={String((formData.metadata as Record<string, unknown>)?.navLabel ?? '')}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  metadata: {
+                                    ...(formData.metadata || {}),
+                                    navLabel: e.target.value || undefined,
+                                  },
+                                })
+                              }
+                              className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                              placeholder="Same as page title"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Nav sort order</Label>
+                            <Input
+                              type="number"
+                              value={(formData.metadata as Record<string, unknown>)?.navOrder !== undefined && (formData.metadata as Record<string, unknown>)?.navOrder !== null
+                                ? String((formData.metadata as Record<string, unknown>).navOrder)
+                                : ''}
+                              onChange={(e) => {
+                                const raw = e.target.value.trim()
+                                setFormData({
+                                  ...formData,
+                                  metadata: {
+                                    ...(formData.metadata || {}),
+                                    navOrder: raw === '' ? undefined : Number(raw),
+                                  },
+                                })
+                              }}
+                              className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                              placeholder="100"
+                            />
+                          </div>
+                        </div>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/80 p-3">
+                          <input
+                            type="checkbox"
+                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-mid-blue focus:ring-mid-blue"
+                            checked={(formData.metadata as Record<string, unknown>)?.showInFooter === true}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                metadata: {
+                                  ...(formData.metadata || {}),
+                                  showInFooter: e.target.checked,
+                                },
+                              })
+                            }
+                          />
+                          <span>
+                            <span className="text-sm font-semibold text-navy">Show in footer (Navigation column)</span>
+                            <span className="mt-0.5 block text-xs text-slate-500">Listed after the core site links</span>
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Footer label (optional)</Label>
+                            <Input
+                              value={String((formData.metadata as Record<string, unknown>)?.footerLabel ?? '')}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  metadata: {
+                                    ...(formData.metadata || {}),
+                                    footerLabel: e.target.value || undefined,
+                                  },
+                                })
+                              }
+                              className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                              placeholder="Defaults to nav label or title"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Footer sort order</Label>
+                            <Input
+                              type="number"
+                              value={(formData.metadata as Record<string, unknown>)?.footerOrder !== undefined && (formData.metadata as Record<string, unknown>)?.footerOrder !== null
+                                ? String((formData.metadata as Record<string, unknown>).footerOrder)
+                                : ''}
+                              onChange={(e) => {
+                                const raw = e.target.value.trim()
+                                setFormData({
+                                  ...formData,
+                                  metadata: {
+                                    ...(formData.metadata || {}),
+                                    footerOrder: raw === '' ? undefined : Number(raw),
+                                  },
+                                })
+                              }}
+                              className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                              placeholder="Same as nav order"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <Label className="text-sm font-bold text-navy">Raw Metadata (Advanced)</Label>
                         <Textarea
@@ -340,9 +477,10 @@ export default function PagesManager() {
             </Dialog>
           </div>
 
-          <Card className="bg-white border-slate-200 shadow-sm overflow-hidden rounded-xl">
+          <Card className="overflow-hidden rounded-xl border-slate-200 bg-white shadow-sm">
             <CardContent className="p-0">
-              <Table>
+              <div className={CMS_TABLE_SCROLL}>
+              <Table className="min-w-[720px]">
                 <TableHeader className="bg-slate-50/50">
                   <TableRow className="border-slate-100 h-14">
                     <TableHead className="text-slate-600 font-bold px-6">Title</TableHead>
@@ -398,6 +536,7 @@ export default function PagesManager() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
 

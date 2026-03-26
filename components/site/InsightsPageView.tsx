@@ -227,21 +227,33 @@ export function InsightsPageView({
             <p className="mt-6 text-sm text-slate">Loading posts from Content…</p>
           ) : null}
 
-          <div className="mt-7 grid gap-0 border border-[#d9deea] bg-white md:grid-cols-3">
+          <div className="mt-7 grid gap-0 border border-[#d9deea] bg-white md:grid-cols-3 md:items-stretch">
             {latestPosts.length === 0 ? (
               <div className="col-span-full p-10 text-center text-sm text-slate">
                 No articles yet. Publish posts from{" "}
                 <span className="font-semibold text-navy">Admin → Content</span> to show them here.
               </div>
             ) : (
-              latestPosts.map((post, index) => (
+              latestPosts.map((post, index) => {
+                const col = index % 3
+                const row = Math.floor(index / 3)
+                const postCardBorders = cn(
+                  // Mobile (1 col): horizontal rule between stacked cards
+                  index === 0 && "border-t-2 border-t-cyan",
+                  index > 0 && "border-t border-t-[#e4e8f1]",
+                  // md: 3-column grid — row divider + column dividers
+                  "md:border-t-0 md:border-l-0",
+                  row === 0 && col === 0 && "md:border-t-2 md:border-t-cyan",
+                  row === 0 &&
+                    col > 0 &&
+                    "md:border-t-2 md:border-t-transparent md:border-l md:border-l-[#e4e8f1]",
+                  row >= 1 && "md:border-t md:border-t-[#e4e8f1]",
+                  row >= 1 && col > 0 && "md:border-l md:border-l-[#e4e8f1]"
+                )
+                return (
                 <article
                   key={post.slug}
-                  className={`p-5 ${
-                    index === 0
-                      ? "border-t-2 border-t-cyan"
-                      : "border-t-2 border-t-transparent border-l border-l-[#e4e8f1]"
-                  }`}
+                  className={cn("flex flex-col p-5", postCardBorders)}
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-slate">
                     {formatDate(post.date)}
@@ -255,12 +267,13 @@ export function InsightsPageView({
                   <p className="mt-3 text-sm leading-relaxed text-slate">{post.excerpt}</p>
                   <Link
                     href={`/site/insights/${post.slug}`}
-                    className="mt-5 inline-block text-sm font-semibold text-mid-blue hover:text-deep-blue"
+                    className="mt-auto pt-5 inline-block text-sm font-semibold text-mid-blue hover:text-deep-blue"
                   >
                     Read article →
                   </Link>
                 </article>
-              ))
+                )
+              })
             )}
           </div>
 

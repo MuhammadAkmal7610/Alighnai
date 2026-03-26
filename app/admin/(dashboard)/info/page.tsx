@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, Eye, Phone, Mail, MapPin, FileText, Info as InfoIcon, Globe, Map } from 'lucide-react'
 import { InfoType, type InfoType as InfoTypeValue } from '@/lib/cms-enums'
 import { cn } from '@/lib/utils'
+import { CMS_H1, CMS_PAGE_HEADER, CMS_PAGE_SHELL } from '@/lib/cms-page-shell'
 import { CMSEditor } from '@/components/cms/CMSEditor'
 
 export default function InfoManager() {
@@ -144,7 +145,7 @@ export default function InfoManager() {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-sm font-bold text-navy">Category Type</Label>
                   <select

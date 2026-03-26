@@ -39,6 +39,12 @@ import {
 } from "@/lib/cms-enums";
 import { CMSEditor } from "@/components/cms/CMSEditor";
 import { cn } from "@/lib/utils";
+import {
+  CMS_H1,
+  CMS_PAGE_HEADER,
+  CMS_PAGE_SHELL,
+  CMS_TABLE_SCROLL,
+} from "@/lib/cms-page-shell";
 
 const emptyForm = {
   title: "",
@@ -174,15 +180,15 @@ export default function ContentManager() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-      <div className="mb-8 flex flex-col gap-6 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl">Content</h1>
+    <div className={CMS_PAGE_SHELL}>
+      <div className={CMS_PAGE_HEADER}>
+        <div className="min-w-0">
+          <h1 className={CMS_H1}>Content</h1>
           <p className="mt-1 font-medium text-slate-500">
             Manage your articles, blog posts, and resources
           </p>
-          <div className="mt-4 flex w-max items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
-            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-mid-blue" />
+          <div className="mt-4 flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 sm:w-max">
+            <div className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-mid-blue" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
               Double-click any row to edit
             </span>
@@ -456,8 +462,8 @@ export default function ContentManager() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto -mx-px">
-          <Table>
+          <div className={CMS_TABLE_SCROLL}>
+          <Table className="min-w-[720px]">
             <TableHeader className="bg-slate-50/50">
               <TableRow className="h-14 border-slate-100">
                 <TableHead className="px-6 font-bold text-slate-600">Title</TableHead>
