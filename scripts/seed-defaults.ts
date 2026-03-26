@@ -7,6 +7,9 @@ async function main() {
   try {
     // Seed Home Page Metadata
     const homeDefaults = {
+      seoTitle: 'Enterprise AI Governance & Strategy',
+      seoDescription:
+        'AlignAI by ByteStream Strategies helps enterprises deploy AI responsibly with governance frameworks, decision visibility, and strategic advisory.',
       hero: {
         kicker: 'Enterprise AI Governance Architecture',
         title: 'AI is already influencing decisions in your organization.',
@@ -38,6 +41,9 @@ async function main() {
 
     // Seed About Page Metadata
     const aboutDefaults = {
+      seoTitle: 'About AlignAI',
+      seoDescription:
+        'Learn about AlignAI by ByteStream Strategies — our mission, expertise, and commitment to responsible enterprise AI governance.',
       hero: {
         kicker: 'The Founder',
         title: 'Built from doctoral research.',
@@ -74,6 +80,9 @@ async function main() {
 
     // Seed Services Page Metadata
     const servicesDefaults = {
+      seoTitle: 'Services',
+      seoDescription:
+        'The AI Decision Visibility Assessment is a structured 4–6 week engagement covering one business domain.',
       hero: {
         kicker: 'The Entry Point',
         title: 'The AI Decision Visibility Assessment.',
@@ -114,6 +123,9 @@ async function main() {
 
     // Seed Contact Page Metadata
     const contactDefaults = {
+      seoTitle: 'Contact',
+      seoDescription:
+        'Get in touch with AlignAI by ByteStream Strategies to discuss enterprise AI governance and strategic advisory.',
       email: "bburke@bytestream.ca",
       linkedin: "https://www.linkedin.com/",
       description: "No forms, no demos, no sales calls. A direct conversation about whether there is a fit.",
@@ -133,6 +145,71 @@ async function main() {
       }
     });
     console.log('Seeded Contact Page metadata.');
+
+    const insightsDefaults = {
+      seoTitle: 'Insights',
+      seoDescription:
+        'Articles and analysis on enterprise AI governance, compliance, risk management, and the AlignAI framework.',
+      hero: {
+        kicker: 'Thought Leadership',
+        title:
+          'AI governance thinking.<span class="block text-cyan">Grounded in research.</span>',
+        description:
+          'Perspectives on the governance gap, regulatory exposure, and what enterprise AI accountability actually requires.',
+      },
+      latestPosts: [
+        {
+          slug: 'why-ai-governance-matters-now',
+          date: '2026-03-06',
+          badge: 'Featured',
+          title: 'The Governance Layer Nobody Built',
+          excerpt:
+            'Every major AI governance framework focuses on the model. NIST, ISO 42001, the EU AI Act - all of them. None of them govern where AI actually changes enterprise behaviour.',
+        },
+        {
+          slug: 'ai-governance-for-financial-services',
+          date: '2026-03-08',
+          badge: 'Real Estate',
+          title: 'Your Yardi System Is Making Decisions. Who Owns Them?',
+          excerpt:
+            'If your organization runs Yardi, MRI, or a comparable property management platform, AI is already embedded in your operations. The governance question most organizations cannot yet answer.',
+        },
+        {
+          slug: 'decision-visibility-assessment-explained',
+          date: '2026-03-01',
+          badge: '',
+          title: 'The Decision Your AI Made This Morning',
+          excerpt:
+            'Before your first meeting today, AI had already made several decisions on your behalf. Not suggestions. Decisions. The question is whether you know which ones.',
+        },
+      ],
+      samplePost: {
+        slug: 'why-ai-governance-matters-now',
+        title: 'The Governance Layer Nobody Built',
+        date: '2026-03-06',
+        tag: 'AI Governance',
+        author: 'Brian Burke',
+        paragraphs: [
+          'Every major AI governance framework in circulation focuses on the model. NIST AI RMF, ISO 42001, the EU AI Act, the proposed Canadian AIDA - all of them are fundamentally concerned with how models are built, trained, documented, and audited.',
+          'That is not the wrong thing to govern. But it is not where AI is actually changing enterprise behaviour.',
+        ],
+      },
+    };
+
+    await prisma.page.upsert({
+      where: { slug: 'insights' },
+      update: { metadata: insightsDefaults, template: 'insights' },
+      create: {
+        title: 'Insights',
+        slug: 'insights',
+        content:
+          'Articles and analysis on enterprise AI governance, compliance, risk management, and the AlignAI framework.',
+        metadata: insightsDefaults,
+        status: 'PUBLISHED',
+        template: 'insights',
+      },
+    });
+    console.log('Seeded Insights page.');
 
     // Also update Info table for Home/Settings if needed
     await prisma.info.update({

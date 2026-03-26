@@ -1,5 +1,6 @@
+import bcrypt from 'bcryptjs'
 import { prisma } from '../lib/prisma'
-import { ContentStatus, ContentType, InfoType } from '@prisma/client'
+import { ContentStatus, ContentType, InfoType, UserRole } from '@prisma/client'
 
 async function main() {
   console.log('Seeding CMS data...')
@@ -87,6 +88,9 @@ async function main() {
       status: ContentStatus.PUBLISHED,
       content: 'Governance architecture for the layer most frameworks miss.',
       metadata: {
+        seoTitle: 'AlignAI Governance Framework',
+        seoDescription:
+          'Governance architecture for the layer where AI actually changes enterprise behaviour.',
         hero: {
           kicker: 'The Framework',
           title: 'Governance architecture for the layer most frameworks miss.',
@@ -120,6 +124,9 @@ async function main() {
       status: ContentStatus.PUBLISHED,
       content: 'This is the home page content managed by the CMS.',
       metadata: {
+        seoTitle: 'Enterprise AI Governance & Strategy',
+        seoDescription:
+          'AlignAI by ByteStream Strategies helps enterprises deploy AI responsibly with governance frameworks, decision visibility, and strategic advisory.',
         hero: {
           kicker: 'Enterprise AI Governance Architecture',
           title: 'AI is already influencing decisions in your organization.',
@@ -147,6 +154,9 @@ async function main() {
       status: ContentStatus.PUBLISHED,
       content: 'Learn about AlignAI by ByteStream Strategies — our mission, expertise, and commitment to responsible enterprise AI governance.',
       metadata: {
+        seoTitle: 'About AlignAI',
+        seoDescription:
+          'Learn about AlignAI by ByteStream Strategies — our mission, expertise, and commitment to responsible enterprise AI governance.',
         hero: {
           title: 'Built from doctoral research.',
           highlight: 'Delivered with 30 years of enterprise experience.'
@@ -177,6 +187,9 @@ async function main() {
       status: ContentStatus.PUBLISHED,
       content: 'Start a conversation.',
       metadata: {
+        seoTitle: 'Contact',
+        seoDescription:
+          'Get in touch with AlignAI by ByteStream Strategies to discuss enterprise AI governance and strategic advisory.',
         kicker: 'ByteStream Strategies',
         title: 'Start a conversation.',
         description: "No forms, no demos, no sales calls. A direct conversation about whether there is a fit.",
@@ -197,6 +210,9 @@ async function main() {
       status: ContentStatus.PUBLISHED,
       content: 'The AI Decision Visibility Assessment is a structured 4–6 week engagement covering one business domain.',
       metadata: {
+        seoTitle: 'Services',
+        seoDescription:
+          'The AI Decision Visibility Assessment is a structured 4–6 week engagement covering one business domain.',
         hero: {
           kicker: 'The Entry Point',
           title: 'The AI Decision Visibility Assessment.',
@@ -225,6 +241,69 @@ async function main() {
     }
   })
 
+  // 9. Insights Page
+  await prisma.page.upsert({
+    where: { slug: 'insights' },
+    update: {},
+    create: {
+      title: 'Insights',
+      slug: 'insights',
+      status: ContentStatus.PUBLISHED,
+      template: 'insights',
+      content:
+        'Articles and analysis on enterprise AI governance, compliance, risk management, and the AlignAI framework.',
+      metadata: {
+        seoTitle: 'Insights',
+        seoDescription:
+          'Articles and analysis on enterprise AI governance, compliance, risk management, and the AlignAI framework.',
+        hero: {
+          kicker: 'Thought Leadership',
+          title:
+            'AI governance thinking.<span class="block text-cyan">Grounded in research.</span>',
+          description:
+            'Perspectives on the governance gap, regulatory exposure, and what enterprise AI accountability actually requires.',
+        },
+        latestPosts: [
+          {
+            slug: 'why-ai-governance-matters-now',
+            date: '2026-03-06',
+            badge: 'Featured',
+            title: 'The Governance Layer Nobody Built',
+            excerpt:
+              'Every major AI governance framework focuses on the model. NIST, ISO 42001, the EU AI Act - all of them. None of them govern where AI actually changes enterprise behaviour.',
+          },
+          {
+            slug: 'ai-governance-for-financial-services',
+            date: '2026-03-08',
+            badge: 'Real Estate',
+            title: 'Your Yardi System Is Making Decisions. Who Owns Them?',
+            excerpt:
+              'If your organization runs Yardi, MRI, or a comparable property management platform, AI is already embedded in your operations. The governance question most organizations cannot yet answer.',
+          },
+          {
+            slug: 'decision-visibility-assessment-explained',
+            date: '2026-03-01',
+            badge: '',
+            title: 'The Decision Your AI Made This Morning',
+            excerpt:
+              'Before your first meeting today, AI had already made several decisions on your behalf. Not suggestions. Decisions. The question is whether you know which ones.',
+          },
+        ],
+        samplePost: {
+          slug: 'why-ai-governance-matters-now',
+          title: 'The Governance Layer Nobody Built',
+          date: '2026-03-06',
+          tag: 'AI Governance',
+          author: 'Brian Burke',
+          paragraphs: [
+            'Every major AI governance framework in circulation focuses on the model. NIST AI RMF, ISO 42001, the EU AI Act, the proposed Canadian AIDA - all of them are fundamentally concerned with how models are built, trained, documented, and audited.',
+            'That is not the wrong thing to govern. But it is not where AI is actually changing enterprise behaviour.',
+          ],
+        },
+      },
+    },
+  })
+
   console.log('Seeding categories...')
   const categories = [
     { name: 'Governance', slug: 'governance', color: '#0ea5e9' },
@@ -240,6 +319,136 @@ async function main() {
       create: cat
     })
   }
+
+  const adminEmail = (process.env.CMS_ADMIN_EMAIL || 'admin@alignai.com')
+    .trim()
+    .toLowerCase()
+  const adminPassword = process.env.CMS_ADMIN_PASSWORD
+  if (adminPassword && adminPassword.length >= 8) {
+    const passwordHash = await bcrypt.hash(adminPassword, 12)
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { passwordHash, role: UserRole.ADMIN, name: 'CMS Admin' },
+      create: {
+        email: adminEmail,
+        name: 'CMS Admin',
+        role: UserRole.ADMIN,
+        passwordHash,
+      },
+    })
+    console.log('Seeded CMS admin user:', adminEmail)
+  } else {
+    console.warn(
+      'CMS_ADMIN_PASSWORD not set or shorter than 8 characters; skipped CMS admin user seed.'
+    )
+  }
+
+  // 10. Insight articles as Content (same slugs/titles as Insights page listing)
+  const governanceCat = await prisma.category.findUnique({
+    where: { slug: 'governance' },
+    select: { id: true },
+  })
+  const strategyCat = await prisma.category.findUnique({
+    where: { slug: 'strategy' },
+    select: { id: true },
+  })
+  const policyCat = await prisma.category.findUnique({
+    where: { slug: 'policy' },
+    select: { id: true },
+  })
+
+  const cmsAuthor = await prisma.user.findFirst({
+    where: { email: adminEmail },
+    select: { id: true },
+  })
+
+  const insightArticles: Array<{
+    slug: string
+    title: string
+    excerpt: string
+    content: string
+    publishedAt: Date
+    featured: boolean
+    categoryId: string | undefined
+    metadata?: Record<string, unknown>
+  }> = [
+    {
+      slug: 'why-ai-governance-matters-now',
+      title: 'The Governance Layer Nobody Built',
+      excerpt:
+        'Every major AI governance framework focuses on the model. NIST, ISO 42001, the EU AI Act - all of them. None of them govern where AI actually changes enterprise behaviour.',
+      content: [
+        '<p>Every major AI governance framework in circulation focuses on the model. NIST AI RMF, ISO 42001, the EU AI Act, the proposed Canadian AIDA — all of them are fundamentally concerned with how models are built, trained, documented, and audited.</p>',
+        '<p>That is not the wrong thing to govern. But it is not where AI is actually changing enterprise behaviour.</p>',
+        '<p>The governance layer that matters is the one enterprises have not mapped: where AI shapes what people see, what they prioritize, and what they decide before a human ever acts.</p>',
+      ].join('\n'),
+      publishedAt: new Date('2026-03-06T12:00:00.000Z'),
+      featured: true,
+      categoryId: governanceCat?.id,
+      metadata: { listBadge: 'Featured' },
+    },
+    {
+      slug: 'ai-governance-for-financial-services',
+      title: 'Your Yardi System Is Making Decisions. Who Owns Them?',
+      excerpt:
+        'If your organization runs Yardi, MRI, or a comparable property management platform, AI is already embedded in your operations. The governance question most organizations cannot yet answer.',
+      content: [
+        '<p>If your organization runs Yardi, MRI, or a comparable property management platform, AI is already embedded in your operations — not only in obvious automation, but in ranking, routing, and recommendations that change what staff and tenants experience.</p>',
+        '<p>The governance question most organizations cannot yet answer is simple to ask and difficult to answer: who is accountable when an AI-influenced workflow produces a harmful or non-compliant outcome?</p>',
+        '<p>AlignAI treats that question as architectural, not rhetorical: map decision influence, assign ownership, and align controls to regulatory and operational exposure.</p>',
+      ].join('\n'),
+      publishedAt: new Date('2026-03-08T12:00:00.000Z'),
+      featured: false,
+      categoryId: strategyCat?.id,
+      metadata: { listBadge: 'Real Estate' },
+    },
+    {
+      slug: 'decision-visibility-assessment-explained',
+      title: 'The Decision Your AI Made This Morning',
+      excerpt:
+        'Before your first meeting today, AI had already made several decisions on your behalf. Not suggestions. Decisions. The question is whether you know which ones.',
+      content: [
+        '<p>Before your first meeting today, AI had already made several decisions on your behalf. Not suggestions. Decisions embedded in dashboards, inboxes, and workflow tools.</p>',
+        '<p>The question is whether you know which ones — and whether your governance architecture can evidence who approved, who monitors, and who is accountable when something goes wrong.</p>',
+        '<p>Decision visibility is the entry point: you cannot govern influence you cannot see.</p>',
+      ].join('\n'),
+      publishedAt: new Date('2026-03-01T12:00:00.000Z'),
+      featured: false,
+      categoryId: policyCat?.id,
+    },
+  ]
+
+  for (const article of insightArticles) {
+    await prisma.content.upsert({
+      where: { slug: article.slug },
+      update: {
+        title: article.title,
+        excerpt: article.excerpt,
+        content: article.content,
+        type: ContentType.BLOG_POST,
+        status: ContentStatus.PUBLISHED,
+        featured: article.featured,
+        publishedAt: article.publishedAt,
+        categoryId: article.categoryId ?? null,
+        authorId: cmsAuthor?.id ?? null,
+        metadata: article.metadata as object | undefined,
+      },
+      create: {
+        slug: article.slug,
+        title: article.title,
+        excerpt: article.excerpt,
+        content: article.content,
+        type: ContentType.BLOG_POST,
+        status: ContentStatus.PUBLISHED,
+        featured: article.featured,
+        publishedAt: article.publishedAt,
+        categoryId: article.categoryId,
+        authorId: cmsAuthor?.id,
+        metadata: article.metadata as object | undefined,
+      },
+    })
+  }
+  console.log(`Seeded ${insightArticles.length} insight articles into Content.`)
 
   console.log('CMS Seeded successfully.')
 }

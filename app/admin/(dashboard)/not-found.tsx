@@ -14,7 +14,7 @@ export default function CMSNotFound() {
           The management module or object you are looking for has been moved or does not exist.
         </p>
         <Link 
-          href="/site/dashboard" 
+          href="/admin" 
           className="inline-flex items-center gap-2 bg-navy text-white px-8 py-3 rounded-lg font-bold hover:bg-navy/90 transition-all shadow-md active:scale-95"
         >
           <MoveLeft className="w-4 h-4" />

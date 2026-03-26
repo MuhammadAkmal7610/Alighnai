@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   const { id } = await params
   try {
     console.log(`GET /api/cms/pages/${id} - Fetching page...`)
@@ -32,6 +36,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   const { id } = await params
   try {
     console.log(`PATCH /api/cms/pages/${id} - Updating page...`)
@@ -67,6 +74,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   const { id } = await params
   try {
     console.log(`DELETE /api/cms/pages/${id} - Deleting page...`)

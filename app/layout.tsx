@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Sora, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import Providers from "@/components/Providers";
-import { ChatWidget } from "@/components/ChatWidget";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -63,7 +62,6 @@ export default function RootLayout({
             Skip to main content
           </a>
           {children}
-          <ChatWidget />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

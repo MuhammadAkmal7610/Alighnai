@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function GET() {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     const hasDatabase = Boolean(process.env.DATABASE_URL?.trim())
     if (!hasDatabase) {

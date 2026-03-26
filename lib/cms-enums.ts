@@ -3,6 +3,8 @@ export const ContentType = {
   ARTICLE: 'ARTICLE',
   NEWS: 'NEWS',
   CASE_STUDY: 'CASE_STUDY',
+  WHITEPAPER: 'WHITEPAPER',
+  PRESS_RELEASE: 'PRESS_RELEASE',
 } as const
 
 export type ContentType = (typeof ContentType)[keyof typeof ContentType]
@@ -11,6 +13,7 @@ export const ContentStatus = {
   DRAFT: 'DRAFT',
   PUBLISHED: 'PUBLISHED',
   ARCHIVED: 'ARCHIVED',
+  SCHEDULED: 'SCHEDULED',
 } as const
 
 export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]

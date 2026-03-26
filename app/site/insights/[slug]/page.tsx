@@ -4,9 +4,12 @@ import { CTASection } from "@/components/CTASection";
 import { notFound } from "next/navigation";
 import { ModernCMS } from "@/lib/modern-cms";
 import { ContentStatus } from "@/lib/cms-enums";
+import { auth } from "@/auth";
+import { getPublishedContentMetadata } from "@/lib/content-post-meta";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateStaticParams() {
@@ -14,19 +17,32 @@ export async function generateStaticParams() {
   return posts.map((post: { slug: string }) => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await ModernCMS.getContentBySlug(slug);
-  if (!post) return {};
-  return {
-    title: post.title,
-    description: post.excerpt,
-  };
+  return getPublishedContentMetadata(slug, searchParams, {
+    title: "Insights",
+    description: "AlignAI insights and articles.",
+  });
 }
 
-export default async function InsightPostPage({ params }: PageProps) {
+export default async function InsightPostPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
-  const post = await ModernCMS.getContentBySlug(slug);
+  const sp = (await searchParams) ?? {};
+  const pv = sp.preview;
+  const preview =
+    pv === "1" ||
+    pv === "true" ||
+    (Array.isArray(pv) && (pv[0] === "1" || pv[0] === "true"));
+  if (preview) {
+    const session = await auth();
+    if (!session?.user?.id) notFound();
+  }
+  const post = await ModernCMS.getContentBySlug(slug, {
+    publishedOnly: !preview,
+  });
   if (!post) notFound();
 
   const formatDate = (value: string) =>
@@ -80,6 +96,12 @@ export default async function InsightPostPage({ params }: PageProps) {
 
   return (
     <>
+      {preview ? (
+        <div className="border-b border-amber-600/40 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
+          Draft preview (authenticated). Visitors still only see published posts at this URL without{" "}
+          <code className="rounded bg-amber-200/80 px-1">?preview=1</code>.
+        </div>
+      ) : null}
       <section className="bg-navy pt-32 pb-16">
         <div className="container-main">
           <Link

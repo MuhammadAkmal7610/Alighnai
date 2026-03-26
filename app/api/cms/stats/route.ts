@@ -1,27 +1,26 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
-import { CustomCMS } from '@/lib/cms-db'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function GET() {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
-    const hasDatabase = Boolean(process.env.DATABASE_URL?.trim())
-    if (!hasDatabase) {
-      const customStats = await CustomCMS.getStats()
+    if (!process.env.DATABASE_URL?.trim()) {
       return NextResponse.json({
-        totalContents: customStats.totalPosts,
-        publishedContents: customStats.publishedPosts,
-        draftContents: customStats.draftPosts,
+        totalContents: 0,
+        publishedContents: 0,
+        draftContents: 0,
         totalPages: 0,
         publishedPages: 0,
         draftPages: 0,
-        totalCategories: customStats.totalCategories,
+        totalCategories: 0,
         totalUsers: 0,
       })
     }
 
-    console.log('GET /api/cms/stats - Fetching statistics...')
     const stats = await ModernCMS.getStats()
-    console.log('GET /api/cms/stats - Successfully fetched statistics.')
     return NextResponse.json(stats)
   } catch (error: any) {
     console.error('Stats API GET error:', {

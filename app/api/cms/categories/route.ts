@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
-import { CustomCMS } from '@/lib/cms-db'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function GET() {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
-    const hasDatabase = Boolean(process.env.DATABASE_URL?.trim())
-    if (!hasDatabase) {
-      const categories = await CustomCMS.getCategories()
-      return NextResponse.json({ categories })
+    if (!process.env.DATABASE_URL?.trim()) {
+      return NextResponse.json({ categories: [] })
     }
 
-    console.log('GET /api/cms/categories - Fetching categories...')
     const categories = await ModernCMS.getCategories()
-    console.log(`GET /api/cms/categories - Successfully fetched ${categories.length} categories.`)
     return NextResponse.json({ categories })
   } catch (error: any) {
     console.error('Categories API GET error:', {
@@ -30,6 +29,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     const body = await request.json()
     const { name, slug, description, color, icon } = body

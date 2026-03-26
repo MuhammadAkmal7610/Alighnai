@@ -3,54 +3,34 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { signOut, useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Home, FileText, Grid3x3, Info, Settings, Users, LogOut, MessageSquare } from 'lucide-react'
+import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut, MessageSquare, FolderTree } from 'lucide-react'
 
-const navigation = [
-  {
-    title: 'Dashboard',
-    href: '/',
-    icon: Home,
-  },
-  {
-    title: 'Content',
-    href: '/content',
-    icon: FileText,
-  },
-  {
-    title: 'Pages',
-    href: '/pages',
-    icon: Grid3x3,
-  },
-  /* {
-    title: 'Categories',
-    href: '/categories',
-    icon: Menu,
-  },
-  {
-    title: 'Info',
-    href: '/info',
-    icon: Info,
-  },
-  {
-    title: 'Users',
-    href: '/users',
-    icon: Users,
-  },
-  {
-    title: 'Chat',
-    href: '/chat',
-    icon: MessageSquare,
-  }, */
-  {
-    title: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
+const navOverview = [
+  { title: 'Dashboard', href: '/admin', icon: Home },
+  { title: 'Content', href: '/admin/content', icon: FileText },
+  { title: 'Pages', href: '/admin/pages', icon: Grid3x3 },
 ]
+
+const navManage = [
+  { title: 'Categories', href: '/admin/categories', icon: FolderTree },
+  // { title: 'Info', href: '/admin/info', icon: Info },
+  { title: 'Users', href: '/admin/users', icon: Users },
+  { title: 'Chat', href: '/admin/chat', icon: MessageSquare },
+  { title: 'Settings', href: '/admin/settings', icon: Settings },
+]
+
+function navItemActive(pathname: string | null, href: string) {
+  if (!pathname) return false
+  if (href === '/admin') {
+    return pathname === '/admin' || pathname === '/admin/'
+  }
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
 
 interface SidebarProps {
   children: React.ReactNode
@@ -59,15 +39,21 @@ interface SidebarProps {
 export function Sidebar({ children }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { data: session } = useSession()
   
-  const isEditMode = pathname?.includes('/edit')
+  const isFullBleedChrome =
+    pathname?.includes('/edit') || pathname?.startsWith('/admin/preview')
 
-  if (isEditMode) {
+  if (isFullBleedChrome) {
     return <>{children}</>
   }
 
+  const user = session?.user
+  const initial =
+    (user?.name?.[0] || user?.email?.[0] || '?').toUpperCase()
+
   const NavItem = ({ item, level = 0 }: { item: any; level?: number }) => {
-    const isActive = pathname === item.href
+    const isActive = navItemActive(pathname, item.href)
     const hasChildren = item.children && item.children.length > 0
 
     return (
@@ -114,10 +100,27 @@ export function Sidebar({ children }: SidebarProps) {
 
       {/* Navigation */}
       <ScrollArea className="flex-1 px-4 py-6">
-        <nav className="space-y-1">
-          {navigation.map((item, index) => (
-            <NavItem key={index} item={item} />
-          ))}
+        <nav className="space-y-6">
+          <div>
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Overview
+            </p>
+            <div className="space-y-1">
+              {navOverview.map((item, index) => (
+                <NavItem key={index} item={item} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Manage
+            </p>
+            <div className="space-y-1">
+              {navManage.map((item, index) => (
+                <NavItem key={index} item={item} />
+              ))}
+            </div>
+          </div>
         </nav>
       </ScrollArea>
 
@@ -126,15 +129,15 @@ export function Sidebar({ children }: SidebarProps) {
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center border border-slate-300">
             <span className="text-xs text-slate-700 font-semibold">
-              A
+              {initial}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-navy truncate">
-              Admin User
+              {user?.name || 'Signed in'}
             </p>
             <p className="text-xs text-slate-500 truncate">
-              admin@alignai.com
+              {user?.email || '—'}
             </p>
           </div>
         </div>
@@ -142,6 +145,7 @@ export function Sidebar({ children }: SidebarProps) {
           variant="ghost"
           size="sm"
           className="mt-4 w-full justify-start text-slate-600 hover:text-navy hover:bg-white hover:shadow-sm"
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
         >
           <LogOut className="mr-3 h-4 w-4" />
           Sign Out

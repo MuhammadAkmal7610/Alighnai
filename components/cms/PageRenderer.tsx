@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { InsightsPageView } from "@/components/site/InsightsPageView"
 
 interface PageRendererProps {
   page: any
@@ -33,7 +34,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
   const dbTemplate = page?.template
   const template = (dbTemplate && dbTemplate !== 'default' && dbTemplate !== 'blank') 
     ? dbTemplate 
-    : (slug === 'home' ? 'home' : (slug === 'about' ? 'about' : (slug === 'framework' ? 'framework' : (slug === 'services' ? 'services' : (slug === 'contact' ? 'contact' : 'blank')))))
+    : (slug === 'home' ? 'home' : (slug === 'about' ? 'about' : (slug === 'framework' ? 'framework' : (slug === 'services' ? 'services' : (slug === 'contact' ? 'contact' : (slug === 'insights' ? 'insights' : 'blank'))))))
 
   // Page specific elements
   const isHome = template === 'home'
@@ -41,6 +42,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
   const isFramework = template === 'framework'
   const isServices = template === 'services'
   const isContact = template === 'contact'
+  const isInsights = template === 'insights'
   const isBlank = template === 'blank'
   
   const hero = data.hero || {
@@ -71,6 +73,34 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
   const customSections = data.customSections || []
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  /** Contact copy: DB may store flat keys (seed) or nested under hero */
+  const contactCopy = isContact
+    ? {
+        kicker: data.kicker ?? data.hero?.kicker ?? hero.kicker,
+        title: data.title ?? data.hero?.title ?? hero.title,
+        description:
+          data.description ??
+          data.hero?.description ??
+          hero.description,
+        email: data.email ?? "bburke@bytestream.ca",
+        subtext:
+          data.subtext ??
+          "If you are working on AI governance architecture - or trying to understand whether you should be - this is the conversation to have. Reach out directly. No intake form, no scheduling tool, no SDR.",
+        linkedin: data.linkedin ?? "https://www.linkedin.com/",
+      }
+    : null
+
+  const patchContactMetadata = (updates: Record<string, string>) => {
+    if (!onMetadataChange) return
+    const existingHero =
+      data.hero && typeof data.hero === "object" ? data.hero : {}
+    onMetadataChange({
+      ...data,
+      ...updates,
+      hero: { ...existingHero, ...updates },
+    })
+  }
 
   // Metadata update helpers
   const updateHero = (field: string, value: string) => {
@@ -227,41 +257,38 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         isEditing ? "bg-navy" : "bg-navy"
     )}>
       {/* Hero Section */}
-      {template !== 'blank' && (
+      {template !== 'blank' && !isContact && !isInsights && (
         <section className={cn(
           "hero-panel relative",
           isServices ? "min-h-[72vh] pt-28 pb-16 md:min-h-[85vh] md:pt-36 md:pb-24" : "pt-28 pb-14 md:pt-32 md:pb-16",
           (isHome || isAbout || isFramework || isServices) ? "" : "bg-navy"
         )} id="hero">
         <div className="container-main relative z-10">
-          {/* Decorative Triangle from target site */}
-          {(isHome || isFramework) && !isEditing && (
+          {/* Decorative triangle: framework only — home uses .hero-panel::before in globals.css (avoids double triangle) */}
+          {isFramework && !isEditing && (
             <div className="absolute top-0 right-0 w-[50%] h-full pointer-events-none overflow-hidden opacity-30">
                <div className="absolute bottom-0 right-[-5%] w-0 h-0 border-l-[600px] border-l-transparent border-b-[800px] border-b-deep-blue" />
             </div>
           )}
 
           <div className="max-w-4xl">
-            {/* Kicker */}
-            {/* Kicker */}
-            {(!isHome) && (
-              isEditing && editingField === 'kicker' ? (
-                <div className="mb-6">
-                  <CMSEditor 
-                    variant="ghost"
-                    content={hero.kicker}
-                    onChange={(val) => updateHero('kicker', val)}
-                    onDone={() => setEditingField(null)}
-                    placeholder="Enter kicker..."
-                  />
-                </div>
-              ) : (
-                <div 
-                  className={cn("hero-kicker mb-8", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                  onDoubleClick={() => isEditing && setEditingField('kicker')}
-                  dangerouslySetInnerHTML={{ __html: hero.kicker || (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : 'New Page'))) }}
+            {/* Kicker (shown on home too — matches live bytestream / ByteStream Strategies site) */}
+            {isEditing && editingField === 'kicker' ? (
+              <div className="mb-6">
+                <CMSEditor 
+                  variant="ghost"
+                  content={hero.kicker}
+                  onChange={(val) => updateHero('kicker', val)}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Enter kicker..."
                 />
-              )
+              </div>
+            ) : (
+              <div 
+                className={cn("hero-kicker mb-8", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
+                onDoubleClick={() => isEditing && setEditingField('kicker')}
+                dangerouslySetInnerHTML={{ __html: hero.kicker || (isAbout ? 'The Founder' : (isFramework ? 'The Framework' : (isServices ? 'The Entry Point' : (isHome ? 'Enterprise AI Governance Architecture' : 'New Page')))) }}
+              />
             )}
 
             {/* Title */}
@@ -389,7 +416,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn1Link || "/site/framework"} 
                       className={cn(
-                        "bg-mid-blue hover:bg-cyan hover:text-navy text-white font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 group text-sm uppercase tracking-wider",
+                        "bg-mid-blue hover:bg-[#4a8cc8] text-white font-bold py-4 px-8 rounded-btn border border-[#34649e] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all flex items-center gap-2 group text-[15px] leading-tight tracking-normal",
                         isEditing && "hover:ring-2 hover:ring-white border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -405,7 +432,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     <Link 
                       href={data.heroBtn2Link || "/site/contact"} 
                       className={cn(
-                        "bg-transparent hover:bg-white/10 text-white border border-mid-blue font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 text-sm uppercase tracking-wider",
+                        "bg-transparent hover:bg-white/5 text-white border border-white/35 font-bold py-4 px-8 rounded-btn transition-all flex items-center gap-2 text-[15px] leading-tight tracking-normal",
                         isEditing && "hover:ring-2 hover:ring-white/50 border border-transparent shadow-lg"
                       )}
                       onClick={(e) => {
@@ -453,7 +480,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
                     onDoubleClick={() => isEditing && setEditingField('hero-credentials')}
                   >
                     {(data.credentials || ["PHD - CARLETON UNIVERSITY", "MBA - UNIVERSITY OF OTTAWA", "PMP CERTIFIED", "30+ YEARS ENTERPRISE"]).map((cred: string, i: number) => (
-                      <div key={i} className="px-3 py-1.5 bg-deep-blue border border-mid-blue/30 rounded-btn xl:rounded-sm text-[10px] font-bold text-light-slate uppercase tracking-widest whitespace-nowrap">
+                      <div key={i} className="rounded-full border border-cyan/45 bg-white/[0.04] px-3 py-2 text-[10px] font-bold text-white uppercase tracking-widest whitespace-nowrap backdrop-blur-[2px]">
                         {cred}
                       </div>
                     ))}
@@ -465,6 +492,14 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
 
           </div>
         </section>
+      )}
+
+      {isInsights && (
+        <InsightsPageView
+          metadata={data}
+          isEditing={isEditing}
+          onMetadataChange={onMetadataChange}
+        />
       )}
 
       {/* Main Content Area (For Generic Pages) */}
@@ -745,7 +780,7 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
 
               <div className="mt-12 grid sm:grid-cols-2">
                 {problems.map((problem: any, index: number) => (
-                  <div key={index} className="border border-off-white bg-white px-7 py-10">
+                  <div key={index} className="border border-navy/[0.08] bg-white px-7 py-10 shadow-sm">
                     <div className="flex flex-col h-full">
                        <span className="mb-2 block text-xs font-medium tracking-wide text-light-slate">
                          {(index + 1).toString().padStart(2, "0")}
@@ -1027,94 +1062,174 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         </>
       )}
 
-      {isContact && (
-        <>
-          <div className="section-divider" />
-          <section className="bg-navy py-44 min-h-[60vh] flex items-center relative overflow-hidden" id="contact">
-            <div className="container-main text-center relative z-10">
-              <div className="max-w-4xl mx-auto space-y-16">
-                <div className="flex flex-col items-center">
-                   <div className="h-px w-12 bg-cyan mb-8" />
-                   <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Start a Conversation</p>
-                </div>
-                <div className="space-y-6">
-                  {isEditing && editingField === 'contact.email' ? (
-                     <CMSEditor 
-                        variant="ghost"
-                        content={data.email || 'bburke@bytestream.ca'}
-                        onChange={(val) => updateMetadata('email', val)}
-                        onDone={() => setEditingField(null)}
-                      />
-                  ) : (
-                    <div className="relative group">
-                        <a 
-                            href={isEditing ? "#" : `mailto:${data.email || 'bburke@bytestream.ca'}`}
-                            className={cn("text-4xl md:text-7xl lg:text-8xl font-bold text-white hover:text-cyan transition-all duration-500 font-heading block tracking-tighter", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                            onClick={(e) => {
-                                if (isEditing) {
-                                    e.preventDefault();
-                                    setEditingField('contact.email');
-                                }
-                            }}
-                        >
-                            {data.email || 'bburke@bytestream.ca'}
-                        </a>
-                        {isEditing && (
-                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-cyan text-[10px] font-bold text-navy px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                CLICK TO EDIT EMAIL
-                            </div>
-                        )}
-                    </div>
-                  )}
-                </div>
-                <div className="max-w-2xl mx-auto">
-                  {isEditing && editingField === 'contact.subtext' ? (
-                    <CMSEditor 
-                      variant="ghost"
-                      content={data.subtext || 'Whether you are working on AI governance architecture...'}
-                      onChange={(val) => updateMetadata('subtext', val)}
-                      onDone={() => setEditingField(null)}
-                    />
-                  ) : (
-                    <p 
-                        className={cn("text-xl text-white opacity-80 leading-relaxed font-medium", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                        onClick={() => isEditing && setEditingField('contact.subtext')}
-                        dangerouslySetInnerHTML={{ __html: data.subtext || 'Whether you are early in AI deployment or already hitting scaling friction, the Assessment provides immediate decision visibility.' }}
-                    />
-                  )}
-                </div>
-                <div className="pt-8">
-                  {isEditing && editingField === 'contact.linkedin' ? (
-                    <CMSEditor 
-                      variant="ghost"
-                      content={data.linkedin || 'https://www.linkedin.com/'}
-                      onChange={(val) => updateMetadata('linkedin', val)}
-                      onDone={() => setEditingField(null)}
-                    />
-                  ) : (
-                    <p className="text-white/40 text-sm">
-                        Find Brian on{' '}
-                        <a
-                            href={data.linkedin || 'https://www.linkedin.com/'}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={cn("text-cyan underline underline-offset-4 font-bold", isEditing && "hover:ring-1 hover:ring-cyan/30 cursor-edit transition-all rounded px-1")}
-                            onClick={(e) => {
-                                if (isEditing) {
-                                    e.preventDefault();
-                                    setEditingField('contact.linkedin');
-                                }
-                            }}
-                        >
-                            LinkedIn
-                        </a>
-                    </p>
-                  )}
-                </div>
+      {isContact && contactCopy && (
+        <section
+          className="hero-panel flex min-h-screen items-center pt-16"
+          id="contact"
+        >
+          <div className="container-main py-20 text-center">
+            {isEditing && editingField === "contact.kicker" ? (
+              <div className="flex justify-center">
+                <CMSEditor
+                  variant="ghost"
+                  content={contactCopy.kicker}
+                  onChange={(val) => patchContactMetadata({ kicker: val })}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Kicker"
+                />
               </div>
+            ) : (
+              <p
+                className={cn(
+                  "hero-kicker justify-center",
+                  isEditing &&
+                    "cursor-edit rounded px-1 transition-all hover:ring-1 hover:ring-cyan/30"
+                )}
+                onDoubleClick={() =>
+                  isEditing && setEditingField("contact.kicker")
+                }
+                dangerouslySetInnerHTML={{ __html: contactCopy.kicker }}
+              />
+            )}
+
+            {isEditing && editingField === "contact.title" ? (
+              <div className="mx-auto mt-8 max-w-4xl">
+                <CMSEditor
+                  variant="ghost"
+                  content={contactCopy.title}
+                  onChange={(val) => patchContactMetadata({ title: val })}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Headline"
+                />
+              </div>
+            ) : (
+              <h1
+                className={cn(
+                  "mt-8 text-4xl text-white md:text-6xl",
+                  isEditing &&
+                    "cursor-edit rounded px-1 transition-all hover:ring-1 hover:ring-cyan/30"
+                )}
+                onDoubleClick={() =>
+                  isEditing && setEditingField("contact.title")
+                }
+                dangerouslySetInnerHTML={{ __html: contactCopy.title }}
+              />
+            )}
+
+            {isEditing && editingField === "contact.description" ? (
+              <div className="mx-auto mt-6 max-w-[520px]">
+                <CMSEditor
+                  variant="ghost"
+                  content={contactCopy.description}
+                  onChange={(val) => patchContactMetadata({ description: val })}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Intro line"
+                />
+              </div>
+            ) : (
+              <p
+                className={cn(
+                  "mx-auto mt-6 max-w-[520px] text-lg leading-relaxed text-light-slate",
+                  isEditing &&
+                    "cursor-edit rounded px-1 transition-all hover:ring-1 hover:ring-cyan/30"
+                )}
+                onDoubleClick={() =>
+                  isEditing && setEditingField("contact.description")
+                }
+                dangerouslySetInnerHTML={{ __html: contactCopy.description }}
+              />
+            )}
+
+            {isEditing && editingField === "contact.email" ? (
+              <div className="mx-auto mt-12 max-w-xl">
+                <CMSEditor
+                  variant="ghost"
+                  content={contactCopy.email}
+                  onChange={(val) => patchContactMetadata({ email: val })}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Email address"
+                />
+              </div>
+            ) : (
+              <a
+                href={isEditing ? "#" : `mailto:${contactCopy.email}`}
+                className={cn(
+                  "mt-12 inline-block border-b border-deep-blue pb-1 text-2xl font-semibold text-white transition-colors hover:text-cyan md:text-4xl",
+                  isEditing &&
+                    "cursor-edit rounded px-1 transition-all hover:ring-1 hover:ring-cyan/30"
+                )}
+                onClick={(e) => {
+                  if (isEditing) {
+                    e.preventDefault()
+                    setEditingField("contact.email")
+                  }
+                }}
+              >
+                {contactCopy.email.replace(/<[^>]+>/g, "")}
+              </a>
+            )}
+
+            {isEditing && editingField === "contact.subtext" ? (
+              <div className="mx-auto mt-14 max-w-[520px]">
+                <CMSEditor
+                  variant="ghost"
+                  content={contactCopy.subtext}
+                  onChange={(val) => patchContactMetadata({ subtext: val })}
+                  onDone={() => setEditingField(null)}
+                  placeholder="Body copy"
+                />
+              </div>
+            ) : (
+              <p
+                className={cn(
+                  "mx-auto mt-14 max-w-[520px] text-[15px] leading-[1.8] text-light-slate",
+                  isEditing &&
+                    "cursor-edit rounded px-1 transition-all hover:ring-1 hover:ring-cyan/30"
+                )}
+                onDoubleClick={() =>
+                  isEditing && setEditingField("contact.subtext")
+                }
+                dangerouslySetInnerHTML={{ __html: contactCopy.subtext }}
+              />
+            )}
+
+            <div className="mt-10 text-[15px] text-light-slate">
+              {isEditing && editingField === "contact.linkedin" ? (
+                <div className="mx-auto max-w-xl">
+                  <CMSEditor
+                    variant="ghost"
+                    content={contactCopy.linkedin}
+                    onChange={(val) => patchContactMetadata({ linkedin: val })}
+                    onDone={() => setEditingField(null)}
+                    placeholder="LinkedIn URL"
+                  />
+                </div>
+              ) : (
+                <>
+                  You can also find Brian on{" "}
+                  <a
+                    href={contactCopy.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={cn(
+                      "text-mid-blue underline decoration-mid-blue/60 underline-offset-2 hover:text-white",
+                      isEditing &&
+                        "cursor-edit rounded px-0.5 hover:ring-1 hover:ring-cyan/30"
+                    )}
+                    onClick={(e) => {
+                      if (isEditing) {
+                        e.preventDefault()
+                        setEditingField("contact.linkedin")
+                      }
+                    }}
+                  >
+                    LinkedIn
+                  </a>
+                </>
+              )}
             </div>
-          </section>
-        </>
+          </div>
+        </section>
       )}
 
       {/* Dynamic Custom Sections */}
@@ -1203,8 +1318,12 @@ export function PageRenderer({ page, isEditing, onContentChange, onMetadataChang
         </div>
       )}
 
-      <div className="section-divider" />
-      <CTASection />
+      {!isContact && (
+        <>
+          {!isInsights && <div className="section-divider" />}
+          <CTASection />
+        </>
+      )}
     </div>
   )
 }

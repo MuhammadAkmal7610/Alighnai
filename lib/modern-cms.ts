@@ -82,7 +82,7 @@ export class ModernCMS {
           },
           category: true
         },
-        orderBy: { publishedAt: 'desc' }
+        orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
       })
     } catch (error) {
       if (isDatabaseConfigError(error)) return []
@@ -90,10 +90,17 @@ export class ModernCMS {
     }
   }
 
-  static async getContentBySlug(slug: string) {
+  static async getContentBySlug(
+    slug: string,
+    options?: { publishedOnly?: boolean }
+  ) {
+    const publishedOnly = options?.publishedOnly ?? true
     try {
-      return await prisma.content.findUnique({
-        where: { slug },
+      return await prisma.content.findFirst({
+        where: {
+          slug,
+          ...(publishedOnly ? { status: ContentStatus.PUBLISHED } : {}),
+        },
         include: {
           author: {
             select: { id: true, name: true, email: true }
@@ -108,10 +115,35 @@ export class ModernCMS {
   }
 
   static async createContent(data: CreateContentData) {
+    const categoryId =
+      data.categoryId && String(data.categoryId).trim() !== ''
+        ? data.categoryId
+        : undefined
+    const status = data.status ?? ContentStatus.DRAFT
+
+    let authorId: string | null | undefined = data.authorId
+    if (authorId) {
+      const userRow = await prisma.user.findUnique({
+        where: { id: authorId },
+        select: { id: true },
+      })
+      if (!userRow) authorId = null
+    }
+
     return await prisma.content.create({
       data: {
-        ...data,
-        publishedAt: data.status === ContentStatus.PUBLISHED ? new Date() : null
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt,
+        content: data.content,
+        type: data.type,
+        status,
+        featured: data.featured ?? false,
+        publishedAt:
+          status === ContentStatus.PUBLISHED ? new Date() : null,
+        categoryId,
+        authorId: authorId ?? null,
+        metadata: data.metadata,
       },
       include: {
         author: true,
@@ -120,16 +152,55 @@ export class ModernCMS {
     })
   }
 
-  static async updateContent(id: string, data: any) {
-    // Remove relation objects and non-updatable fields
-    const { id: _id, author, category, createdAt, updatedAt, ...cleanData } = data
-    
+  static async updateContent(id: string, data: Record<string, unknown>) {
+    const { author, category, createdAt, updatedAt, id: _rid, ...rest } = data
+
+    const payload: Record<string, unknown> = {}
+    const fields = [
+      'title',
+      'slug',
+      'excerpt',
+      'content',
+      'type',
+      'status',
+      'featured',
+      'categoryId',
+      'authorId',
+      'metadata',
+    ] as const
+    for (const f of fields) {
+      if (rest[f] !== undefined) payload[f] = rest[f]
+    }
+
+    if (payload.categoryId === '') payload.categoryId = null
+
+    const status = payload.status as ContentStatus | undefined
+    let publishedAt: Date | null | undefined
+
+    if (status === ContentStatus.PUBLISHED) {
+      const raw = rest.publishedAt
+      publishedAt = raw ? new Date(String(raw)) : new Date()
+      if (Number.isNaN(publishedAt.getTime())) publishedAt = new Date()
+    } else if (
+      status === ContentStatus.DRAFT ||
+      status === ContentStatus.ARCHIVED
+    ) {
+      publishedAt = null
+    } else if (status === ContentStatus.SCHEDULED) {
+      const raw = rest.publishedAt
+      publishedAt = raw ? new Date(String(raw)) : null
+      if (publishedAt && Number.isNaN(publishedAt.getTime())) publishedAt = null
+    } else if (rest.publishedAt !== undefined) {
+      const raw = rest.publishedAt
+      publishedAt = raw ? new Date(String(raw)) : null
+      if (publishedAt && Number.isNaN(publishedAt.getTime())) publishedAt = null
+    }
+
+    if (publishedAt !== undefined) payload.publishedAt = publishedAt
+
     return await prisma.content.update({
       where: { id },
-      data: {
-        ...cleanData,
-        publishedAt: data.status === ContentStatus.PUBLISHED && !data.publishedAt ? new Date() : data.publishedAt
-      },
+      data: payload as any,
       include: {
         author: {
           select: { id: true, name: true, email: true }
@@ -230,10 +301,17 @@ export class ModernCMS {
     }
   }
 
-  static async getPageBySlug(slug: string) {
+  static async getPageBySlug(
+    slug: string,
+    options?: { publishedOnly?: boolean }
+  ) {
+    const publishedOnly = options?.publishedOnly ?? false
     try {
-      return await prisma.page.findUnique({
-        where: { slug },
+      return await prisma.page.findFirst({
+        where: {
+          slug,
+          ...(publishedOnly ? { status: ContentStatus.PUBLISHED } : {}),
+        },
         include: {
           author: {
             select: { id: true, name: true, email: true }
@@ -291,12 +369,23 @@ export class ModernCMS {
         }
       }
 
-      // Remove relation objects and non-updatable fields
-      const { id: _id, author, createdAt, updatedAt, ...updateData } = data
-      
+      const { id: _id, author, createdAt, updatedAt, ...rest } = data
+      const updateData: Record<string, unknown> = {}
+      for (const key of [
+        'title',
+        'slug',
+        'content',
+        'status',
+        'template',
+        'metadata',
+        'authorId',
+      ] as const) {
+        if (rest[key] !== undefined) updateData[key] = rest[key]
+      }
+
       const updated = await prisma.page.update({
         where: { id },
-        data: updateData,
+        data: updateData as any,
         include: {
           author: {
             select: { id: true, name: true, email: true }
@@ -332,7 +421,7 @@ export class ModernCMS {
   static async getAllInfo() {
     try {
       return await prisma.info.findMany({
-        where: { isPublic: true }
+        orderBy: { type: 'asc' },
       })
     } catch (error) {
       if (isDatabaseConfigError(error)) return []

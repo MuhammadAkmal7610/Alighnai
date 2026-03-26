@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BarChart3, FileText, Users, Eye, TrendingUp, Calendar, Home, Grid3x3, Settings, Menu, MessageSquare, Phone, Activity } from 'lucide-react'
-import { Sidebar } from '@/components/cms/ModernSidebar'
 import { cn } from '@/lib/utils'
 
 export default function ModernDashboard() {
@@ -169,7 +168,7 @@ export default function ModernDashboard() {
                     <p className="text-blue-700">Connect instantly with your team members</p>
                   </div>
                   <Button 
-                    onClick={() => window.open('/chat', '_blank')}
+                    onClick={() => window.open('/admin/chat', '_blank')}
                     className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
                     size="lg"
                   >
@@ -240,7 +239,10 @@ export default function ModernDashboard() {
                         key={content.id} 
                         className="border-slate-100 hover:bg-slate-50/50 transition-colors cursor-pointer group"
                         onDoubleClick={() => {
-                          const route = content.type === 'PAGE' ? `/pages/${content.id}/edit` : `/content/${content.id}/edit`
+                          const route =
+                            content.type === 'PAGE'
+                              ? `/admin/pages/${content.id}/edit`
+                              : `/admin/content`
                           window.location.href = route
                         }}
                       >

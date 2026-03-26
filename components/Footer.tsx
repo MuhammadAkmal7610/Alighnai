@@ -1,7 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
-export function Footer() {
+interface FooterProps {
+  /** When true (e.g. CMS iframe preview), internal links do not navigate */
+  suppressNavigation?: boolean;
+}
+
+export function Footer({ suppressNavigation }: FooterProps = {}) {
   return (
     <footer className="bg-[#08162e] text-light-slate">
       <div className="container-main py-14">
@@ -11,8 +18,15 @@ export function Footer() {
               href="/site"
               className="font-heading text-base font-bold text-white"
               aria-label="ByteStream Strategies home"
+              onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
             >
-              <Image src="/brand/logo-bg-black.png" alt="AlignAI Logo" width={150} height={150} />
+              <Image
+                src="/brand/logo-bg-black.png"
+                alt="AlignAI"
+                width={160}
+                height={40}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-slate">
               Governance architecture for AI-influenced enterprise decisions.
@@ -29,27 +43,47 @@ export function Footer() {
             </p>
             <ul className="mt-3 space-y-5 text-sm">
               <li>
-                <Link href="/site" className="hover:text-white text-zinc-500 transition-colors">
+                <Link
+                  href="/site"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/site/framework" className="hover:text-white text-zinc-500 transition-colors">
+                <Link
+                  href="/site/framework"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
                   The Framework
                 </Link>
               </li>
               <li>
-                <Link href="/site/services" className="hover:text-white text-zinc-500 transition-colors">
+                <Link
+                  href="/site/services"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="/site/insights" className="hover:text-white text-zinc-500 transition-colors">
+                <Link
+                  href="/site/insights"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
                   Insights
                 </Link>
               </li>
               <li>
-                <Link href="/site/contact" className="hover:text-white text-zinc-500 transition-colors">
+                <Link
+                  href="/site/contact"
+                  className="hover:text-white text-zinc-500 transition-colors"
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+                >
                   Contact
                 </Link>
               </li>
@@ -77,6 +111,7 @@ export function Footer() {
             <Link
               href="/site/client-access"
               className=" inline-block text-sm hover:text-white text-zinc-500 transition-colors"
+              onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
             >
               Client Access
             </Link>

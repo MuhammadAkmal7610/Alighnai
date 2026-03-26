@@ -77,7 +77,7 @@ export default function PagesManager() {
   }
 
   const startEdit = (page: any) => {
-    router.push(`/pages/${page.id}/edit`)
+    router.push(`/admin/pages/${page.id}/edit`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -197,6 +197,9 @@ export default function PagesManager() {
                           <option value="home">Home Template (Enterprise Governance Focus)</option>
                           <option value="about">About Template (Founder Focus)</option>
                           <option value="framework">Framework Template (Architecture Focus)</option>
+                          <option value="services">Services Template</option>
+                          <option value="contact">Contact Template</option>
+                          <option value="insights">Insights Template</option>
                         </select>
                       </div>
                       <div className="space-y-2">
@@ -247,6 +250,58 @@ export default function PagesManager() {
                               placeholder="Leave empty for default"
                             />
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="p-6 border border-slate-200 rounded-xl space-y-5 bg-white">
+                        <h4 className="text-sm font-bold text-mid-blue flex items-center gap-2 uppercase tracking-wider">
+                          <Settings className="w-4 h-4" />
+                          SEO (search & social)
+                        </h4>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta title (optional)</Label>
+                          <Input
+                            value={String((formData.metadata as Record<string, string>)?.seoTitle ?? '')}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              metadata: {
+                                ...(formData.metadata || {}),
+                                seoTitle: e.target.value,
+                              },
+                            })}
+                            className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                            placeholder="Defaults to page title"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta description</Label>
+                          <Textarea
+                            value={String((formData.metadata as Record<string, string>)?.seoDescription ?? '')}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              metadata: {
+                                ...(formData.metadata || {}),
+                                seoDescription: e.target.value,
+                              },
+                            })}
+                            className="bg-white border-slate-200 text-navy text-sm rounded-lg min-h-[88px]"
+                            placeholder="Google / social preview text"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Social image URL (optional)</Label>
+                          <Input
+                            value={String((formData.metadata as Record<string, string>)?.ogImage ?? '')}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              metadata: {
+                                ...(formData.metadata || {}),
+                                ogImage: e.target.value,
+                              },
+                            })}
+                            className="bg-white border-slate-200 text-navy text-sm h-10 rounded-lg"
+                            placeholder="https://…"
+                          />
                         </div>
                       </div>
 

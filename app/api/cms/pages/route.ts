@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
+import { cmsAuth, resolveSessionAuthorId } from '@/lib/cms-auth'
 
 export async function GET() {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     const hasDatabase = Boolean(process.env.DATABASE_URL?.trim())
     if (!hasDatabase) {
@@ -27,6 +31,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     let body;
     try {
@@ -35,7 +42,12 @@ export async function POST(request: Request) {
     } catch (e) {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
     }
-    const newPage = await ModernCMS.createPage(body)
+    const authorId = await resolveSessionAuthorId(authResult.session)
+
+    const newPage = await ModernCMS.createPage({
+      ...body,
+      authorId,
+    })
     return NextResponse.json(newPage, { status: 201 })
   } catch (error: any) {
     console.error('Create page error:', error)

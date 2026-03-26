@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function GET(request: Request) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     const { searchParams } = new URL(request.url)
     const take = parseInt(searchParams.get('take') || '5')

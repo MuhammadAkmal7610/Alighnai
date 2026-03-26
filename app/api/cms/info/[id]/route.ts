@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
 import { InfoType, type InfoType as InfoTypeValue } from '@/lib/cms-enums'
+import { cmsAuth } from '@/lib/cms-auth'
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   const { id } = await params
   try {
     console.log(`PATCH /api/cms/info/${id} - Updating info item...`)

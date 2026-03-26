@@ -1,35 +1,38 @@
 import { NextResponse } from 'next/server'
 import { ModernCMS } from '@/lib/modern-cms'
-import { CustomCMS } from '@/lib/cms-db'
+import { cmsAuth, resolveSessionAuthorId } from '@/lib/cms-auth'
+
+function slugify(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
 
 export async function GET(request: Request) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
-    const hasDatabase = Boolean(process.env.DATABASE_URL?.trim())
-    if (!hasDatabase) {
-      const posts = await CustomCMS.getPosts()
-      return NextResponse.json({ posts })
+    if (!process.env.DATABASE_URL?.trim()) {
+      return NextResponse.json({ posts: [] })
     }
 
-    console.log('GET /api/cms/posts - Parsing query parameters...')
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
     const status = searchParams.get('status')
     const featured = searchParams.get('featured')
     const take = searchParams.get('take')
 
-    const filters: any = {}
+    const filters: Record<string, unknown> = {}
     if (type) filters.type = type
     if (status) filters.status = status
     if (featured === 'true') filters.featured = true
-    
-    // Convert take to number if present
-    const options: any = { ...filters }
-    if (take) options.take = parseInt(take)
 
-    console.log('GET /api/cms/posts - Fetching contents with options:', options)
-    const posts = await ModernCMS.getContents(options)
-    console.log(`GET /api/cms/posts - Successfully fetched ${posts.length} posts.`)
+    const options: Record<string, unknown> = { ...filters }
+    if (take) options.take = parseInt(take, 10)
 
+    const posts = await ModernCMS.getContents(options as any)
     return NextResponse.json({ posts })
   } catch (error: any) {
     console.error('Posts API GET error:', {
@@ -47,25 +50,54 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authResult = await cmsAuth()
+  if (!authResult.ok) return authResult.response
+
   try {
     const body = await request.json()
-    const { title, excerpt, content, category, author, publishedAt, featured, status } = body
+    const {
+      title,
+      excerpt,
+      content,
+      type,
+      status,
+      featured,
+      categoryId,
+      slug: bodySlug,
+      metadata,
+    } = body
 
-    // Generate slug from title
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
+    if (!title || !content) {
+      return NextResponse.json(
+        { error: 'Title and content are required' },
+        { status: 400 }
+      )
+    }
+
+    const slug =
+      typeof bodySlug === 'string' && bodySlug.trim()
+        ? slugify(bodySlug.trim())
+        : slugify(String(title))
+
+    const authorId = await resolveSessionAuthorId(authResult.session)
 
     const newPost = await ModernCMS.createContent({
       title,
       slug,
       excerpt,
       content,
-      type: body.type || 'BLOG_POST',
+      type: type || 'BLOG_POST',
       status: status || 'DRAFT',
-      featured: featured || false,
-      authorId: author, // Mapping author to authorId
+      featured: Boolean(featured),
+      categoryId:
+        typeof categoryId === 'string' && categoryId.trim()
+          ? categoryId.trim()
+          : undefined,
+      authorId,
+      metadata:
+        metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+          ? metadata
+          : undefined,
     })
 
     return NextResponse.json({ post: newPost }, { status: 201 })

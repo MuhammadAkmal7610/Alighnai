@@ -18,10 +18,16 @@ const NAV_LINKS = [
 
 interface HeaderProps {
   className?: string; // Allow overriding fixed positioning for editor
-  pathname?: string;  // Allow overriding pathname for editor preview
+  pathname?: string; // Allow overriding pathname for editor preview
+  /** When true (e.g. CMS iframe preview), nav links do not navigate — avoids leaving the editor */
+  suppressNavigation?: boolean;
 }
 
-export function Header({ className, pathname: propPathname }: HeaderProps) {
+export function Header({
+  className,
+  pathname: propPathname,
+  suppressNavigation,
+}: HeaderProps) {
   const currentPathname = usePathname();
   const effectivePathname = propPathname || currentPathname;
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -54,6 +60,7 @@ export function Header({ className, pathname: propPathname }: HeaderProps) {
           href="/site"
           className="flex items-center gap-4 transition-opacity hover:opacity-80"
           aria-label="AlignAI home"
+          onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
         >
           <Image
             src="/brand/logo-bg-black.png"
@@ -75,6 +82,7 @@ export function Header({ className, pathname: propPathname }: HeaderProps) {
                       ? "text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-cyan"
                       : "text-light-slate hover:text-white"
                     }`}
+                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
                 >
                   {link.label}
                 </Link>
@@ -130,7 +138,10 @@ export function Header({ className, pathname: propPathname }: HeaderProps) {
                   href={link.href}
                   className={`text-xl font-bold uppercase tracking-widest ${isActive(link.href) ? "text-cyan" : "text-white"
                     }`}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={(e) => {
+                    if (suppressNavigation) e.preventDefault();
+                    setMobileOpen(false);
+                  }}
                 >
                   {link.label}
                 </Link>
