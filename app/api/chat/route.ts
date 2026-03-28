@@ -1,24 +1,124 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
+import { buildFullSystemPrompt } from "@/lib/alignai-chat-system";
+import { sendAlignAIChatMessage } from "@/lib/anthropic";
+import { allowChatRequest, getClientIp } from "@/lib/chat-rate-limit";
+import { getCachedSiteContextForChat } from "@/lib/chat-site-context";
+import {
+  chatRequestSchema,
+  hasAbusivePattern,
+  stripLeadingAssistantMessages,
+  takeLastTurns,
+} from "@/lib/chat-validation";
+
+const CHATBOT_DISABLED =
+  process.env.NEXT_PUBLIC_CHATBOT_ENABLED === "false" ||
+  process.env.CHATBOT_API_ENABLED === "false";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  try {
-    const { messages } = await request.json()
-    const lastMessage = messages[messages.length - 1].content.toLowerCase()
-    
-    let reply = "I'm the AlignAI assistant. How can I help you with AI governance today?"
-    
-    if (lastMessage.includes('framework')) {
-      reply = "The AlignAI framework provides structural controls for the AI decision environment — the layer where AI systems influence human choices."
-    } else if (lastMessage.includes('assessment')) {
-      reply = "Our AI Decision Visibility Assessment helps organizations understand what their AI is deciding before it impacts the business."
-    } else if (lastMessage.includes('founder') || lastMessage.includes('brian')) {
-      reply = "AlignAI was founded by Brian Burke, a PhD with 30 years of enterprise experience in AI architecture and governance."
-    } else if (lastMessage.includes('price') || lastMessage.includes('cost')) {
-      reply = "Please contact our strategic advisory team for a customized quote based on your organization's AI footprint."
-    }
+  if (CHATBOT_DISABLED) {
+    return NextResponse.json(
+      { error: "Chat is disabled.", code: "DISABLED" },
+      { status: 403 }
+    );
+  }
 
-    return NextResponse.json({ reply })
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to process chat' }, { status: 500 })
+  const ip = getClientIp(request);
+  if (!allowChatRequest(ip)) {
+    return NextResponse.json(
+      {
+        error: "Too many requests. Please try again in a few minutes.",
+        code: "RATE_LIMIT",
+      },
+      { status: 429 }
+    );
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "Chat is temporarily unavailable.",
+        code: "NO_API_KEY",
+      },
+      { status: 503 }
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body.", code: "BAD_JSON" },
+      { status: 400 }
+    );
+  }
+
+  const parsed = chatRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid message payload.", code: "VALIDATION" },
+      { status: 400 }
+    );
+  }
+
+  for (const m of parsed.data.messages) {
+    if (hasAbusivePattern(m.content)) {
+      return NextResponse.json(
+        { error: "Message could not be sent.", code: "INVALID_MESSAGE" },
+        { status: 400 }
+      );
+    }
+  }
+
+  const thread = takeLastTurns(stripLeadingAssistantMessages(parsed.data.messages));
+  if (thread.length === 0) {
+    return NextResponse.json(
+      { error: "No user message to respond to.", code: "NO_USER_MESSAGE" },
+      { status: 400 }
+    );
+  }
+
+  const last = thread[thread.length - 1];
+  if (last.role !== "user") {
+    return NextResponse.json(
+      { error: "Last message must be from the user.", code: "BAD_ORDER" },
+      { status: 400 }
+    );
+  }
+
+  let siteAppendix: string;
+  try {
+    siteAppendix = await getCachedSiteContextForChat();
+  } catch (e) {
+    console.error("[api/chat] site context load failed:", e);
+    siteAppendix = "";
+  }
+
+  const systemPrompt = buildFullSystemPrompt(siteAppendix);
+
+  try {
+    const reply = await sendAlignAIChatMessage({
+      systemPrompt,
+      messages: thread,
+    });
+    return NextResponse.json({ reply });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === "ANTHROPIC_API_KEY_MISSING") {
+      return NextResponse.json(
+        { error: "Chat is temporarily unavailable.", code: "NO_API_KEY" },
+        { status: 503 }
+      );
+    }
+    console.error("[api/chat] Anthropic error:", msg.slice(0, 500));
+    return NextResponse.json(
+      {
+        error: "The assistant could not complete your request. Please try again.",
+        code: "UPSTREAM",
+      },
+      { status: 502 }
+    );
   }
 }
