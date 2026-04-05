@@ -95,8 +95,37 @@ model User {
   // Relations
   contents      Content[]
   pages         Page[]
+  assessmentIntakes AssessmentIntake[]
 
   @@map("users")
+}
+
+/// Files / links shown in the protected client portal resource library
+model ClientResource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  fileUrl     String
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("client_resources")
+}
+
+/// Client-submitted assessment intake forms
+model AssessmentIntake {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payload   Json
+  status    String   @default("SUBMITTED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("assessment_intakes")
 }
 
 model Media {
@@ -136,6 +165,7 @@ enum UserRole {
   EDITOR
   AUTHOR
   VIEWER
+  CLIENT
 }
 
 enum InfoType {

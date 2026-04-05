@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { ChatMessageMarkdown } from "@/components/ChatMessageMarkdown";
 
 interface Message {
   role: "assistant" | "user";
@@ -155,30 +156,34 @@ export function ChatPanel({
   return (
     <div
       id={id}
-      className="fixed inset-x-3 bottom-[100px] z-[70] flex w-auto max-w-[min(calc(100vw-1.5rem),460px)] flex-col overflow-hidden rounded-2xl border border-[rgba(99,188,231,0.28)] bg-navy text-white shadow-[0_24px_64px_rgba(8,22,46,0.55)] sm:inset-x-auto sm:right-6 sm:bottom-[104px] md:right-8 md:max-w-[460px]"
+      className="fixed inset-x-3 bottom-[100px] z-[70] flex w-auto max-w-[min(calc(100vw-1.5rem),460px)] flex-col overflow-hidden rounded-2xl border border-cyan/35 bg-navy text-white shadow-[0_24px_64px_rgba(8,22,46,0.55),0_0_0_1px_rgba(99,188,231,0.12)_inset] sm:inset-x-auto sm:right-6 sm:bottom-[104px] md:right-8 md:max-w-[460px]"
       role="dialog"
       aria-label="Chat with AlignAI"
       aria-busy={loading}
     >
       {/* Header */}
-      <div className="flex shrink-0 items-center justify-between gap-3 bg-deep-blue px-4 py-3.5 sm:px-5">
+      <div className="relative flex shrink-0 items-center justify-between gap-3 overflow-hidden bg-gradient-to-r from-deep-blue via-[#2d4f96] to-deep-blue px-4 py-3.5 sm:px-5">
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan/50 to-transparent"
+          aria-hidden
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 gap-y-1">
-            <span className="text-base font-bold tracking-tight text-white">
+            <span className="font-heading text-base font-bold tracking-tight text-white">
               AlignAI
             </span>
-            <span className="rounded-full bg-cyan/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy">
+            <span className="rounded-full bg-cyan px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy shadow-sm shadow-cyan/30">
               Beta
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-white/85">
+          <p className="mt-0.5 text-xs text-cyan/90">
             Ask about AlignAI · governance &amp; assessments
           </p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="shrink-0 rounded-lg p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+          className="shrink-0 rounded-lg p-2 text-white/90 transition-colors hover:bg-white/15 hover:text-white"
           aria-label="Close chat"
         >
           <svg
@@ -200,49 +205,49 @@ export function ChatPanel({
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="min-h-[220px] flex-1 overflow-y-auto bg-gradient-to-b from-navy to-[#0a1628] px-4 py-4 sm:min-h-[280px] sm:px-5"
+        className="min-h-[220px] flex-1 overflow-y-auto bg-[#0b1629] px-4 py-4 sm:min-h-[280px] sm:px-5"
         style={{ maxHeight: "min(58vh, 480px)" }}
       >
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`mb-3.5 last:mb-1 ${
-              msg.role === "user" ? "text-right" : "text-left"
-            }`}
-          >
-            <span
-              className={`inline-block max-w-[95%] rounded-2xl px-3.5 py-2.5 text-[15px] leading-relaxed sm:max-w-[92%] ${
-                msg.role === "user"
-                  ? "bg-mid-blue text-white shadow-md shadow-mid-blue/20"
-                  : "border border-white/5 bg-deep-blue/90 text-white/90 shadow-sm"
-              }`}
+        <div className="flex flex-col gap-3">
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              {msg.content}
-            </span>
-          </div>
-        ))}
-        {loading && (
-          <div className="text-left">
-            <span className="inline-flex items-center gap-2 rounded-2xl border border-white/5 bg-deep-blue/90 px-3.5 py-2.5 text-sm text-white/80">
-              <span
-                className="inline-flex gap-1"
-                aria-hidden
+              <div
+                className={`inline-block max-w-[min(100%,17.5rem)] rounded-2xl px-3.5 py-2.5 sm:max-w-[min(100%,20rem)] ${
+                  msg.role === "user"
+                    ? "rounded-br-md bg-cyan shadow-md shadow-cyan/25"
+                    : "rounded-bl-md border border-white/10 border-l-[3px] border-l-cyan bg-[#152a45]/95 shadow-sm"
+                }`}
               >
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan [animation-delay:-0.2s]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan [animation-delay:-0.1s]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan" />
+                <ChatMessageMarkdown
+                  content={msg.content}
+                  variant={msg.role}
+                />
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div className="flex justify-start">
+              <span className="inline-flex max-w-[min(100%,17.5rem)] items-center gap-2 rounded-2xl rounded-bl-md border border-white/10 border-l-[3px] border-l-cyan bg-[#152a45]/95 px-3.5 py-2.5 text-sm text-slate-200">
+                <span className="inline-flex gap-1" aria-hidden>
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan [animation-delay:-0.2s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan [animation-delay:-0.1s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan" />
+                </span>
+                Thinking&hellip;
               </span>
-              Thinking&hellip;
-            </span>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Suggestions */}
-      <div className="shrink-0 border-t border-deep-blue/70 bg-[#0a1628]/95 px-3 py-2.5 sm:px-4">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[#8fd4f6]">
+      <div className="shrink-0 border-t border-white/10 bg-[#080f1c] px-3 py-2.5 sm:px-4">
+        {/* <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-cyan/80">
           Suggestions
-        </p>
+        </p> */}
         <div className="-mx-1 flex gap-2 overflow-x-auto [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {SUGGESTIONS.map((s) => (
             <button
@@ -250,7 +255,7 @@ export function ChatPanel({
               type="button"
               disabled={inputDisabled}
               onClick={() => void sendMessage(s.query)}
-              className="shrink-0 rounded-full border border-cyan/35 bg-deep-blue/80 px-3 py-2 text-left text-xs font-medium text-white/90 transition-colors hover:border-cyan/55 hover:bg-deep-blue hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
+              className="shrink-0 rounded-full border border-cyan/25 bg-cyan/10 px-3 py-2 text-left text-xs font-medium text-slate-100 transition-all hover:border-cyan/50 hover:bg-cyan/15 hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
             >
               {s.label}
             </button>
@@ -264,43 +269,45 @@ export function ChatPanel({
           e.preventDefault();
           void sendMessage(input);
         }}
-        className="flex shrink-0 border-t border-deep-blue bg-navy"
+        className="shrink-0 border-t border-white/10 bg-[#060d18] p-3 sm:p-3.5"
       >
         <label className="sr-only" htmlFor="chat-input">
           Type a message
         </label>
-        <input
-          id="chat-input"
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={
-            chatLive ? "Ask a question…" : "Chat is unavailable"
-          }
-          className="min-w-0 flex-1 bg-transparent px-4 py-3.5 text-[15px] text-white placeholder:text-white/45 outline-none sm:px-5"
-          disabled={inputDisabled}
-          autoComplete="off"
-        />
-        <button
-          type="submit"
-          className="shrink-0 px-4 text-mid-blue transition-colors hover:text-cyan disabled:opacity-50 sm:px-5"
-          disabled={inputDisabled || !input.trim()}
-          aria-label="Send message"
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
+        <div className="flex items-stretch gap-2 rounded-xl border border-white/12 bg-navy/60 p-1 pl-3 shadow-inner shadow-black/20 sm:pl-4">
+          <input
+            id="chat-input"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={
+              chatLive ? "Ask a question…" : "Chat is unavailable"
+            }
+            className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] text-white placeholder:text-slate-500 outline-none"
+            disabled={inputDisabled}
+            autoComplete="off"
+          />
+          <button
+            type="submit"
+            className="flex shrink-0 items-center justify-center rounded-lg bg-cyan px-3.5 text-navy shadow-sm transition-colors hover:bg-[#7fd4f5] disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300 disabled:shadow-none"
+            disabled={inputDisabled || !input.trim()}
+            aria-label="Send message"
           >
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </button>
+        </div>
       </form>
-      <div className="shrink-0 border-t border-deep-blue/80 bg-[#081222] px-4 py-2.5 text-center text-[11px] leading-snug text-white/55">
+      {/* <div className="shrink-0 border-t border-white/5 bg-[#050a12] px-4 py-2.5 text-center text-[11px] leading-snug text-slate-400">
         Powered by AlignAI · AI-generated — verify important details
-      </div>
+      </div> */}
     </div>
   );
 }

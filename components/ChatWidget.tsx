@@ -15,7 +15,7 @@ export function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-5 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-mid-blue text-white shadow-[0_10px_40px_rgba(64,123,183,0.45)] ring-2 ring-white/10 transition-transform duration-200 ease-in-out hover:scale-[1.07] active:scale-95 sm:bottom-7 sm:right-7 sm:h-[60px] sm:w-[60px]"
+        className="fixed bottom-6 right-5 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-mid-blue to-deep-blue text-white shadow-[0_10px_40px_rgba(64,123,183,0.5)]  transition-transform duration-200 ease-in-out hover:scale-[1.07] hover:ring-cyan/60 active:scale-95 sm:bottom-7 sm:right-7 sm:h-[60px] sm:w-[60px]"
         aria-label={open ? "Close chat" : "Open chat"}
         aria-expanded={open}
         aria-controls={CHAT_PANEL_ID}

@@ -61,7 +61,7 @@ export default async function ClientAccessPage({
   return (
     <section className="hero-panel flex min-h-screen items-center justify-center pt-16">
       <div className="container-main py-14">
-        <LoginCard logoUrl={logoUrl} />
+        <LoginCard logoUrl={logoUrl} clientPortalSignIn />
       </div>
     </section>
   );

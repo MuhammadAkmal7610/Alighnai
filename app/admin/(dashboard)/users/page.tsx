@@ -287,7 +287,9 @@ export default function UsersManager() {
                       "rounded-md px-2 py-0.5 font-bold tracking-tight shadow-none",
                       user.role === "ADMIN"
                         ? "bg-navy text-white"
-                        : "bg-slate-100 text-slate-600"
+                        : user.role === "CLIENT"
+                          ? "border border-mid-blue/35 bg-cyan/15 text-navy"
+                          : "bg-slate-100 text-slate-600"
                     )}
                   >
                     {user.role}

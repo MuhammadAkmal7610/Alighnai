@@ -512,6 +512,33 @@ async function main() {
   }
   console.log(`Seeded ${insightArticles.length} insight articles into Content.`)
 
+  const clientResourceCount = await prisma.clientResource.count()
+  if (clientResourceCount === 0) {
+    await prisma.clientResource.createMany({
+      data: [
+        {
+          title: 'AlignAI framework overview',
+          description: 'Public overview of the governance framework (opens on the marketing site).',
+          fileUrl: '/site/framework',
+          sortOrder: 0,
+        },
+        {
+          title: 'Decision Visibility Assessment — explainer',
+          description: 'What the assessment covers and typical outcomes.',
+          fileUrl: '/site/insights/decision-visibility-assessment-explained',
+          sortOrder: 1,
+        },
+        {
+          title: 'Contact AlignAI',
+          description: 'Reach the team for questions about your engagement.',
+          fileUrl: '/site/contact',
+          sortOrder: 2,
+        },
+      ],
+    })
+    console.log('Seeded default client portal resources (empty library).')
+  }
+
   console.log('CMS Seeded successfully.')
 }
 

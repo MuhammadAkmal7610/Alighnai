@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { buildFullSystemPrompt } from "@/lib/alignai-chat-system";
-import { sendAlignAIChatMessage } from "@/lib/anthropic";
+import {
+  isLlmConfigured,
+  LLM_API_KEY_MISSING,
+  resolveLlmAdapter,
+  sendAlignAIChatMessage,
+} from "@/lib/ai-chat";
 import { allowChatRequest, getClientIp } from "@/lib/chat-rate-limit";
 import { getCachedSiteContextForChat } from "@/lib/chat-site-context";
 import {
@@ -35,7 +40,8 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const llmAdapter = resolveLlmAdapter();
+  if (!isLlmConfigured()) {
     return NextResponse.json(
       {
         error: "Chat is temporarily unavailable.",
@@ -106,13 +112,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ reply });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    if (msg === "ANTHROPIC_API_KEY_MISSING") {
+    if (msg === LLM_API_KEY_MISSING) {
       return NextResponse.json(
         { error: "Chat is temporarily unavailable.", code: "NO_API_KEY" },
         { status: 503 }
       );
     }
-    console.error("[api/chat] Anthropic error:", msg.slice(0, 500));
+    console.error(`[api/chat] LLM error (${llmAdapter}):`, msg.slice(0, 500));
     return NextResponse.json(
       {
         error: "The assistant could not complete your request. Please try again.",

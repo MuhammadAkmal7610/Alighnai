@@ -694,6 +694,7 @@ export function PageRenderer({
               onFormCopyChange={(patch: Partial<ClientAccessFormCopy>) =>
                 patchClientAccessForm(patch)
               }
+              clientPortalSignIn={!isEditing}
             />
           </div>
         </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,11 @@ function LoginForm() {
       if (res?.error) {
         setFormError("Invalid email or password.");
         setLoading(false);
+        return;
+      }
+      const session = await getSession();
+      if (session?.user?.role === "CLIENT") {
+        window.location.href = "/portal";
         return;
       }
       if (res?.url) {

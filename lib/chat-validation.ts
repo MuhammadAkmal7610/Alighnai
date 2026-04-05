@@ -21,7 +21,7 @@ export const chatRequestSchema = z.object({
 
 export type ChatMessageInput = z.infer<typeof chatMessageSchema>;
 
-/** Drop leading assistant turns (e.g. client greeting) so Anthropic receives user-first thread. */
+/** Drop leading assistant turns (e.g. client greeting) so the model API receives user-first thread. */
 export function stripLeadingAssistantMessages(
   messages: ChatMessageInput[]
 ): ChatMessageInput[] {

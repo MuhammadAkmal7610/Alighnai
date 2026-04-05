@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import { DEFAULT_LOGO_URL } from "@/lib/site-theme";
 import {
   mergeClientAccessForm,
@@ -28,6 +29,8 @@ type LoginCardProps = {
   /** CMS preview: double-click copy to edit */
   editable?: boolean;
   onFormCopyChange?: (patch: Partial<ClientAccessFormCopy>) => void;
+  /** When true, submit authenticates via NextAuth and only allows role CLIENT into /portal */
+  clientPortalSignIn?: boolean;
 };
 
 export function LoginCard({
@@ -35,15 +38,47 @@ export function LoginCard({
   formCopy,
   editable = false,
   onFormCopyChange,
+  clientPortalSignIn = false,
 }: LoginCardProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeField, setActiveField] = useState<FieldKey | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
 
   const c = mergeClientAccessForm(formCopy ?? undefined);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!clientPortalSignIn) return;
+    setAuthError(null);
+    setSigningIn(true);
+    try {
+      const res = await signIn("credentials", {
+        email: email.trim(),
+        password,
+        redirect: false,
+        callbackUrl: "/portal",
+      });
+      if (res?.error) {
+        setAuthError("Invalid email or password.");
+        setSigningIn(false);
+        return;
+      }
+      const session = await getSession();
+      if (session?.user?.role !== "CLIENT") {
+        setAuthError(
+          "This area is only for accounts with the CLIENT role. In Admin → Users, edit your user and set role to Client, then try again."
+        );
+        await signOut({ redirect: false });
+        setSigningIn(false);
+        return;
+      }
+      window.location.href = "/portal";
+    } catch {
+      setAuthError("Something went wrong. Try again.");
+      setSigningIn(false);
+    }
   }
 
   function patch(patch: Partial<ClientAccessFormCopy>) {
@@ -149,6 +184,11 @@ export function LoginCard({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {clientPortalSignIn && authError ? (
+            <div className="rounded-btn border border-red-400/40 bg-red-950/40 px-3 py-2 text-center text-xs text-red-200">
+              {authError}
+            </div>
+          ) : null}
           <div>
             {editable && activeField === "emailLabel" ? (
               <Input
@@ -190,12 +230,14 @@ export function LoginCard({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={clientPortalSignIn && signingIn}
                 className={cn(
                   "mt-2 w-full rounded-btn border border-deep-blue bg-[rgba(11,32,63,0.9)] px-4 py-2.5 text-sm text-white outline-none focus:border-mid-blue focus:ring-1 focus:ring-mid-blue",
                   editable && "cursor-text hover:ring-1 hover:ring-cyan/25"
                 )}
                 placeholder={c.emailPlaceholder}
                 autoComplete="email"
+                required={clientPortalSignIn}
                 onDoubleClick={(e) => {
                   if (editable) {
                     e.preventDefault();
@@ -246,12 +288,14 @@ export function LoginCard({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={clientPortalSignIn && signingIn}
                 className={cn(
                   "mt-2 w-full rounded-btn border border-deep-blue bg-[rgba(11,32,63,0.9)] px-4 py-2.5 text-sm text-white outline-none focus:border-mid-blue focus:ring-1 focus:ring-mid-blue",
                   editable && "cursor-text hover:ring-1 hover:ring-cyan/25"
                 )}
                 placeholder={c.passwordPlaceholder}
                 autoComplete="current-password"
+                required={clientPortalSignIn}
                 onDoubleClick={(e) => {
                   if (editable) {
                     e.preventDefault();
@@ -273,8 +317,9 @@ export function LoginCard({
           ) : (
             <button
               type="submit"
+              disabled={clientPortalSignIn && signingIn}
               className={cn(
-                "w-full rounded-btn bg-mid-blue px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-deep-blue",
+                "w-full rounded-btn bg-mid-blue px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-deep-blue disabled:opacity-60",
                 editable && "cursor-text hover:ring-1 hover:ring-cyan/35"
               )}
               onDoubleClick={(e) => {
@@ -283,7 +328,7 @@ export function LoginCard({
                 setActiveField("submitButton");
               }}
             >
-              {c.submitButton}
+              {signingIn ? "Signing in…" : c.submitButton}
             </button>
           )}
         </form>
