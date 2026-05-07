@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut } from 'lucide-react'
+import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut, ClipboardList } from 'lucide-react'
 
 const navOverview = [
   { title: 'Dashboard', href: '/admin', icon: Home },
@@ -19,6 +19,7 @@ const navOverview = [
 const navManage = [
   // { title: 'Categories', href: '/admin/categories', icon: FolderTree },
   // { title: 'Info', href: '/admin/info', icon: Info },
+  { title: 'Assessments', href: '/admin/assessments', icon: ClipboardList },
   { title: 'Users', href: '/admin/users', icon: Users },
   // { title: 'Chat', href: '/admin/chat', icon: MessageSquare },
   { title: 'Settings', href: '/admin/settings', icon: Settings },
@@ -38,14 +39,33 @@ interface SidebarProps {
 
 export function Sidebar({ children }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { data: session } = useSession()
-  
+  const { data: session, status } = useSession()
+
+  // Bounce to login if the session is lost/expired while on a dashboard page.
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      const callback = pathname && pathname.startsWith('/admin') ? pathname : '/admin'
+      router.replace(`/admin/login?callbackUrl=${encodeURIComponent(callback)}`)
+    } else if (status === 'authenticated' && session?.user?.role === 'CLIENT') {
+      router.replace('/portal')
+    }
+  }, [status, session?.user?.role, pathname, router])
+
   const isFullBleedChrome =
     pathname?.includes('/edit') || pathname?.startsWith('/admin/preview')
 
   if (isFullBleedChrome) {
     return <>{children}</>
+  }
+
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-slate-50 text-sm font-medium text-slate-500">
+        {status === 'loading' ? 'Loading…' : 'Redirecting to sign in…'}
+      </div>
+    )
   }
 
   const user = session?.user
