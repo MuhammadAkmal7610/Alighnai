@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut, ClipboardList } from 'lucide-react'
+import { Menu, Home, FileText, Grid3x3, Settings, Users, LogOut, ClipboardList, Library } from 'lucide-react'
 
 const navOverview = [
   { title: 'Dashboard', href: '/admin', icon: Home },
@@ -19,6 +19,7 @@ const navOverview = [
 const navManage = [
   // { title: 'Categories', href: '/admin/categories', icon: FolderTree },
   // { title: 'Info', href: '/admin/info', icon: Info },
+  { title: 'Resources', href: '/admin/resources', icon: Library },
   { title: 'Assessments', href: '/admin/assessments', icon: ClipboardList },
   { title: 'Users', href: '/admin/users', icon: Users },
   // { title: 'Chat', href: '/admin/chat', icon: MessageSquare },
