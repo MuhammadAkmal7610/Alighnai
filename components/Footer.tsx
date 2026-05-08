@@ -92,7 +92,7 @@ export function Footer({
               bburke@bytestream.ca
             </a>
             <a
-              href="https://www.linkedin.com/"
+              href="https://www.linkedin.com/in/brian-burke-ai/"
               target="_blank"
               rel="noreferrer"
               className=" block text-sm hover:text-white text-zinc-500 transition-colors"

@@ -100,7 +100,7 @@ export function PageRenderer({
         subtext:
           data.subtext ??
           "If you are working on AI governance architecture - or trying to understand whether you should be - this is the conversation to have. Reach out directly. No intake form, no scheduling tool, no SDR.",
-        linkedin: data.linkedin ?? "https://www.linkedin.com/",
+        linkedin: data.linkedin ?? "https://www.linkedin.com/in/brian-burke-ai/",
       }
     : null
 
@@ -900,7 +900,7 @@ export function PageRenderer({
 
                   <div className="mt-12 flex flex-wrap gap-4">
                     <Link 
-                      href={data.linkedin || "https://www.linkedin.com/"}
+                      href={data.linkedin || "https://www.linkedin.com/in/brian-burke-ai/"}
                       className="bg-mid-blue hover:bg-navy text-white font-bold py-3.5 px-8 rounded-btn transition-all text-[15px] flex items-center gap-2"
                     >
                       Connect on LinkedIn <span>→</span>
