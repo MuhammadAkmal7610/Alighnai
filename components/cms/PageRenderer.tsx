@@ -898,6 +898,33 @@ export function PageRenderer({
                     ))}
                   </div>
 
+                  {isEditing && (
+                    <div className="mt-10 grid gap-3 rounded-lg border border-cyan/30 bg-cyan/5 p-4 sm:grid-cols-2">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-navy">
+                          LinkedIn button URL
+                        </Label>
+                        <Input
+                          value={data.linkedin || ""}
+                          onChange={(e) => updateMetadata("linkedin", e.target.value)}
+                          placeholder="https://www.linkedin.com/in/…"
+                          className="h-9 bg-white border-slate-200 font-mono text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-navy">
+                          Contact email
+                        </Label>
+                        <Input
+                          value={data.email || ""}
+                          onChange={(e) => updateMetadata("email", e.target.value)}
+                          placeholder="name@example.com"
+                          className="h-9 bg-white border-slate-200 font-mono text-xs"
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mt-12 flex flex-wrap gap-4">
                     <Link 
                       href={data.linkedin || "https://www.linkedin.com/in/brian-burke-ai/"}

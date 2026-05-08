@@ -1,39 +1,44 @@
-"use client";
+import Image from "next/image";
+import { getSiteSettings } from "@/lib/site-settings-server";
+import { getSiteSettingsRow, brandingFromMetadata } from "@/lib/site-theme-server";
 
-import React, { useEffect, useState } from "react";
-
-export default function Loading() {
-  const [dots, setDots] = useState("");
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
-    }, 400);
-    return () => clearInterval(interval);
-  }, []);
+export default async function Loading() {
+  const [siteSettings, settingsRow] = await Promise.all([
+    getSiteSettings(),
+    getSiteSettingsRow().catch(() => null),
+  ]);
+  const { logoUrl } = brandingFromMetadata(settingsRow?.metadata);
+  const { title, subtitle } = siteSettings.loader;
 
   return (
     <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white">
-      <div className="relative flex items-center justify-center mb-8">
-        <div className="absolute w-32 h-32 border-4 border-blue-500/20 rounded-full animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
-        <div className="absolute w-20 h-20 border-4 border-blue-600 rounded-full border-t-transparent animate-[spin_1.5s_linear_infinite]" />
-        <div className="absolute w-14 h-14 border-4 border-blue-400 rounded-full border-b-transparent animate-[spin_2s_ease-in-out_infinite_reverse]" />
-        <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse shadow-[0_0_20px_rgba(37,99,235,0.8)]" />
-      </div>
-      <div className="text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-2 font-sans">
-          AlignAI<span className="text-blue-600">.</span>
-        </h2>
-        <div className="flex items-center justify-center gap-1 min-w-[100px]">
-          <span className="text-sm font-medium text-slate-500 font-sans tracking-wide uppercase">
-            Loading Experience
-          </span>
-          <div className="flex items-center gap-1 ml-2">
-            <span className="w-1.5 h-1.5 bg-blue-600/80 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-            <span className="w-1.5 h-1.5 bg-blue-600/80 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-            <span className="w-1.5 h-1.5 bg-blue-600/80 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-          </div>
-        </div>
+      <div className="flex flex-col items-center gap-6">
+        {logoUrl ? (
+          <Image
+            src={logoUrl}
+            alt={title}
+            width={120}
+            height={32}
+            className="h-10 w-auto opacity-90"
+            priority
+          />
+        ) : (
+          <h2 className="font-heading text-xl font-bold text-slate-900">
+            {title}
+          </h2>
+        )}
+
+        <div
+          className="h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900"
+          role="status"
+          aria-label="Loading"
+        />
+
+        {subtitle ? (
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+            {subtitle}
+          </p>
+        ) : null}
       </div>
     </div>
   );

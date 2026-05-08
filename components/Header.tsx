@@ -6,15 +6,11 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DEFAULT_LOGO_URL } from "@/lib/site-theme";
-
-const NAV_LINKS = [
-  { href: "/site", label: "Home" },
-  { href: "/site/framework", label: "The Framework" },
-  { href: "/site/services", label: "Services" },
-  { href: "/site/about", label: "About" },
-  { href: "/site/insights", label: "Insights" },
-  { href: "/site/contact", label: "Contact" },
-];
+import {
+  DEFAULT_NAV_ITEMS,
+  type CtaButton,
+  type NavItem,
+} from "@/lib/site-settings";
 
 export type HeaderNavLink = { href: string; label: string };
 
@@ -23,7 +19,14 @@ interface HeaderProps {
   pathname?: string; // Allow overriding pathname for editor preview
   /** When true (e.g. CMS iframe preview), nav links do not navigate — avoids leaving the editor */
   suppressNavigation?: boolean;
-  /** Appended after core links — from CMS page metadata (showInNav) */
+  /** Primary navigation list driven from CMS Settings */
+  navItems?: NavItem[];
+  /** Optional CTA button rendered to the right of the nav */
+  cta?: CtaButton;
+  /**
+   * Extra links appended after the configured `navItems` — typically pages
+   * that opt-in via `metadata.showInNav` on the page record.
+   */
   extraNavLinks?: HeaderNavLink[];
   /** Admin → Settings → Branding */
   logoUrl?: string;
@@ -33,6 +36,8 @@ export function Header({
   className,
   pathname: propPathname,
   suppressNavigation,
+  navItems,
+  cta,
   extraNavLinks = [],
   logoUrl = DEFAULT_LOGO_URL,
 }: HeaderProps) {
@@ -56,12 +61,23 @@ export function Header({
     return effectivePathname.startsWith(href);
   }
 
-  const coreHrefs = new Set(NAV_LINKS.map((l) => l.href));
-  const extrasFiltered = extraNavLinks.filter((l) => !coreHrefs.has(l.href));
-  const navLinks: HeaderNavLink[] = [
-    ...NAV_LINKS.map((l) => ({ href: l.href, label: l.label })),
-    ...extrasFiltered,
+  const baseItems = (
+    navItems && navItems.length ? navItems : DEFAULT_NAV_ITEMS
+  ).filter((i) => !i.hidden);
+
+  const baseHrefs = new Set(baseItems.map((l) => l.href));
+  const extrasFiltered = extraNavLinks.filter((l) => !baseHrefs.has(l.href));
+
+  const navLinks: NavItem[] = [
+    ...baseItems,
+    ...extrasFiltered.map((l) => ({ label: l.label, href: l.href })),
   ];
+
+  function navAnchorProps(item: NavItem) {
+    const target = item.openInNewTab ? "_blank" : undefined;
+    const rel = item.openInNewTab ? "noopener noreferrer" : undefined;
+    return { target, rel };
+  }
 
   return (
     <header
@@ -95,24 +111,42 @@ export function Header({
           />
         </Link>
 
-        <nav className="hidden md:block" aria-label="Primary navigation">
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className={`relative pb-1 text-[13px] font-semibold uppercase tracking-[0.07em] transition-colors ${isActive(link.href)
-                      ? "text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-cyan"
-                      : "text-light-slate hover:text-white"
+        <div className="hidden items-center gap-6 md:flex">
+          <nav aria-label="Primary navigation">
+            <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    {...navAnchorProps(link)}
+                    className={`relative pb-1 text-[13px] font-semibold uppercase tracking-[0.07em] transition-colors ${
+                      isActive(link.href)
+                        ? "text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-cyan"
+                        : "text-light-slate hover:text-white"
                     }`}
-                  onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+                    onClick={
+                      suppressNavigation ? (e) => e.preventDefault() : undefined
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {cta ? (
+            <Link
+              href={cta.href}
+              target={cta.openInNewTab ? "_blank" : undefined}
+              rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
+              onClick={suppressNavigation ? (e) => e.preventDefault() : undefined}
+              className="inline-flex h-10 items-center rounded-btn bg-cyan px-5 text-[13px] font-bold uppercase tracking-[0.07em] text-navy transition-colors hover:bg-white"
+            >
+              {cta.label}
+            </Link>
+          ) : null}
+        </div>
 
         <button
           type="button"
@@ -160,8 +194,10 @@ export function Header({
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`text-xl font-bold uppercase tracking-widest ${isActive(link.href) ? "text-cyan" : "text-white"
-                    }`}
+                  {...navAnchorProps(link)}
+                  className={`text-xl font-bold uppercase tracking-widest ${
+                    isActive(link.href) ? "text-cyan" : "text-white"
+                  }`}
                   onClick={(e) => {
                     if (suppressNavigation) e.preventDefault();
                     setMobileOpen(false);
@@ -171,6 +207,22 @@ export function Header({
                 </Link>
               </li>
             ))}
+            {cta ? (
+              <li>
+                <Link
+                  href={cta.href}
+                  target={cta.openInNewTab ? "_blank" : undefined}
+                  rel={cta.openInNewTab ? "noopener noreferrer" : undefined}
+                  onClick={(e) => {
+                    if (suppressNavigation) e.preventDefault();
+                    setMobileOpen(false);
+                  }}
+                  className="inline-flex h-12 items-center rounded-btn bg-cyan px-6 text-sm font-bold uppercase tracking-[0.1em] text-navy"
+                >
+                  {cta.label}
+                </Link>
+              </li>
+            ) : null}
           </ul>
         </nav>
       )}
